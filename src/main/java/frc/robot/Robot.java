@@ -5,11 +5,8 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-
 // Systems
-import frc.robot.systems.FSMSystem;
-import frc.robot.systems.AutoHandlerSystem;
-import frc.robot.systems.AutoHandlerSystem.AutoPath;
+import frc.robot.systems.DriveFSMSystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -17,13 +14,8 @@ import frc.robot.systems.AutoHandlerSystem.AutoPath;
  */
 public class Robot extends TimedRobot {
 	private TeleopInput input;
-
 	// Systems
-	private FSMSystem subSystem1;
-	private FSMSystem subSystem2;
-	private FSMSystem subSystem3;
-
-	private AutoHandlerSystem autoHandler;
+	private DriveFSMSystem driveFSMSystem;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -33,38 +25,30 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		System.out.println("robotInit");
 		input = new TeleopInput();
-
 		// Instantiate all systems here
-		subSystem1 = new FSMSystem();
-		subSystem2 = new FSMSystem();
-		subSystem3 = new FSMSystem();
-		autoHandler = new AutoHandlerSystem(subSystem1, subSystem2, subSystem3);
+		driveFSMSystem = new DriveFSMSystem();
 	}
-
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		autoHandler.reset(AutoPath.PATH1);
+		driveFSMSystem.resetAutonomus();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		autoHandler.update();
+		driveFSMSystem.update(null);
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		subSystem1.reset();
-		subSystem2.reset();
-		subSystem3.reset();
+		driveFSMSystem.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		subSystem1.update(input);
-		subSystem2.update(input);
-		subSystem3.update(input);
+		driveFSMSystem.update(input);
+
 	}
 
 	@Override
@@ -74,16 +58,6 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void disabledPeriodic() {
-
-	}
-
-	@Override
-	public void testInit() {
-		System.out.println("-------- Test Init --------");
-	}
-
-	@Override
-	public void testPeriodic() {
 
 	}
 
