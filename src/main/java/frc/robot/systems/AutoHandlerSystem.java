@@ -5,13 +5,11 @@ public class AutoHandlerSystem {
 	// Auto FSM state definitions
 	public enum AutoFSMState {
 		STATE1,
-		STATE2,
-		STATE3
+		STATE2
 	}
 	public enum AutoPath {
 		PATH1,
-		PATH2,
-		PATH3
+		PATH2
 	}
 
 	/* ======================== Private variables ======================== */
@@ -22,19 +20,16 @@ public class AutoHandlerSystem {
 	private int currentStateIndex;
 
 	//FSM Systems that the autoHandlerFSM uses
-	private FSMSystem subsystem1;
-	private FSMSystem subsystem2;
-	private FSMSystem subsystem3;
+	private DriveFSMSystem driveSystem;
+	// private FSMSystem subsystem2;
+	// private FSMSystem subsystem3;
 
 	//Predefined auto paths
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
-		AutoFSMState.STATE1, AutoFSMState.STATE2, AutoFSMState.STATE3};
+		AutoFSMState.STATE1, AutoFSMState.STATE2};
 
 	private static final AutoFSMState[] PATH2 = new AutoFSMState[]{
-		AutoFSMState.STATE3, AutoFSMState.STATE2, AutoFSMState.STATE1};
-
-	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{
-		AutoFSMState.STATE1, AutoFSMState.STATE3, AutoFSMState.STATE2};
+		AutoFSMState.STATE2, AutoFSMState.STATE1};
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state.
@@ -43,10 +38,10 @@ public class AutoHandlerSystem {
 	 * @param fsm2 the second subsystem that the auto handler will call functions on
 	 * @param fsm3 the third subsystem that the auto handler will call functions on
 	 */
-	public AutoHandlerSystem(FSMSystem fsm1, FSMSystem fsm2, FSMSystem fsm3) {
-		subsystem1 = fsm1;
-		subsystem2 = fsm2;
-		subsystem3 = fsm3;
+	public AutoHandlerSystem(DriveFSMSystem fsm1) {
+		driveSystem = fsm1;
+		// subsystem2 = fsm2;
+		// subsystem3 = fsm3;
 	}
 
 	/* ======================== Public methods ======================== */
@@ -68,17 +63,15 @@ public class AutoHandlerSystem {
 	 * @param path the auto path to be executed
 	 */
 	public void reset(AutoPath path) {
-		subsystem1.reset();
-		subsystem2.reset();
-		subsystem3.reset();
+		driveSystem.reset();
+		// subsystem2.reset();
+		// subsystem3.reset();
 
 		currentStateIndex = 0;
 		if (path == AutoPath.PATH1) {
 			currentStateList = PATH1;
 		} else if (path == AutoPath.PATH2) {
 			currentStateList = PATH2;
-		} else if (path == AutoPath.PATH3) {
-			currentStateList = PATH3;
 		}
 	}
 
@@ -94,19 +87,10 @@ public class AutoHandlerSystem {
 		System.out.println("In State: " + getCurrentState());
 		switch (getCurrentState()) {
 			case STATE1:
-				isCurrentStateFinished = subsystem1.updateAutonomous(AutoFSMState.STATE1)
-					&& subsystem2.updateAutonomous(AutoFSMState.STATE1)
-					&& subsystem3.updateAutonomous(AutoFSMState.STATE1);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.STATE1);
 				break;
 			case STATE2:
-				isCurrentStateFinished = subsystem1.updateAutonomous(AutoFSMState.STATE2)
-					&& subsystem2.updateAutonomous(AutoFSMState.STATE2)
-					&& subsystem3.updateAutonomous(AutoFSMState.STATE2);
-				break;
-			case STATE3:
-				isCurrentStateFinished = subsystem1.updateAutonomous(AutoFSMState.STATE3)
-					&& subsystem2.updateAutonomous(AutoFSMState.STATE3)
-					&& subsystem3.updateAutonomous(AutoFSMState.STATE3);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.STATE2);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());
