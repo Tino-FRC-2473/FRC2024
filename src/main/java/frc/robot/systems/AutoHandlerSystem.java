@@ -4,8 +4,8 @@ public class AutoHandlerSystem {
 	/* ======================== Constants ======================== */
 	// Auto FSM state definitions
 	public enum AutoFSMState {
-		STATE1,
-		STATE2
+		AUTO_STATE,
+		ALIGN_TO_TAG_STATE
 	}
 	public enum AutoPath {
 		PATH1,
@@ -26,10 +26,10 @@ public class AutoHandlerSystem {
 
 	//Predefined auto paths
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
-		AutoFSMState.STATE1, AutoFSMState.STATE2};
+		AutoFSMState.AUTO_STATE};
 
 	private static final AutoFSMState[] PATH2 = new AutoFSMState[]{
-		AutoFSMState.STATE2, AutoFSMState.STATE1};
+		AutoFSMState.AUTO_STATE};
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state.
@@ -86,11 +86,8 @@ public class AutoHandlerSystem {
 		boolean isCurrentStateFinished;
 		System.out.println("In State: " + getCurrentState());
 		switch (getCurrentState()) {
-			case STATE1:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.STATE1);
-				break;
-			case STATE2:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.STATE2);
+			case AUTO_STATE:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.AUTO_STATE);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());

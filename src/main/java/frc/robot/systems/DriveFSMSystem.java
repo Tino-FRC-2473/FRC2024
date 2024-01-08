@@ -21,6 +21,7 @@ import edu.wpi.first.math.MathUtil;
 
 // Robot Imports
 import frc.robot.TeleopInput;
+import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 import frc.robot.utils.SwerveUtils;
 import frc.robot.HardwareMap;
 import frc.robot.RaspberryPI;
@@ -35,7 +36,7 @@ public class DriveFSMSystem {
 	public enum FSMState {
 		TELEOP_STATE,
 		AUTO_STATE,
-		DRIVE_TO_CONE_STATE
+		ALIGN_TO_TAG_STATE
 	}
 
 	/* ======================== Private variables ======================== */
@@ -151,13 +152,37 @@ public class DriveFSMSystem {
 	 */
 
 	public void resetAutonomus() {
-		currentState = FSMState.DRIVE_TO_CONE_STATE;
+		currentState = FSMState.AUTO_STATE;
 		currentPointInPath = 0;
 
 		//resetEncoders();
 		resetOdometry(getPose());
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
+	}
+
+	/**
+	 * Performs specific action based on the autoState passed in.
+	 * @param autoState autoState that the subsystem executes.
+	 * @return if the action carried out in this state has finished executing
+	 */
+	public boolean updateAutonomous(AutoFSMState autoState) {
+		odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()),
+			new SwerveModulePosition[] {
+				frontLeft.getPosition(),
+				frontRight.getPosition(),
+				rearLeft.getPosition(),
+				rearRight.getPosition()});
+
+		SmartDashboard.putNumber("X Pos", getPose().getX());
+		SmartDashboard.putNumber("Y Pos", getPose().getY());
+
+		switch (autoState) {
+			case AUTO_STATE:
+				driveToPose(new Pose2d(1, 1, new Rotation2d(Math.toRadians(0))));
+			default:
+				return true;
+		}
 	}
 
 	/**
@@ -196,32 +221,20 @@ public class DriveFSMSystem {
 		n++;
 		switch (currentState) {
 			case TELEOP_STATE:
-				if (input != null) {
-					drive(-MathUtil.applyDeadband((input.getControllerLeftJoystickY()
-						* Math.abs(input.getControllerLeftJoystickY())),
-						OIConstants.DRIVE_DEADBAND),
-						-MathUtil.applyDeadband((input.getControllerLeftJoystickX()
-						* Math.abs(input.getControllerLeftJoystickX())),
-						OIConstants.DRIVE_DEADBAND),
-						-MathUtil.applyDeadband(input.getControllerRightJoystickX(),
-						OIConstants.DRIVE_DEADBAND), true, true);
-					if (input.isBackButtonPressed()) {
-						gyro.reset();
-					}
+				drive(-MathUtil.applyDeadband((input.getControllerLeftJoystickY()
+					* Math.abs(input.getControllerLeftJoystickY())),
+					OIConstants.DRIVE_DEADBAND),
+					-MathUtil.applyDeadband((input.getControllerLeftJoystickX()
+					* Math.abs(input.getControllerLeftJoystickX())),
+					OIConstants.DRIVE_DEADBAND),
+					-MathUtil.applyDeadband(input.getControllerRightJoystickX(),
+					OIConstants.DRIVE_DEADBAND), true, true);
+				if (input.isBackButtonPressed()) {
+					gyro.reset();
 				}
 				break;
 
-			case AUTO_STATE:
-				if (input == null) {
-					driveToPose(new Pose2d(1, 1, new Rotation2d(Math.toRadians(0))));
-					// ArrayList<Pose2d> points = new ArrayList<Pose2d>();
-					// points.add(new Pose2d(1, 1, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					// driveAlongPath(points);
-				}
-				break;
-
-			case DRIVE_TO_CONE_STATE:
+			case ALIGN_TO_TAG_STATE:
 				double dist = rpi.getConeDistance();
 				double angle = rpi.getConeYaw();
 				boolean canSee = (dist == -1 || angle == -1);
@@ -258,16 +271,16 @@ public class DriveFSMSystem {
 		switch (currentState) {
 			case TELEOP_STATE:
 				if (input.isCircleButtonPressed()) {
-					return FSMState.DRIVE_TO_CONE_STATE;
+					return FSMState.ALIGN_TO_TAG_STATE;
 				}
 				return FSMState.TELEOP_STATE;
 			case AUTO_STATE:
 				return FSMState.AUTO_STATE;
-			case DRIVE_TO_CONE_STATE:
+			case ALIGN_TO_TAG_STATE:
 				if (input.isCircleButtonReleased()) {
 					return FSMState.TELEOP_STATE;
 				}
-				return FSMState.DRIVE_TO_CONE_STATE;
+				return FSMState.ALIGN_TO_TAG_STATE;
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
