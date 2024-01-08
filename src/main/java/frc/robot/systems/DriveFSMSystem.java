@@ -49,7 +49,7 @@ public class DriveFSMSystem {
 	// The gyro sensor
 	private AHRS gyro;
 
-	private RaspberryPI rpi = new RaspberryPI();
+	private RaspberryPI rpi;
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double currentRotation = 0.0;
@@ -101,6 +101,7 @@ public class DriveFSMSystem {
 	public DriveFSMSystem() {
 		// Perform hardware init
 		gyro = new AHRS(SPI.Port.kMXP);
+		rpi = new RaspberryPI();
 
 		// Reset state machine
 		reset();
@@ -136,8 +137,7 @@ public class DriveFSMSystem {
 	public void reset() {
 		currentState = FSMState.TELEOP_STATE;
 
-		//resetEncoders();
-		resetOdometry(getPose());
+		resetOdometry(new Pose2d());
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -155,8 +155,7 @@ public class DriveFSMSystem {
 		currentState = FSMState.AUTO_STATE;
 		currentPointInPath = 0;
 
-		//resetEncoders();
-		resetOdometry(getPose());
+		resetOdometry(new Pose2d());
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -179,9 +178,9 @@ public class DriveFSMSystem {
 
 		switch (autoState) {
 			case AUTO_STATE:
-				driveToPose(new Pose2d(1, 1, new Rotation2d(Math.toRadians(0))));
+				return driveToPose(new Pose2d(1, 1, new Rotation2d(Math.toRadians(0))));
 			default:
-				return true;
+				return false;
 		}
 	}
 
