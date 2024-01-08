@@ -15,21 +15,7 @@ public class TeleopInput {
 	/* ======================== Constants ======================== */
 	private static final int LEFT_JOYSTICK_PORT = 1;
 	private static final int RIGHT_JOYSTICK_PORT = 2;
-	private static final int ELEVATOR_HIGH_BUTTON = 7;
-	private static final int ELEVATOR_MID_BUTTON = 9;
-	private static final int ELEVATOR_LOW_BUTTON = 11;
-	private static final int WRIST_IN_BUTTON = 6;
-	private static final int WRIST_OUT_BUTTON = 4;
-	private static final int WRIST_IN_BUTTON_DOUBLE = 5;
-	private static final int WRIST_OUT_BUTTON_DOUBLE = 3;
-	private static final int ABORT_FLIP_BUTTON = 12;
-	private static final int INTAKE_BUTTON = 2;
-	private static final int FLIP_BUTTON = 10;
-	private static final int ARM_ZERO_BUTTON = 8;
-	//private static final int WRIST_ZERO_BUTTON = -1;
-
 	public static final int DRIVER_CONTROLLER_PORT = 0;
-
 
 	/* ======================== Private variables ======================== */
 	// Input objects
@@ -129,14 +115,6 @@ public class TeleopInput {
 		return leftJoystick.getRawButton(1);
 	}
 
-	/**
-	 * Get the value of the flip button.
-	 * @return True if the button is pressed
-	 */
-	public boolean isFlipButtonPressed() {
-		return leftJoystick.getRawButtonPressed(FLIP_BUTTON);
-	}
-
 	/* ------------------------ Right Joystick ------------------------ */
 	/**
 	 * Get X axis of Right Joystick.
@@ -154,91 +132,11 @@ public class TeleopInput {
 	}
 
 	/**
-	 * Get the value of the high button.
-	 * @return True if button is pressed
-	 */
-	public boolean isHighButtonPressed() {
-		return leftJoystick.getRawButton(ELEVATOR_HIGH_BUTTON);
-	}
-
-	/**
-	 * Get the value of the mid button.
-	 * @return True if button is pressed
-	 */
-	public boolean isMidButtonPressed() {
-		return leftJoystick.getRawButton(ELEVATOR_MID_BUTTON);
-	}
-
-	/**
-	 * Get the value of the low button.
-	 * @return True if button is pressed
-	 */
-	public boolean isLowButtonPressed() {
-		return leftJoystick.getRawButton(ELEVATOR_LOW_BUTTON);
-	}
-
-	/**
 	 * Get the value of the release button.
 	 * @return True if button is pressed
 	 */
 	public boolean isOuttakeButtonPressed() {
 		return leftJoystick.getTrigger();
-	}
-
-	/**
-	 * Get the value of the wrist down button.
-	 * @return True if button is pressed
-	 */
-	public boolean isWristOutButtonPressed() {
-		return leftJoystick.getRawButton(WRIST_OUT_BUTTON);
-	}
-
-	/**
-	 * Get the value of the wrist up button.
-	 * @return True if button is pressed
-	 */
-	public boolean isWristInButtonPressed() {
-		return leftJoystick.getRawButton(WRIST_IN_BUTTON);
-	}
-
-		/**
-	 * Get the value of the wrist down button.
-	 * @return True if button is pressed
-	 */
-	public boolean isWristOutDoubleButtonPressed() {
-		return leftJoystick.getRawButton(WRIST_OUT_BUTTON_DOUBLE);
-	}
-
-	/**
-	 * Get the value of the wrist up button.
-	 * @return True if button is pressed
-	 */
-	public boolean isWristInDoubleButtonPressed() {
-		return leftJoystick.getRawButton(WRIST_IN_BUTTON_DOUBLE);
-	}
-
-	/**
-	 * Get the value of the flip abort button.
-	 * @return True if button is pressed
-	 */
-	public boolean isFlipAbortButtonPressed() {
-		return leftJoystick.getRawButton(ABORT_FLIP_BUTTON);
-	}
-
-	/**
-	 * Get the value of the fine tuning button.
-	 * @return True if button is pressed
-	 */
-	public boolean isIntakeButtonPressed() {
-		return leftJoystick.getRawButton(INTAKE_BUTTON);
-	}
-
-	/**
-	 * Get the value of the arm zero button.
-	 * @return True if button is pressed
-	 */
-	public boolean isArmZeroButtonPressed() {
-		return leftJoystick.getRawButton(ARM_ZERO_BUTTON);
 	}
 
 	/**
