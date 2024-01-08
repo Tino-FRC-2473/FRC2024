@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import os
+import apriltag
 
 # basically fixes the intrinsic parameters and is the class that returns the 3D stuff
 # printed 3dpose --> tvec (x: left/right, y: up/down, z: front/back), rvec
@@ -120,11 +121,16 @@ class AprilTag():
 
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-            # Create an AprilTag detector
-            aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_16h5)
-            detector = cv2.aruco.ArucoDetector(aruco_dict)
-            # Detect AprilTags in the image
-            corners, ids, rejected_img_points = detector.detectMarkers(gray)
+            # aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_16h5)
+            # detector = cv2.aruco.ArucoDetector(aruco_dict)
+            # corners, ids, rejected_img_points = detector.detectMarkers(gray)
+
+            options = apriltag.DetectorOptions(families='tag36h11')  # You can choose a different tag family if needed
+            detector = apriltag.Detector(options)
+            results = detector.detect(gray)
+            corners = [res.corners for res in results]
+            ids = [res.tag_id for res in results]
+
             pose_data = {}
             num_tags = len(ids) if ids is not None else 0
             #print(str(num_tags) + ' AprilTags detected')
