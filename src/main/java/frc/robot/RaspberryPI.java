@@ -1,4 +1,5 @@
 package frc.robot;
+import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -12,10 +13,7 @@ public class RaspberryPI {
 
 	//FPS Calculation
 	private DoubleSubscriber fpsCounter;
-	private DoubleSubscriber cubeYawSubscriber;
-	private DoubleSubscriber cubeDistanceSubscriber;
-	private DoubleSubscriber coneYawSubscriber;
-	private DoubleSubscriber coneDistanceSubscriber;
+	private DoubleArraySubscriber tagSubscriber;
 	private double previousValueReceived = 0;
 	private double previousTimeReceived = 0;
 	private Timer timer = new Timer();
@@ -25,51 +23,12 @@ public class RaspberryPI {
 		timer.start();
 		table = NetworkTableInstance.getDefault().getTable(NetworkTablesConstants.TABLE_NAME);
 		fpsCounter = table.getDoubleTopic("x").subscribe(-1);
-		cubeYawSubscriber = table.getDoubleTopic(
-			NetworkTablesConstants.CUBE_YAW_TOPIC).subscribe(-1);
-		cubeDistanceSubscriber = table.getDoubleTopic(
-			NetworkTablesConstants.CUBE_DISTANCE_TOPIC).subscribe(-1);
-		coneYawSubscriber = table.getDoubleTopic(
-			NetworkTablesConstants.CONE_YAW_TOPIC).subscribe(-1);
-		coneDistanceSubscriber = table.getDoubleTopic(
-			NetworkTablesConstants.CUBE_DISTANCE_TOPIC).subscribe(-1);
+		tagSubscriber = table.getDoubleArrayTopic("april_tag_data").subscribe(null);
 	}
 
 	/**Updates the values in SmartDashboard. */
 	public void update() {
 		updateFPS();
-	}
-
-	/**
-	 * Gets the yaw to the cube.
-	 * @return returns the horizontal angle between the cube and the camera in degrees.
-	 */
-	public double getCubeYaw() {
-		return cubeYawSubscriber.get();
-	}
-
-	/**
-	 * Gets the yaw to the cone.
-	 * @return returns the horizontal angle between the cone and the camera in degrees.
-	 */
-	public double getConeYaw() {
-		return coneYawSubscriber.get();
-	}
-
-	/**
-	 * Gets the distance to the cube.
-	 * @return returns the distance to the cube in meters.
-	 */
-	public double getCubeDistance() {
-		return cubeDistanceSubscriber.get();
-	}
-
-	/**
-	 * Gets the distance to the cone.
-	 * @return returns the distance to the cone in meters.
-	 */
-	public double getConeDistance() {
-		return coneDistanceSubscriber.get();
 	}
 
 	/**
