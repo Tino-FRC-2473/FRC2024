@@ -35,7 +35,6 @@ public class DriveFSMSystem {
 	// FSM state definitions
 	public enum FSMState {
 		TELEOP_STATE,
-		AUTO_STATE,
 		ALIGN_TO_TAG_STATE
 	}
 
@@ -47,7 +46,7 @@ public class DriveFSMSystem {
 	// be private to their owner system and may not be used elsewhere.
 
 	// The gyro sensor
-	private AHRS gyro;
+	private AHRS gyro = new AHRS(SPI.Port.kMXP);
 
 	private RaspberryPI rpi;
 
@@ -152,7 +151,6 @@ public class DriveFSMSystem {
 	 */
 
 	public void resetAutonomus() {
-		currentState = FSMState.AUTO_STATE;
 		currentPointInPath = 0;
 
 		resetOdometry(new Pose2d());
@@ -218,6 +216,9 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
 		n++;
+		if (input == null) {
+			return;
+		}
 		switch (currentState) {
 			case TELEOP_STATE:
 				drive(-MathUtil.applyDeadband((input.getControllerLeftJoystickY()
@@ -273,10 +274,8 @@ public class DriveFSMSystem {
 					return FSMState.ALIGN_TO_TAG_STATE;
 				}
 				return FSMState.TELEOP_STATE;
-			case AUTO_STATE:
-				return FSMState.AUTO_STATE;
 			case ALIGN_TO_TAG_STATE:
-				if (input.isCircleButtonReleased()) {
+				if (!input.isCircleButtonPressed()) {
 					return FSMState.TELEOP_STATE;
 				}
 				return FSMState.ALIGN_TO_TAG_STATE;

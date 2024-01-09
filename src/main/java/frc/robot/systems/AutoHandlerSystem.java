@@ -4,8 +4,7 @@ public class AutoHandlerSystem {
 	/* ======================== Constants ======================== */
 	// Auto FSM state definitions
 	public enum AutoFSMState {
-		AUTO_STATE,
-		ALIGN_TO_TAG_STATE
+		AUTO_STATE
 	}
 	public enum AutoPath {
 		PATH1,
@@ -35,8 +34,6 @@ public class AutoHandlerSystem {
 	 * Create FSMSystem and initialize to starting state.
 	 * Initializes any subsystems such as driveFSM, armFSM, ect.
 	 * @param fsm1 the first subsystem that the auto handler will call functions on
-	 * @param fsm2 the second subsystem that the auto handler will call functions on
-	 * @param fsm3 the third subsystem that the auto handler will call functions on
 	 */
 	public AutoHandlerSystem(DriveFSMSystem fsm1) {
 		driveSystem = fsm1;
