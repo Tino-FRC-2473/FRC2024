@@ -11,8 +11,9 @@ import apriltag
 class AprilTag():
 
     def __init__(self):
-        self.camera_matrix = np.load('calibration_data/camera2_matrix.npy')
-        self.dist_coeffs = np.load('calibration_data/camera2_dist.npy')
+        # self.camera_matrix = np.load('calibration_data/camera2_matrix.npy')
+        # self.dist_coeffs = np.load('calibration_data/camera2_dist.npy')
+        pass
 
     def calibrate(self, dirpath, square_size, width, height, visualize=False):
         """ Apply camera calibration operation for images in the given directory path. """
@@ -32,6 +33,7 @@ class AprilTag():
 
         images = os.listdir(dirpath)
         for fname in images:
+            print(fname)
             img = cv2.imread(os.path.join(dirpath, fname))
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -56,8 +58,8 @@ class AprilTag():
         self.camera_matrix = mtx
         self.dist_coeffs = dist
 
-        np.save('calibration_data/camera2_matrix.npy',mtx)
-        np.save('calibration_data/camera2_dist.npy',dist)
+        np.save('/Users/tanmayidasari/FRC2024/src/main/python/calibration_data/camera1_matrix.npy',mtx)
+        np.save('/Users/tanmayidasari/FRC2024/src/main/python/calibration_data/camera1_dist.npy',dist)
 
     def draw_axis_on_image(self, image, camera_matrix, dist_coeffs, rvec, tvec, size=1):
         try:
@@ -124,9 +126,9 @@ class AprilTag():
             # aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_16h5)
             # detector = cv2.aruco.ArucoDetector(aruco_dict)
             # corners, ids, rejected_img_points = detector.detectMarkers(gray)
-
-            options = apriltag.DetectorOptions(families='tag36h11')  # You can choose a different tag family if needed
-            detector = apriltag.Detector(options)
+            
+            #options = apriltag.DetectorOptions(families='tag36h11')
+            detector = apriltag.Detector()
             results = detector.detect(gray)
             corners = [res.corners for res in results]
             ids = [res.tag_id for res in results]

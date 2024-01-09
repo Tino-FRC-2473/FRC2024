@@ -7,8 +7,12 @@ inst = ntcore.NetworkTableInstance.getDefault()
 inst.startClient4("python")
 inst.setServerTeam(2473)
 
+
+FOV = (50.28, 29.16)
 RES = (640, 480)
-input = VisionInput(RES)
+CAM_HEIGHT = 0.4
+CAM_ANGLE = -15
+input = VisionInput(FOV, RES, CAM_HEIGHT, CAM_ANGLE)
 tag_module = AprilTag()
 while True:
     frame = input.getFrame()
