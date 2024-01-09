@@ -20,8 +20,6 @@ public class AutoHandlerSystem {
 
 	//FSM Systems that the autoHandlerFSM uses
 	private DriveFSMSystem driveSystem;
-	// private FSMSystem subsystem2;
-	// private FSMSystem subsystem3;
 
 	//Predefined auto paths
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
@@ -37,8 +35,6 @@ public class AutoHandlerSystem {
 	 */
 	public AutoHandlerSystem(DriveFSMSystem fsm1) {
 		driveSystem = fsm1;
-		// subsystem2 = fsm2;
-		// subsystem3 = fsm3;
 	}
 
 	/* ======================== Public methods ======================== */
@@ -61,8 +57,6 @@ public class AutoHandlerSystem {
 	 */
 	public void reset(AutoPath path) {
 		driveSystem.resetAutonomus();
-		// subsystem2.reset();
-		// subsystem3.reset();
 
 		currentStateIndex = 0;
 		if (path == AutoPath.PATH1) {
