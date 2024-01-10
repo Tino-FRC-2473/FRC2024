@@ -43,4 +43,28 @@ public class RaspberryPI {
 		previousValueReceived = currentReceivedValue;
 		SmartDashboard.putNumber("FPS", fps);
 	}
+
+	public double getAprilTagX(int id) {
+		return tagSubscriber.get()[(6 * (id - 1))];
+	}
+	
+	public double getAprilTagY(int id) {
+		return tagSubscriber.get()[(6 * (id - 1)) + 1];
+	}
+
+	public double getAprilTagZ(int id) {
+		return tagSubscriber.get()[(6 * (id - 1)) + 2];
+	}
+
+	public double getAprilTagYaw(int id) {
+		return tagSubscriber.get()[(6 * (id - 1)) + 3];
+	}
+
+	public double getAprilTagPitch(int id) {
+		return tagSubscriber.get()[(6 * (id - 1)) + 4];
+	}
+
+	public double getAprilTagRoll(int id) {
+		return tagSubscriber.get()[(6 * (id - 1)) + 5];
+	}
 }

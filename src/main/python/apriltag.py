@@ -11,8 +11,8 @@ import apriltag
 class AprilTag():
 
     def __init__(self):
-        # self.camera_matrix = np.load('calibration_data/camera2_matrix.npy')
-        # self.dist_coeffs = np.load('calibration_data/camera2_dist.npy')
+        self.camera_matrix = np.load('calibration_data/camera1_matrix.npy')
+        self.dist_coeffs = np.load('calibration_data/camera1_dist.npy')
         pass
 
     def calibrate(self, dirpath, square_size, width, height, visualize=False):
@@ -127,11 +127,11 @@ class AprilTag():
             # detector = cv2.aruco.ArucoDetector(aruco_dict)
             # corners, ids, rejected_img_points = detector.detectMarkers(gray)
             
-            #options = apriltag.DetectorOptions(families='tag36h11')
-            detector = apriltag.Detector()
+            options = apriltag.DetectorOptions(families='tag36h11')
+            detector = apriltag.Detector(options)
             results = detector.detect(gray)
-            corners = [res.corners for res in results]
-            ids = [res.tag_id for res in results]
+            corners = tuple(res.corners[:, np.newaxis] for res in results)
+            ids = [[res.tag_id] for res in results]
 
             pose_data = {}
             num_tags = len(ids) if ids is not None else 0
