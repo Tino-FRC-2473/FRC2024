@@ -63,7 +63,7 @@ public class AutoHandlerSystem {
 	 * @param path the auto path to be executed
 	 */
 	public void reset(AutoPath path) {
-		driveSystem.reset();
+		driveSystem.resetAutonomus();
 		// subsystem2.reset();
 		// subsystem3.reset();
 

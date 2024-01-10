@@ -47,8 +47,7 @@ public class DriveFSMSystem {
 	// be private to their owner system and may not be used elsewhere.
 
 	// The gyro sensor
-	private AHRS gyro;
-
+	private AHRS gyro = new AHRS(SPI.Port.kMXP);
 	private RaspberryPI rpi = new RaspberryPI();
 
 	// Slew rate filter variables for controlling lateral acceleration
@@ -100,7 +99,7 @@ public class DriveFSMSystem {
 	 */
 	public DriveFSMSystem() {
 		// Perform hardware init
-		gyro = new AHRS(SPI.Port.kMXP);
+		//gyro = new AHRS(SPI.Port.kMXP);
 
 		// Reset state machine
 		reset();
@@ -137,7 +136,7 @@ public class DriveFSMSystem {
 		currentState = FSMState.TELEOP_STATE;
 
 		//resetEncoders();
-		resetOdometry(getPose());
+		resetOdometry(new Pose2d());
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -156,7 +155,7 @@ public class DriveFSMSystem {
 		currentPointInPath = 0;
 
 		//resetEncoders();
-		resetOdometry(getPose());
+		resetOdometry(new Pose2d());
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -179,9 +178,9 @@ public class DriveFSMSystem {
 
 		switch (autoState) {
 			case AUTO_STATE:
-				driveToPose(new Pose2d(1, 1, new Rotation2d(Math.toRadians(0))));
+				return driveToPose(new Pose2d(1, 1, new Rotation2d(Math.toRadians(0))));
 			default:
-				return true;
+				return false;
 		}
 	}
 
@@ -221,6 +220,10 @@ public class DriveFSMSystem {
 		n++;
 		switch (currentState) {
 			case TELEOP_STATE:
+				if (input == null) {
+					System.out.println("Input is NULL");
+					break;
+				}
 				drive(-MathUtil.applyDeadband((input.getControllerLeftJoystickY()
 					* Math.abs(input.getControllerLeftJoystickY())),
 					OIConstants.DRIVE_DEADBAND),
