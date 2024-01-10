@@ -392,7 +392,7 @@ public class DriveFSMSystem {
 		double xDiff = x - getPose().getX();
 		double yDiff = y - getPose().getY();
 		double aDiff = angle - getPose().getRotation().getDegrees();
-		double travelAngle = Math.atan2(yDiff, xDiff);
+
 		System.out.println("Xdiff: " + xDiff);
 		System.out.println("Ydiff: " + yDiff);
 		System.out.println("adiff: " + aDiff);
