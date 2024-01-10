@@ -84,13 +84,6 @@ public class TeleopInput {
 	public boolean isCircleButtonPressed() {
 		return driverController.getCircleButtonPressed();
 	}
-	/**
-	 * Get the value of the Circle button.
-	 * @return True if button is released
-	 */
-	public boolean isCircleButtonReleased() {
-		return driverController.getCircleButtonReleased();
-	}
 
 	/* ------------------------ Left Joystick ------------------------ */
 	/**

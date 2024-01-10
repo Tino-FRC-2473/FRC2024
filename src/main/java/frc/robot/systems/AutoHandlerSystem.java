@@ -4,8 +4,7 @@ public class AutoHandlerSystem {
 	/* ======================== Constants ======================== */
 	// Auto FSM state definitions
 	public enum AutoFSMState {
-		AUTO_STATE,
-		ALIGN_TO_TAG_STATE
+		AUTO_STATE
 	}
 	public enum AutoPath {
 		PATH1,
@@ -21,8 +20,6 @@ public class AutoHandlerSystem {
 
 	//FSM Systems that the autoHandlerFSM uses
 	private DriveFSMSystem driveSystem;
-	// private FSMSystem subsystem2;
-	// private FSMSystem subsystem3;
 
 	//Predefined auto paths
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
@@ -35,13 +32,9 @@ public class AutoHandlerSystem {
 	 * Create FSMSystem and initialize to starting state.
 	 * Initializes any subsystems such as driveFSM, armFSM, ect.
 	 * @param fsm1 the first subsystem that the auto handler will call functions on
-	 * @param fsm2 the second subsystem that the auto handler will call functions on
-	 * @param fsm3 the third subsystem that the auto handler will call functions on
 	 */
 	public AutoHandlerSystem(DriveFSMSystem fsm1) {
 		driveSystem = fsm1;
-		// subsystem2 = fsm2;
-		// subsystem3 = fsm3;
 	}
 
 	/* ======================== Public methods ======================== */
@@ -64,8 +57,6 @@ public class AutoHandlerSystem {
 	 */
 	public void reset(AutoPath path) {
 		driveSystem.resetAutonomus();
-		// subsystem2.reset();
-		// subsystem3.reset();
 
 		currentStateIndex = 0;
 		if (path == AutoPath.PATH1) {
