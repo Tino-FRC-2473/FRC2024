@@ -178,12 +178,11 @@ public class DriveFSMSystem {
 		switch (autoState) {
 			case AUTO_STATE:
 				ArrayList<Pose2d> points = new ArrayList<Pose2d>();
-				points.add(new Pose2d(0, -2, new Rotation2d(Math.toRadians(90))));
-				points.add(new Pose2d(-2, -2, new Rotation2d(Math.toRadians(180))));
-				points.add(new Pose2d(-2, 0, new Rotation2d(Math.toRadians(-90))));
-				points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+				// points.add(new Pose2d(0, -2, new Rotation2d(Math.toRadians(90))));
+				// points.add(new Pose2d(-2, -2, new Rotation2d(Math.toRadians(180))));
+				// points.add(new Pose2d(-2, 0, new Rotation2d(Math.toRadians(-90))));
+				// points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				return driveAlongPath(points);
-				//return driveToPose(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(180))));
 			default:
 				return false;
 		}
