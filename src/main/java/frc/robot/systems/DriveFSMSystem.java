@@ -47,7 +47,7 @@ public class DriveFSMSystem {
 	// be private to their owner system and may not be used elsewhere.
 
 	// The gyro sensor
-	private AHRS gyro;
+	//private AHRS gyro;
 	private RaspberryPI rpi;
 
 	// Slew rate filter variables for controlling lateral acceleration
@@ -81,15 +81,15 @@ public class DriveFSMSystem {
 		DriveConstants.REAR_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
 	// Odometry class for tracking robot pose
-	private SwerveDriveOdometry odometry = new SwerveDriveOdometry(
-		DriveConstants.DRIVE_KINEMATICS,
-		Rotation2d.fromDegrees(-gyro.getAngle()),
-		new SwerveModulePosition[] {
-			frontLeft.getPosition(),
-			frontRight.getPosition(),
-			rearLeft.getPosition(),
-			rearRight.getPosition()
-		});
+	// private SwerveDriveOdometry odometry = new SwerveDriveOdometry(
+	// 	DriveConstants.DRIVE_KINEMATICS,
+	// 	Rotation2d.fromDegrees(-gyro.getAngle()),
+	// 	new SwerveModulePosition[] {
+	// 		frontLeft.getPosition(),
+	// 		frontRight.getPosition(),
+	// 		rearLeft.getPosition(),
+	// 		rearRight.getPosition()
+	// 	});
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -99,7 +99,7 @@ public class DriveFSMSystem {
 	 */
 	public DriveFSMSystem() {
 		// Perform hardware init
-		gyro = new AHRS(SPI.Port.kMXP);
+		//gyro = new AHRS(SPI.Port.kMXP);
 		rpi = new RaspberryPI();
 
 		// Reset state machine
@@ -121,7 +121,8 @@ public class DriveFSMSystem {
 	 * @return The pose.
 	 */
 	public Pose2d getPose() {
-		return odometry.getPoseMeters();
+		//return odometry.getPoseMeters();
+		return new Pose2d();
 	}
 
 	/**
@@ -165,12 +166,12 @@ public class DriveFSMSystem {
 	 * @return if the action carried out in this state has finished executing
 	 */
 	public boolean updateAutonomous(AutoFSMState autoState) {
-		odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()),
-			new SwerveModulePosition[] {
-				frontLeft.getPosition(),
-				frontRight.getPosition(),
-				rearLeft.getPosition(),
-				rearRight.getPosition()});
+		// odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()),
+		// 	new SwerveModulePosition[] {
+		// 		frontLeft.getPosition(),
+		// 		frontRight.getPosition(),
+		// 		rearLeft.getPosition(),
+		// 		rearRight.getPosition()});
 
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
@@ -189,15 +190,15 @@ public class DriveFSMSystem {
 	 * @param pose The pose to which to set the odometry.
 	 */
 	public void resetOdometry(Pose2d pose) {
-		odometry.resetPosition(
-			Rotation2d.fromDegrees(-gyro.getAngle()),
-				new SwerveModulePosition[] {
-					frontLeft.getPosition(),
-					frontRight.getPosition(),
-					rearLeft.getPosition(),
-					rearRight.getPosition()
-				},
-				pose);
+		// odometry.resetPosition(
+		// 	Rotation2d.fromDegrees(-gyro.getAngle()),
+		// 		new SwerveModulePosition[] {
+		// 			frontLeft.getPosition(),
+		// 			frontRight.getPosition(),
+		// 			rearLeft.getPosition(),
+		// 			rearRight.getPosition()
+		// 		},
+		// 		pose);
 	}
 
 	/**
@@ -207,12 +208,17 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-		odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()),
-			new SwerveModulePosition[] {
-				frontLeft.getPosition(),
-				frontRight.getPosition(),
-				rearLeft.getPosition(),
-				rearRight.getPosition()});
+		// odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()),
+		// 	new SwerveModulePosition[] {
+		// 		frontLeft.getPosition(),
+		// 		frontRight.getPosition(),
+		// 		rearLeft.getPosition(),
+		// 		rearRight.getPosition()});
+
+		if (input == null) {
+			System.out.println("Input is NULL");
+			return;
+		}
 
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
@@ -230,9 +236,9 @@ public class DriveFSMSystem {
 					* Math.abs(input.getControllerLeftJoystickX())),
 					OIConstants.DRIVE_DEADBAND),
 					-MathUtil.applyDeadband(input.getControllerRightJoystickX(),
-					OIConstants.DRIVE_DEADBAND), true, true);
+					OIConstants.DRIVE_DEADBAND), false, true);
 				if (input.isBackButtonPressed()) {
-					gyro.reset();
+					//gyro.reset();
 				}
 				break;
 
@@ -365,7 +371,7 @@ public class DriveFSMSystem {
 		var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
 			fieldRelative
 				? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered,
-					rotDelivered, Rotation2d.fromDegrees(-gyro.getAngle()))
+					rotDelivered, Rotation2d.fromDegrees(0)) // -gyro.getAngle()
 				: new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
 		SwerveDriveKinematics.desaturateWheelSpeeds(
 			swerveModuleStates, DriveConstants.MAX_SPEED_METERS_PER_SECOND);
@@ -492,7 +498,7 @@ public class DriveFSMSystem {
 
 	/** Zeroes the heading of the robot. */
 	public void zeroHeading() {
-		gyro.reset();
+		//gyro.reset();
 	}
 
 	/**
@@ -501,7 +507,8 @@ public class DriveFSMSystem {
 	 * @return the robot's heading in degrees, from -180 to 180
 	 */
 	public double getHeading() {
-		return Rotation2d.fromDegrees(-gyro.getAngle()).getDegrees();
+		//return Rotation2d.fromDegrees(-gyro.getAngle()).getDegrees();
+		return 0;
 	}
 
 	/**
