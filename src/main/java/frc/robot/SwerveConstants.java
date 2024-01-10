@@ -124,9 +124,9 @@ public final class SwerveConstants {
 	}
 
 	public static final class AutoConstants {
-		public static final double MAX_SPEED_METERS_PER_SECOND = 2;
-		public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2;
-		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 2;
+		public static final double MAX_SPEED_METERS_PER_SECOND = 1; //2
+		//public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2;
+		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 12;
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI / 2;
 
 		public static final double PX_CONTROLLER = 1;
@@ -137,9 +137,10 @@ public final class SwerveConstants {
 		public static final double DRIVE_TO_TAG_ROTATIONAL_CONSTANT = 100;
 		public static final double DISTANCE_MARGIN_TO_DRIVE_TO_TAG = 0.58; // meters
 		public static final double ANGLE_MARGIN_TO_DRIVE_TO_TAG = 5; // degrees
-		public static final double METERS_MARGIN_OF_ERROR = 0.05;
-		public static final double DEGREES_MARGIN_OF_ERROR = 5;
-		public static final double ANGULAR_SPEED_ACCEL_CONSTANT = 60;
+		public static final double METERS_MARGIN_OF_ERROR = 0.03;
+		public static final double DEGREES_MARGIN_OF_ERROR = 3;
+		public static final double ANGULAR_SPEED_ACCEL_CONSTANT = 120;
+		public static final double TRANSLATIONAL_SPEED_ACCEL_CONSTANT = 3;
 
 
 		// Constraint for the motion profiled robot angle controller

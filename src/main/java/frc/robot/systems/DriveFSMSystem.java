@@ -173,10 +173,17 @@ public class DriveFSMSystem {
 
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
-
+		System.out.println("X: " + getPose().getX());
+		System.out.println("Y: " + getPose().getY());
 		switch (autoState) {
 			case AUTO_STATE:
-				return driveToPose(new Pose2d(1, 1, new Rotation2d(Math.toRadians(0))));
+				ArrayList<Pose2d> points = new ArrayList<Pose2d>();
+				points.add(new Pose2d(0, -2, new Rotation2d(Math.toRadians(90))));
+				points.add(new Pose2d(-2, -2, new Rotation2d(Math.toRadians(180))));
+				points.add(new Pose2d(-2, 0, new Rotation2d(Math.toRadians(-90))));
+				points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+				return driveAlongPath(points);
+				//return driveToPose(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(180))));
 			default:
 				return false;
 		}
@@ -386,11 +393,17 @@ public class DriveFSMSystem {
 		double yDiff = y - getPose().getY();
 		double aDiff = angle - getPose().getRotation().getDegrees();
 		double travelAngle = Math.atan2(yDiff, xDiff);
-
+		System.out.println("Xdiff: " + xDiff);
+		System.out.println("Ydiff: " + yDiff);
+		System.out.println("adiff: " + aDiff);
 		double xSpeed = Math.abs(xDiff) > AutoConstants.METERS_MARGIN_OF_ERROR
-			? AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.cos(travelAngle) : 0;
+			? clamp(xDiff / AutoConstants.TRANSLATIONAL_SPEED_ACCEL_CONSTANT,
+			-AutoConstants.MAX_SPEED_METERS_PER_SECOND,
+			AutoConstants.MAX_SPEED_METERS_PER_SECOND) : 0;
 		double ySpeed = Math.abs(yDiff) > AutoConstants.METERS_MARGIN_OF_ERROR
-			? AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.sin(travelAngle) : 0;
+			? clamp(yDiff / AutoConstants.TRANSLATIONAL_SPEED_ACCEL_CONSTANT,
+			-AutoConstants.MAX_SPEED_METERS_PER_SECOND,
+			AutoConstants.MAX_SPEED_METERS_PER_SECOND) : 0;
 		double aSpeed = Math.abs(aDiff) > AutoConstants.DEGREES_MARGIN_OF_ERROR ? (aDiff > 0
 			? Math.min(AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff
 			/ AutoConstants.ANGULAR_SPEED_ACCEL_CONSTANT) : Math.max(
