@@ -1,4 +1,3 @@
-import numpy.core.multiarray
 import cv2
 import numpy as np
 import math
@@ -14,9 +13,6 @@ class VisionInput:
         self.cam_a = cam_angle
         self.cap = cv2.VideoCapture(0)
 
-
-    def calibrate(self):
-        pass
 
     def getFrame(self):
         if not self.cap.isOpened():

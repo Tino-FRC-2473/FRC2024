@@ -16,7 +16,7 @@ class AprilTag():
         self.dist_coeffs = np.load('calibration_data/camera1_dist.npy')
         pass
 
-    def calibrate(self, dirpath, square_size, width, height, visualize=False):
+    def calibrate(self, RES, dirpath, square_size, width, height, visualize=False):
         """ Apply camera calibration operation for images in the given directory path. """
 
         # termination criteria
@@ -35,9 +35,8 @@ class AprilTag():
         images = os.listdir(dirpath)
         for fname in images:
             print(fname)
-            img = cv2.imread(os.path.join(dirpath, fname))
+            img = cv2.resize(cv2.imread(os.path.join(dirpath, fname)), RES)
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
             # Find the chess board corners
             ret, corners = cv2.findChessboardCorners(gray, (width, height), None)
 
@@ -54,13 +53,14 @@ class AprilTag():
             if visualize:
                 cv2.imshow('img',img)
                 cv2.waitKey(0)
-
+        
         ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
         self.camera_matrix = mtx
         self.dist_coeffs = dist
 
-        np.save('/Users/tanmayidasari/FRC2024/src/main/python/calibration_data/camera1_matrix.npy',mtx)
-        np.save('/Users/tanmayidasari/FRC2024/src/main/python/calibration_data/camera1_dist.npy',dist)
+        np.save('calibration_data/camera1_matrix.npy',mtx)
+        np.save('calibration_data/camera1_dist.npy',dist)
+        print('Calibration complete')
 
     def draw_axis_on_image(self, image, camera_matrix, dist_coeffs, rvec, tvec, size=1):
         try:
