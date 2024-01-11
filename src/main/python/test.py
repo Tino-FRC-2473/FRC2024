@@ -4,7 +4,6 @@ from apriltag import AprilTag
 from vision_input import VisionInput
 import time
 
-
 tag_module = AprilTag()
 # CALIB_DIR = 'calib_images'
 # CALIB_SIZE_METERS = 0.0301625
