@@ -1,9 +1,9 @@
 import numpy as np
 import cv2
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import os
 #import apriltag
-from pupil_apriltags import Detector
+#from pupil_apriltags import Detector
 
 # basically fixes the intrinsic parameters and is the class that returns the 3D stuff
 # printed 3dpose --> tvec (x: left/right, y: up/down, z: front/back), rvec
@@ -124,34 +124,36 @@ class AprilTag():
 
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-            # aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_16h5)
-            # detector = cv2.aruco.ArucoDetector(aruco_dict)
-            # corners, ids, rejected_img_points = detector.detectMarkers(gray)
-            
-            at_detector = Detector(
-                families="tag36h11",
-                nthreads=1,
-                quad_decimate=1.0,
-                quad_sigma=0.0,
-                refine_edges=1,
-                decode_sharpening=0.25,
-                debug=0
-                )
+            #aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_16h5)
+            #detector = cv2.aruco.ArucoDetector(aruco_dict)
+            #corners, ids, rejected_img_points = detector.detectMarkers(gray)
+            aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_APRILTAG_36h11)
+            corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, aruco_dict)	    
+            #at_detector = Detector(
+            #    families="tag36h11",
+            #    nthreads=1,
+            #    quad_decimate=1.0,
+            #    quad_sigma=0.0,
+            #    refine_edges=1,
+            #    decode_sharpening=0.25,
+            #    debug=0
+            #    )
             # options = apriltag.DetectorOptions(families='tag36h11')
             # detector = apriltag.Detector(options)
             # results = detector.detect(gray)
-            results = at_detector.detect(gray)
+            #results = at_detector.detect(gray)
 
-            corners = tuple(res.corners[:, np.newaxis] for res in results)
-            ids = [[res.tag_id] for res in results]
-            print(corners)
-            print(ids)
+            #corners = tuple(res.corners[:, np.newaxis] for res in results)
+            #ids = [[res.tag_id] for res in results]
+            #print(corners)
+            #print(ids)
+
             pose_data = {}
             num_tags = len(ids) if ids is not None else 0
             #print(str(num_tags) + ' AprilTags detected')
             if num_tags != 0:
                 # Draw the detected markers on the image
-                #cv2.aruco.drawDetectedMarkers(image, corners, ids)
+                cv2.aruco.drawDetectedMarkers(image, corners, ids)
 
                 # Estimate the pose of each detected marker
                 for i in range(len(ids)):

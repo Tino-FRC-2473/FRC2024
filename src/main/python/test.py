@@ -1,5 +1,5 @@
-import cv2
-import numpy as np
+#import cv2
+#import numpy as np
 from apriltag import AprilTag
 from vision_input import VisionInput
 import time
@@ -21,13 +21,15 @@ input = VisionInput(FOV, RES, CAM_HEIGHT, CAM_ANGLE)
 while True:
     frame = input.getFrame()
     annotated_frame = frame.copy()
+    m = time.time()
     pose_data = tag_module.estimate_3d_pose(frame, annotated_frame)
+    print(time.time() - m)
     print(pose_data)
 
-    cv2.imshow('result', annotated_frame)
-    key = cv2.waitKey(1) & 0xFF
-    if key == ord('q'):
-        break
+   # cv2.imshow('result', annotated_frame)
+   # key = cv2.waitKey(1) & 0xFF
+   # if key == ord('q'):
+   #     break
     time.sleep(0.02)
 
 
