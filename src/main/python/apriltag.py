@@ -152,7 +152,7 @@ class AprilTag():
             #print(str(num_tags) + ' AprilTags detected')
             if num_tags != 0:
                 # Draw the detected markers on the image
-                cv2.aruco.drawDetectedMarkers(image, corners, ids)
+                #cv2.aruco.drawDetectedMarkers(image, corners, ids)
 
                 # Estimate the pose of each detected marker
                 for i in range(len(ids)):
@@ -160,10 +160,10 @@ class AprilTag():
                     rvec, tvec= self.estimate_pose_single_marker(corners[i], ARUCO_LENGTH_METERS, self.camera_matrix, self.dist_coeffs)
                     pose_data[ids[i][0]] = (tvec, rvec)
                     # Draw the 3D pose axis on the image
-                    self.draw_axis_on_image(frame_ann, self.camera_matrix, self.dist_coeffs, rvec, tvec, 0.1)
+                    #self.draw_axis_on_image(frame_ann, self.camera_matrix, self.dist_coeffs, rvec, tvec, 0.1)
 
                 # Display the result
-                cv2.imshow('AprilTag Pose Estimation', image)
+                #cv2.imshow('AprilTag Pose Estimation', image)
             else:
                 #print("No AprilTags detected in the image.")
                 pass

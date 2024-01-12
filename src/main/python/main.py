@@ -16,6 +16,7 @@ CAM_ANGLE = -15
 input = VisionInput(FOV, RES, CAM_HEIGHT, CAM_ANGLE)
 tag_module = AprilTag()
 ARUCO_LENGTH_METERS = 0.123
+
 while True:
     frame = input.getFrame()
     table = inst.getTable("datatable")
@@ -25,7 +26,7 @@ while True:
 
     tagData = tag_module.estimate_3d_pose(frame, frame.copy(), ARUCO_LENGTH_METERS)
 
-    pose_list = [200 for _ in range(16 * 6)]
+    pose_list = [4000 for _ in range(16 * 6)]
     for key, value in tagData.items():
         pose_list[(key - 1) * 6 : (key * 6)] = np.concatenate((value[0].flatten(), value[1].flatten()), axis=0).tolist()
     

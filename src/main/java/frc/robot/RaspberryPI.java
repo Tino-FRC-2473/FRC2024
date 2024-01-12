@@ -44,6 +44,7 @@ public class RaspberryPI {
 		SmartDashboard.putNumber("FPS", fps);
 	}
 
+	//If the number 4000 is returned from any of the methods below, that output is invalid and no tag of the inputted Id has been detected
 	public double getAprilTagX(int id) {
 		return tagSubscriber.get()[(6 * (id - 1))];
 	}
