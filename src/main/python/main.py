@@ -15,6 +15,7 @@ CAM_HEIGHT = 0.4
 CAM_ANGLE = -15
 input = VisionInput(FOV, RES, CAM_HEIGHT, CAM_ANGLE)
 tag_module = AprilTag()
+ARUCO_LENGTH_METERS = 0.123
 while True:
     frame = input.getFrame()
     table = inst.getTable("datatable")
@@ -22,7 +23,7 @@ while True:
     xPub = table.getDoubleTopic("fps_incremented_value").publish()
     xPub.set(frame.sum())
 
-    tagData = tag_module.estimate_3d_pose(frame, frame.copy())
+    tagData = tag_module.estimate_3d_pose(frame, frame.copy(), ARUCO_LENGTH_METERS)
 
     pose_list = [200 for _ in range(16 * 6)]
     for key, value in tagData.items():

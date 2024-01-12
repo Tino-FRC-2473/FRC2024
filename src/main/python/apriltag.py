@@ -112,15 +112,14 @@ class AprilTag():
 
             # Solve PnP problem to estimate pose
             _, rvec, tvec = cv2.solvePnP(marker_points_3d, image_points_2d, camera_matrix, dist_coeffs)
-            
+
             return rvec, tvec * 39.3701
 
         except Exception as e:
             print(f"An error occurred: {e}")
             return None, None
-        
-    def estimate_3d_pose(self, image, frame_ann):
-            ARUCO_LENGTH_METERS = 0.1524
+
+    def estimate_3d_pose(self, image, frame_ann, ARUCO_LENGTH_METERS):
 
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
