@@ -241,20 +241,7 @@ public class DriveFSMSystem {
 				break;
 
 			case ALIGN_TO_TAG_STATE:
-				double dist = rpi.getConeDistance();
-				double angle = rpi.getConeYaw();
-				boolean canSee = (dist == -1 || angle == -1);
-				SmartDashboard.putBoolean("Can See Cone", canSee);
-				SmartDashboard.putNumber("Distance to Cone", dist);
-				if (n % Constants.PRINTING_MOD_CONSTANT == 0) {
-					System.out.println("dist: " + dist);
-					System.out.println("ang: " + angle);
-
-					if (!canSee) {
-						System.out.println("CANT SEE");
-					}
-				}
-				driveUntilObject(dist, angle);
+				driveToTag(rpi.getAprilTagX(1), 0, 0);
 				break;
 
 			default:
@@ -432,12 +419,12 @@ public class DriveFSMSystem {
 	}
 
 	/**
-	 * Drives the robot until it reaches a given point.
+	 * Drives the robot until it reaches a given position relative to the apriltag.
 	 * @param xDist constantly updating x distance to the point
 	 * @param yDist constantly updating y distance to the point
 	 * @param rotFinal constantly updating angular difference to the point
 	 */
-	public void driveUntilPoint(double xDist, double yDist, double rotFinal) {
+	public void driveToTag(double xDist, double yDist, double rotFinal) {
 		double xSpeed = xDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
 		double ySpeed = yDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
 		double rotSpeed = rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT;
