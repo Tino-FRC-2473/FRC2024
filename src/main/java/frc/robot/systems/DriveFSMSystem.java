@@ -35,13 +35,14 @@ public class DriveFSMSystem {
 	// FSM state definitions
 	public enum FSMState {
 		TELEOP_STATE,
-		ALIGN_TO_TAG_STATE
+		ALIGN_TO_TAG_STATE,
+		ALIGN_TO_OBJECT_STATE
 	}
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
 	private int currentPointInPath;
-	private int n = 0;
+
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 
@@ -221,7 +222,7 @@ public class DriveFSMSystem {
 
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
-		n++;
+
 		if (input == null) {
 			return;
 		}
@@ -240,20 +241,13 @@ public class DriveFSMSystem {
 				}
 				break;
 
-			case ALIGN_TO_TAG_STATE:
+			case ALIGN_TO_OBJECT_STATE:
 				double dist = rpi.getConeDistance();
 				double angle = rpi.getConeYaw();
 				boolean canSee = (dist == -1 || angle == -1);
 				SmartDashboard.putBoolean("Can See Cone", canSee);
 				SmartDashboard.putNumber("Distance to Cone", dist);
-				if (n % Constants.PRINTING_MOD_CONSTANT == 0) {
-					System.out.println("dist: " + dist);
-					System.out.println("ang: " + angle);
 
-					if (!canSee) {
-						System.out.println("CANT SEE");
-					}
-				}
 				driveUntilObject(dist, angle);
 				break;
 
