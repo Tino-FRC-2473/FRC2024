@@ -14,6 +14,8 @@ public class TeleopInput {
 	/* ======================== Constants ======================== */
 	private static final int LEFT_JOYSTICK_PORT = 0;
 	private static final int RIGHT_JOYSTICK_PORT = 1;
+	private static final int INTAKE_BUTTON = 2;
+	private static final int OUTTAKE_BUTTON = 3;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
@@ -64,7 +66,11 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isIntakeButtonPressed() {
-		return leftJoystick.getRawButton(2);
+		return leftJoystick.getRawButton(INTAKE_BUTTON);
+	}
+
+	public boolean isOuttakeButtonPressed() {
+		return leftJoystick.getRawButton(OUTTAKE_BUTTON);
 	}
 
 	/* ------------------------ Right Joystick ------------------------ */

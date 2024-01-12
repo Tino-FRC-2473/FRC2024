@@ -5,6 +5,7 @@ package frc.robot.systems;
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkLimitSwitch;
+import com.revrobotics.SparkMaxLimitSwitch;
 
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -20,7 +21,8 @@ public class KitBotShooterFSM {
 		OUTTAKING
 	}
 
-	private static final float MOTOR_RUN_POWER = 0.1f;
+	private static final float L_MOTOR_RUN_POWER = 0.05f;
+	private static final float U_MOTOR_RUN_POWER = 0.1f;
 
 	/* ======================== Private variables ======================== */
 	private ShooterFSMState currentState;
@@ -41,6 +43,16 @@ public class KitBotShooterFSM {
 		// Perform hardware init
 		// [Initialize lowMotor and highMotor]
 		//exampleMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER, CANSparkMax.MotorType.kBrushless);
+		lowMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_LOWER,
+						CANSparkMax.MotorType.kBrushless);
+		lowMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+		
+		lowMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
+		bottomLimitSwitch.enableLimitSwitch(false);
+		
+		highMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_LOWER,
+		CANSparkMax.MotorType.kBrushless);
+		highMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
 		// Reset state machine
 		reset();
@@ -76,6 +88,11 @@ public class KitBotShooterFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
+
+		if (input != null) {
+			return;
+		}
+		
 		switch (currentState) {
 			case IDLE_STOP:
 				handleStartState(input);
@@ -89,6 +106,7 @@ public class KitBotShooterFSM {
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
+
 		currentState = nextState(input);
 	}
 
@@ -170,8 +188,8 @@ public class KitBotShooterFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleIntakingState(TeleopInput input) {
-		lowMotor.set(-MOTOR_RUN_POWER);
-		highMotor.set(-MOTOR_RUN_POWER);
+		lowMotor.set(-L_MOTOR_RUN_POWER);
+		highMotor.set(-U_MOTOR_RUN_POWER);
 	}
 
 	/**
@@ -180,8 +198,8 @@ public class KitBotShooterFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleOuttakingState(TeleopInput input) {
-		lowMotor.set(MOTOR_RUN_POWER);
-		highMotor.set(MOTOR_RUN_POWER);
+		lowMotor.set(L_MOTOR_RUN_POWER);
+		highMotor.set(U_MOTOR_RUN_POWER);
 	}
 
 	/**
