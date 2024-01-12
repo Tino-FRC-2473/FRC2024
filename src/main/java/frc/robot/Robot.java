@@ -5,9 +5,8 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-
 // Systems
-import frc.robot.systems.FSMSystem;
+import frc.robot.systems.DriveFSMSystem;
 import frc.robot.systems.AutoHandlerSystem;
 import frc.robot.systems.AutoHandlerSystem.AutoPath;
 
@@ -17,12 +16,8 @@ import frc.robot.systems.AutoHandlerSystem.AutoPath;
  */
 public class Robot extends TimedRobot {
 	private TeleopInput input;
-
 	// Systems
-	private FSMSystem subSystem1;
-	private FSMSystem subSystem2;
-	private FSMSystem subSystem3;
-
+	private DriveFSMSystem driveFSMSystem;
 	private AutoHandlerSystem autoHandler;
 
 	/**
@@ -33,14 +28,10 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		System.out.println("robotInit");
 		input = new TeleopInput();
-
 		// Instantiate all systems here
-		subSystem1 = new FSMSystem();
-		subSystem2 = new FSMSystem();
-		subSystem3 = new FSMSystem();
-		autoHandler = new AutoHandlerSystem(subSystem1, subSystem2, subSystem3);
+		driveFSMSystem = new DriveFSMSystem();
+		autoHandler = new AutoHandlerSystem(driveFSMSystem);
 	}
-
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
@@ -55,16 +46,13 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		subSystem1.reset();
-		subSystem2.reset();
-		subSystem3.reset();
+		driveFSMSystem.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		subSystem1.update(input);
-		subSystem2.update(input);
-		subSystem3.update(input);
+		driveFSMSystem.update(input);
+
 	}
 
 	@Override
@@ -74,16 +62,6 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void disabledPeriodic() {
-
-	}
-
-	@Override
-	public void testInit() {
-		System.out.println("-------- Test Init --------");
-	}
-
-	@Override
-	public void testPeriodic() {
 
 	}
 
@@ -100,3 +78,4 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotPeriodic() { }
 }
+

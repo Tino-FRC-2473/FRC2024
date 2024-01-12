@@ -2,6 +2,7 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PS4Controller;
 
 /**
  * Common class for providing driver inputs during Teleop.
@@ -12,13 +13,15 @@ import edu.wpi.first.wpilibj.Joystick;
  */
 public class TeleopInput {
 	/* ======================== Constants ======================== */
-	private static final int LEFT_JOYSTICK_PORT = 0;
-	private static final int RIGHT_JOYSTICK_PORT = 1;
+	private static final int LEFT_JOYSTICK_PORT = 1;
+	private static final int RIGHT_JOYSTICK_PORT = 2;
+	public static final int DRIVER_CONTROLLER_PORT = 0;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
 	private Joystick leftJoystick;
 	private Joystick rightJoystick;
+	private PS4Controller driverController;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -28,14 +31,59 @@ public class TeleopInput {
 	 */
 	public TeleopInput() {
 		leftJoystick = new Joystick(LEFT_JOYSTICK_PORT);
-
 		rightJoystick = new Joystick(RIGHT_JOYSTICK_PORT);
+		driverController = new PS4Controller(DRIVER_CONTROLLER_PORT);
+
 	}
 
 	/* ======================== Public methods ======================== */
 	// Getter methods for fetch input values should be defined here.
 	// Method names should be descriptive of the behavior, so the
 	// control mapping is hidden from other classes.
+
+	/* ------------------------ Driver Controller ------------------------ */
+	/**
+	 * Get X axis of Left Joystick.
+	 * @return Axis value
+	 */
+	public double getControllerLeftJoystickY() {
+		return driverController.getLeftY();
+	}
+	/**
+	 * Get Y axis of Left Joystick.
+	 * @return Axis value
+	 */
+	public double getControllerLeftJoystickX() {
+		return driverController.getLeftX();
+	}
+	/**
+	 * Get Y axis of Left Joystick.
+	 * @return Axis value
+	 */
+	public double getControllerRightJoystickY() {
+		return driverController.getRightY();
+	}
+	/**
+	 * Get Y axis of Left Joystick.
+	 * @return Axis value
+	 */
+	public double getControllerRightJoystickX() {
+		return driverController.getRightX();
+	}
+	/**
+	 * Get the value of the Share button.
+	 * @return True if button is pressed
+	 */
+	public boolean isBackButtonPressed() {
+		return driverController.getShareButton();
+	}
+	/**
+	 * Get the value of the Circle button.
+	 * @return True if button is pressed
+	 */
+	public boolean isCircleButtonPressed() {
+		return driverController.getCircleButtonPressed();
+	}
 
 	/* ------------------------ Left Joystick ------------------------ */
 	/**
@@ -59,13 +107,6 @@ public class TeleopInput {
 	public boolean isShooterButtonPressed() {
 		return leftJoystick.getRawButton(1);
 	}
-	/**
-	 * Get the value of the intake button.
-	 * @return True if button is pressed
-	 */
-	public boolean isIntakeButtonPressed() {
-		return leftJoystick.getRawButton(2);
-	}
 
 	/* ------------------------ Right Joystick ------------------------ */
 	/**
@@ -83,6 +124,21 @@ public class TeleopInput {
 		return rightJoystick.getY();
 	}
 
+	/**
+	 * Get the value of the release button.
+	 * @return True if button is pressed
+	 */
+	public boolean isOuttakeButtonPressed() {
+		return leftJoystick.getTrigger();
+	}
+
+	/**
+	 * Get the value of the throttle.
+	 * @return True throttle is forward
+	 */
+	public boolean isThrottleForward() {
+		return leftJoystick.getThrottle() <= 0;
+	}
 	/* ======================== Private methods ======================== */
 
 }

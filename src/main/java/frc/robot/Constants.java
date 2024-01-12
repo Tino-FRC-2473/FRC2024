@@ -2,6 +2,8 @@ package frc.robot;
 
 public class Constants {
 
+	public static final int PRINTING_MOD_CONSTANT = 100;
+
 	public static class NetworkTablesConstants {
 		public static final String TABLE_NAME = "datatable";
 		public static final String CUBE_YAW_TOPIC = "cube_yaw";
