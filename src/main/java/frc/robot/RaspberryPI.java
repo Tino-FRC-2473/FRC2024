@@ -1,10 +1,10 @@
 package frc.robot;
+import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.NetworkTablesConstants;
 
 public class RaspberryPI {
 	private double fps = 0;
@@ -12,10 +12,7 @@ public class RaspberryPI {
 
 	//FPS Calculation
 	private DoubleSubscriber fpsCounter;
-	private DoubleSubscriber cubeYawSubscriber;
-	private DoubleSubscriber cubeDistanceSubscriber;
-	private DoubleSubscriber coneYawSubscriber;
-	private DoubleSubscriber coneDistanceSubscriber;
+	private DoubleArraySubscriber tagSubscriber;
 	private double previousValueReceived = 0;
 	private double previousTimeReceived = 0;
 	private Timer timer = new Timer();
@@ -23,57 +20,14 @@ public class RaspberryPI {
 	/**Updates the FPS each iteration of the robot.*/
 	public RaspberryPI() {
 		timer.start();
-		table = NetworkTableInstance.getDefault().getTable(NetworkTablesConstants.TABLE_NAME);
-		fpsCounter = table.getDoubleTopic(NetworkTablesConstants.FPS_COUNTER_TOPIC).subscribe(-1);
-		cubeYawSubscriber = table.getDoubleTopic(
-			NetworkTablesConstants.CUBE_YAW_TOPIC).subscribe(-1);
-		cubeDistanceSubscriber = table.getDoubleTopic(
-			NetworkTablesConstants.CUBE_DISTANCE_TOPIC).subscribe(-1);
-		coneYawSubscriber = table.getDoubleTopic(
-			NetworkTablesConstants.CONE_YAW_TOPIC).subscribe(-1);
-		coneDistanceSubscriber = table.getDoubleTopic(
-			NetworkTablesConstants.CONE_DISTANCE_TOPIC).subscribe(-1);
+		table = NetworkTableInstance.getDefault().getTable("datatable");
+		fpsCounter = table.getDoubleTopic("x").subscribe(-1);
+		tagSubscriber = table.getDoubleArrayTopic("april_tag_data").subscribe(null);
 	}
 
 	/**Updates the values in SmartDashboard. */
 	public void update() {
 		updateFPS();
-		SmartDashboard.putNumber("cube yaw", getCubeYaw());
-		SmartDashboard.putNumber("cube distance", getCubeDistance());
-		SmartDashboard.putNumber("cone yaw", getConeYaw());
-		SmartDashboard.putNumber("cone distance", getConeDistance());
-	}
-
-	/**
-	 * Gets the yaw to the cube.
-	 * @return returns the horizontal angle between the cube and the camera in degrees.
-	 */
-	public double getCubeYaw() {
-		return cubeYawSubscriber.get();
-	}
-
-	/**
-	 * Gets the yaw to the cone.
-	 * @return returns the horizontal angle between the cone and the camera in degrees.
-	 */
-	public double getConeYaw() {
-		return coneYawSubscriber.get();
-	}
-
-	/**
-	 * Gets the distance to the cube.
-	 * @return returns the distance to the cube in meters.
-	 */
-	public double getCubeDistance() {
-		return cubeDistanceSubscriber.get();
-	}
-
-	/**
-	 * Gets the distance to the cone.
-	 * @return returns the distance to the cone in meters.
-	 */
-	public double getConeDistance() {
-		return coneDistanceSubscriber.get();
 	}
 
 	/**
@@ -89,11 +43,54 @@ public class RaspberryPI {
 		SmartDashboard.putNumber("FPS", fps);
 	}
 
+	//If the number 4000 is returned from any of the methods below, that output is
+	//invalid and no tag of the inputted Id has been detected
 	/**
-	 * returns the FPS.
-	 * @return frames per second
+	 * Gives information about april tag.
+	 * @param id takes the id of tag
+	 * @return the x distance to the tag in inches
 	 */
-	public double getFPS() {
-		return fps;
+	public double getAprilTagX(int id) {
+		return tagSubscriber.get()[(6 * (id - 1))];
+	}
+	/**
+	 * Gives information about april tag.
+	 * @param id takes the id of tag
+	 * @return the y distance to the tag in inches
+	 */
+	public double getAprilTagY(int id) {
+		return tagSubscriber.get()[(6 * (id - 1)) + 1];
+	}
+	/**
+	 * Gives information about april tag.
+	 * @param id takes the id of tag
+	 * @return the y distance to the tag in inches
+	 */
+	public double getAprilTagZ(int id) {
+		return tagSubscriber.get()[(6 * (id - 1)) + 2];
+	}
+	/**
+	 * Gives information about april tag.
+	 * @param id takes the id of tag
+	 * @return the yaw to the tag
+	 */
+	public double getAprilTagYaw(int id) {
+		return tagSubscriber.get()[(6 * (id - 1)) + 3];
+	}
+	/**
+	 * Gives information about april tag.
+	 * @param id takes the id of tag
+	 * @return the pitch to the tag
+	 */
+	public double getAprilTagPitch(int id) {
+		return tagSubscriber.get()[(6 * (id - 1)) + 4];
+	}
+	/**
+	 * Gives information about april tag.
+	 * @param id takes the id of tag
+	 * @return the roll to the tag
+	 */
+	public double getAprilTagRoll(int id) {
+		return tagSubscriber.get()[(6 * (id - 1)) + 5];
 	}
 }

@@ -4,11 +4,20 @@ public class AutoHandlerSystem {
 	/* ======================== Constants ======================== */
 	// Auto FSM state definitions
 	public enum AutoFSMState {
-		AUTO_STATE
+		DRIVE_PATH_1,
+		DRIVE_PATH_2,
+		DRIVE_PATH_3,
+		DRIVE_PATH_4_STATE_1,
+		DRIVE_PATH_4_STATE_2,
+		DRIVE_PATH_5
 	}
 	public enum AutoPath {
 		PATH1,
-		PATH2
+		PATH2,
+		PATH3,
+		PATH4,
+		PATH5,
+		PATH6
 	}
 
 	/* ======================== Private variables ======================== */
@@ -23,10 +32,21 @@ public class AutoHandlerSystem {
 
 	//Predefined auto paths
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
-		AutoFSMState.AUTO_STATE};
+		AutoFSMState.DRIVE_PATH_1};
 
 	private static final AutoFSMState[] PATH2 = new AutoFSMState[]{
-		AutoFSMState.AUTO_STATE};
+		AutoFSMState.DRIVE_PATH_2};
+
+	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{
+		AutoFSMState.DRIVE_PATH_3};
+
+	private static final AutoFSMState[] PATH4 = new AutoFSMState[]{
+		AutoFSMState.DRIVE_PATH_4_STATE_1, AutoFSMState.DRIVE_PATH_4_STATE_2};
+
+	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{
+		AutoFSMState.DRIVE_PATH_5};
+
+	private static final AutoFSMState[] PATH6 = new AutoFSMState[]{};
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state.
@@ -63,6 +83,14 @@ public class AutoHandlerSystem {
 			currentStateList = PATH1;
 		} else if (path == AutoPath.PATH2) {
 			currentStateList = PATH2;
+		} else if (path == AutoPath.PATH3) {
+			currentStateList = PATH3;
+		} else if (path == AutoPath.PATH4) {
+			currentStateList = PATH4;
+		} else if (path == AutoPath.PATH5) {
+			currentStateList = PATH5;
+		} else if (path == AutoPath.PATH6) {
+			currentStateList = PATH6;
 		}
 	}
 
@@ -77,8 +105,25 @@ public class AutoHandlerSystem {
 		boolean isCurrentStateFinished;
 		System.out.println("In State: " + getCurrentState());
 		switch (getCurrentState()) {
-			case AUTO_STATE:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.AUTO_STATE);
+			case DRIVE_PATH_1:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DRIVE_PATH_1);
+				break;
+			case DRIVE_PATH_2:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DRIVE_PATH_2);
+				break;
+			case DRIVE_PATH_3:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DRIVE_PATH_3);
+				break;
+			case DRIVE_PATH_4_STATE_1:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.DRIVE_PATH_4_STATE_1);
+				break;
+			case DRIVE_PATH_4_STATE_2:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.DRIVE_PATH_4_STATE_2);
+				break;
+			case DRIVE_PATH_5:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DRIVE_PATH_5);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());
