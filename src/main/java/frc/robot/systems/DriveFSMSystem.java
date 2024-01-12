@@ -241,7 +241,8 @@ public class DriveFSMSystem {
 				break;
 
 			case ALIGN_TO_TAG_STATE:
-				driveToTag(rpi.getAprilTagX(1), 0, 0);
+				System.out.println("x tag: " + rpi.getAprilTagX(1));
+				driveToTag(0, rpi.getAprilTagX(1), 0);
 				break;
 
 			default:
@@ -263,12 +264,15 @@ public class DriveFSMSystem {
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case TELEOP_STATE:
+				//System.out.println("IN TELEOP STATE");
 				if (input.isCircleButtonPressed()) {
 					return FSMState.ALIGN_TO_TAG_STATE;
 				}
 				return FSMState.TELEOP_STATE;
 			case ALIGN_TO_TAG_STATE:
-				if (!input.isCircleButtonPressed()) {
+				System.out.println("IN TAG STATE");
+				if (input.isCircleButtonReleased()) {
+					System.out.println("released");
 					return FSMState.TELEOP_STATE;
 				}
 				return FSMState.ALIGN_TO_TAG_STATE;
@@ -425,11 +429,16 @@ public class DriveFSMSystem {
 	 * @param rotFinal constantly updating angular difference to the point
 	 */
 	public void driveToTag(double xDist, double yDist, double rotFinal) {
-		double xSpeed = xDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
-		double ySpeed = yDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT;
+		if (xDist == 4000 || yDist == 4000 || rotFinal == 4000) {
+			drive(0, 0, 0, false, false);
+			return;
+		}
+		double xSpeed = clamp(xDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT, -AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
+		double ySpeed = clamp(yDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT, -AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
 		double rotSpeed = rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT;
-
-		if (xDist < 1 && yDist < 1 && rotFinal < 1) {
+		System.out.println("drive speed: " + ySpeed);
+		System.out.println ("xdist: " + xDist + " ydist: " + yDist + " rotFinal: " + rotFinal);
+		if (Math.abs(xDist) < 3 && Math.abs(yDist) < 3 && rotFinal < 1) {
 			drive(0, 0, 0, false, false);
 		} else {
 			drive(xSpeed, ySpeed, rotSpeed, true, true);
@@ -442,18 +451,18 @@ public class DriveFSMSystem {
 	 * @param rotFinal constantly updating angular difference to the point
 	 */
 	public void driveUntilObject(double dist, double rotFinal) {
-		double power = clamp((dist - AutoConstants.DISTANCE_MARGIN_TO_DRIVE_TO_TAG)
-			/ AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+		double power = clamp((dist - AutoConstants.DISTANCE_MARGIN_TO_DRIVE_TO_OBJECT)
+			/ AutoConstants.DRIVE_TO_OBJECT_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
-		double rotSpeed = clamp(-rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
+		double rotSpeed = clamp(-rotFinal / AutoConstants.DRIVE_TO_OBJECT_ROTATIONAL_CONSTANT,
 			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
 
 		// System.out.println("power: " + power);
 		// System.out.println("rotSpeed: " + rotSpeed);
 
-		if ((dist < AutoConstants.DISTANCE_MARGIN_TO_DRIVE_TO_TAG && Math.abs(rotFinal)
-			<= AutoConstants.ANGLE_MARGIN_TO_DRIVE_TO_TAG) || (dist == -1 || rotFinal == -1)) {
+		if ((dist < AutoConstants.DISTANCE_MARGIN_TO_DRIVE_TO_OBJECT && Math.abs(rotFinal)
+			<= AutoConstants.ANGLE_MARGIN_TO_DRIVE_TO_OBJECT) || (dist == -1 || rotFinal == -1)) {
 			drive(0, 0, 0, false, false);
 		// } else if (Math.abs(rotFinal) > 5) {
 		// 	drive(0, 0, rotSpeed, false, false);

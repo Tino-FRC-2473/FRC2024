@@ -133,10 +133,15 @@ public final class SwerveConstants {
 		public static final double PY_CONTROLLER = 1;
 		public static final double P_THETA_CONTROLLER = 1;
 
-		public static final double DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT = 0.5; //meters
+		// tag detection/alignment
+		public static final double DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT = 600; //meters
 		public static final double DRIVE_TO_TAG_ROTATIONAL_CONSTANT = 100;
-		public static final double DISTANCE_MARGIN_TO_DRIVE_TO_TAG = 0.58; // meters
-		public static final double ANGLE_MARGIN_TO_DRIVE_TO_TAG = 5; // degrees
+		//object detection/alignment
+		public static final double DRIVE_TO_OBJECT_TRANSLATIONAL_CONSTANT = 0.5; //meters (0.5)
+		public static final double DRIVE_TO_OBJECT_ROTATIONAL_CONSTANT = 100;
+		public static final double DISTANCE_MARGIN_TO_DRIVE_TO_OBJECT = 0.58; // meters
+		public static final double ANGLE_MARGIN_TO_DRIVE_TO_OBJECT = 5; // degrees
+		//auto paths constants
 		public static final double METERS_MARGIN_OF_ERROR = 0.03;
 		public static final double DEGREES_MARGIN_OF_ERROR = 3;
 		public static final double ANGULAR_SPEED_ACCEL_CONSTANT = 120;
