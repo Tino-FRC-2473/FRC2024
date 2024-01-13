@@ -58,8 +58,8 @@ class AprilTag():
         self.camera_matrix = mtx
         self.dist_coeffs = dist
 
-        np.save('calibration_data/camera1_matrix.npy',mtx)
-        np.save('calibration_data/camera1_dist.npy',dist)
+        np.save('calibration_data/home_camera_matrix.npy',mtx)
+        np.save('calibration_data/home_camera_dist.npy',dist)
         print('Calibration complete')
 
     def draw_axis_on_image(self, image, camera_matrix, dist_coeffs, rvec, tvec, size=1):
@@ -87,7 +87,8 @@ class AprilTag():
             text_color = (255, 0, 255)  # White color
             text_position = (10, 30)  # Top-left corner coordinates
             # Add text to the image
-            cv2.putText(image, str(tvec), text_position, font, font_scale, text_color, font_thickness)
+            text = str([list(tvec)[0][0], list(tvec)[2][0], list(rvec)[0][0]])
+            cv2.putText(image, text, text_position, font, font_scale, text_color, font_thickness)
 
 
             return image
@@ -113,7 +114,15 @@ class AprilTag():
             # Solve PnP problem to estimate pose
             _, rvec, tvec = cv2.solvePnP(marker_points_3d, image_points_2d, camera_matrix, dist_coeffs)
 
-            return rvec, tvec * 39.3701
+            # Convert rotation vector to rotation matrix
+            rotation_matrix, _ = cv2.Rodrigues(rvec)
+            
+            # Invert the transformation to get the camera pose relative to the AprilTag
+            inverse_rotation_matrix = np.linalg.inv(rotation_matrix)
+            inverse_translation_vector = -np.dot(inverse_rotation_matrix, tvec)
+
+            return self.rotation_matrix_to_euler_angles(inverse_rotation_matrix), inverse_translation_vector * 39.3701
+
 
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -123,29 +132,11 @@ class AprilTag():
 
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-            #aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_16h5)
-            #detector = cv2.aruco.ArucoDetector(aruco_dict)
-            #corners, ids, rejected_img_points = detector.detectMarkers(gray)
-            aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_APRILTAG_36h11)
-            corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, aruco_dict)	    
-            #at_detector = Detector(
-            #    families="tag36h11",
-            #    nthreads=1,
-            #    quad_decimate=1.0,
-            #    quad_sigma=0.0,
-            #    refine_edges=1,
-            #    decode_sharpening=0.25,
-            #    debug=0
-            #    )
-            # options = apriltag.DetectorOptions(families='tag36h11')
-            # detector = apriltag.Detector(options)
-            # results = detector.detect(gray)
-            #results = at_detector.detect(gray)
-
-            #corners = tuple(res.corners[:, np.newaxis] for res in results)
-            #ids = [[res.tag_id] for res in results]
-            #print(corners)
-            #print(ids)
+            aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_16h5)
+            detector = cv2.aruco.ArucoDetector(aruco_dict)
+            corners, ids, rejected_img_points = detector.detectMarkers(gray)
+            # aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_APRILTAG_36h11)
+            # corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, aruco_dict)	    
 
             pose_data = {}
             num_tags = len(ids) if ids is not None else 0
@@ -168,7 +159,23 @@ class AprilTag():
                 #print("No AprilTags detected in the image.")
                 pass
             return pose_data
-            
+                
+    def rotation_matrix_to_euler_angles(self, rotation_matrix):
+        # Ensure the matrix is a valid rotation matrix
+        rotation_matrix = np.array(rotation_matrix)
+        #assert np.allclose(np.linalg.det(rotation_matrix), 1.0)
 
+        # Extract yaw, pitch, and roll angles
+        # Yaw (around y-axis)
+        yaw = np.arctan2(rotation_matrix[0, 2], rotation_matrix[2, 2])
 
+        # Pitch (around x-axis)
+        pitch = -np.arcsin(rotation_matrix[1, 2])
 
+        # Roll (around z-axis)
+        roll = np.arctan2(rotation_matrix[1, 0], rotation_matrix[1, 1])
+
+        # Convert angles to degrees
+        yaw_degrees, pitch_degrees, roll_degrees = np.degrees([yaw, pitch, roll])
+
+        return np.array([[yaw_degrees], [pitch_degrees], [roll_degrees]])
