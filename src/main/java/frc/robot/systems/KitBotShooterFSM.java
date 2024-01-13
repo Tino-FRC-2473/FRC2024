@@ -41,15 +41,17 @@ public class KitBotShooterFSM {
 	public KitBotShooterFSM() {
 		// Perform hardware init
 		// [Initialize lowMotor and highMotor]
-		//exampleMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER, CANSparkMax.MotorType.kBrushless);
+		//exampleMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER,
+		//CANSparkMax.MotorType.kBrushless);
+
 		lowMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_LOWER,
 						CANSparkMax.MotorType.kBrushless);
 		lowMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-		
+
 		lowMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
 		bottomLimitSwitch.enableLimitSwitch(false);
-		
-		highMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_LOWER,
+
+		highMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_UPPER,
 		CANSparkMax.MotorType.kBrushless);
 		highMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
@@ -91,7 +93,7 @@ public class KitBotShooterFSM {
 		if (input != null) {
 			return;
 		}
-		
+
 		switch (currentState) {
 			case IDLE_STOP:
 				handleStartState(input);
