@@ -132,11 +132,11 @@ class AprilTag():
 
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-            aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_16h5)
-            detector = cv2.aruco.ArucoDetector(aruco_dict)
-            corners, ids, rejected_img_points = detector.detectMarkers(gray)
-            # aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_APRILTAG_36h11)
-            # corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, aruco_dict)	    
+            # aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_16h5)
+            # detector = cv2.aruco.ArucoDetector(aruco_dict)
+            # corners, ids, rejected_img_points = detector.detectMarkers(gray)
+            aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_APRILTAG_36h11)
+            corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, aruco_dict)	    
 
             pose_data = {}
             num_tags = len(ids) if ids is not None else 0
