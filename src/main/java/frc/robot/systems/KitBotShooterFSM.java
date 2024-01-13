@@ -38,9 +38,13 @@ public class KitBotShooterFSM {
 	 * the constructor is called only once when the robot boots.
 	 */
 	public KitBotShooterFSM() {
-		// Perform hardware init
-		// [Initialize lowMotor and highMotor]
-		//exampleMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER, CANSparkMax.MotorType.kBrushless);
+	// Perform hardware init
+	// [Initialize lowMotor and highMotor]
+		highMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_HIGH,
+								CANSparkMax.MotorType.kBrushless);
+
+		lowMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_LOW,
+								CANSparkMax.MotorType.kBrushless);
 
 		// Reset state machine
 		reset();
@@ -121,32 +125,38 @@ public class KitBotShooterFSM {
 	 * @return FSM state for the next iteration
 	 */
 	private ShooterFSMState nextState(TeleopInput input) {
-		if(input == null) {
+		if (input == null) {
 			return ShooterFSMState.IDLE_STOP;
 		}
-		switch(currentState) {
+		switch (currentState) {
 			case IDLE_STOP:
-				if(input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
 					return ShooterFSMState.OUTTAKING;
 				}
-				if(input.isIntakeButtonPressed() && !hasNote() && !input.isOuttakeButtonPressed()) {
+				if (input.isIntakeButtonPressed() && !hasNote()
+					&& !input.isOuttakeButtonPressed()) {
 					return ShooterFSMState.INTAKING;
 				}
-				if((input.isIntakeButtonPressed() && hasNote()) || !(input.isOuttakeButtonPressed() || input.isIntakeButtonPressed()) || (input.isIntakeButtonPressed() && input.isOuttakeButtonPressed())) {
+				if ((input.isIntakeButtonPressed() && hasNote())
+					|| !(input.isOuttakeButtonPressed() || input.isIntakeButtonPressed())
+					|| (input.isIntakeButtonPressed() && input.isOuttakeButtonPressed())) {
 					return ShooterFSMState.IDLE_STOP;
 				}
 			case INTAKING:
-				if(input.isIntakeButtonPressed() && !hasNote() && !input.isOuttakeButtonPressed()) {
+				if (input.isIntakeButtonPressed() && !hasNote()
+					&& !input.isOuttakeButtonPressed()) {
 					return ShooterFSMState.INTAKING;
 				}
-				if(!input.isIntakeButtonPressed() || hasNote() || (input.isIntakeButtonPressed() && input.isOuttakeButtonPressed())) {
+				if (!input.isIntakeButtonPressed() || hasNote()
+					|| (input.isIntakeButtonPressed() && input.isOuttakeButtonPressed())) {
 					return ShooterFSMState.IDLE_STOP;
 				}
 			case OUTTAKING:
-				if(input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
 					return ShooterFSMState.OUTTAKING;
 				}
-				if(!input.isOuttakeButtonPressed() || (input.isIntakeButtonPressed() && input.isOuttakeButtonPressed())) {
+				if (!input.isOuttakeButtonPressed()
+					|| (input.isIntakeButtonPressed() && input.isOuttakeButtonPressed())) {
 					return ShooterFSMState.IDLE_STOP;
 				}
 			default:
@@ -165,7 +175,7 @@ public class KitBotShooterFSM {
 		highMotor.set(0);
 	}
 	/**
-	 * Handle behavior in INTAKING state
+	 * Handle behavior in INTAKING state.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
@@ -175,7 +185,7 @@ public class KitBotShooterFSM {
 	}
 
 	/**
-	 * Handle behavior in OUTTAKING state
+	 * Handle behavior in OUTTAKING state.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
