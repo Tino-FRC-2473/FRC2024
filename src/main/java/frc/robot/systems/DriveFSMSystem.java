@@ -242,7 +242,7 @@ public class DriveFSMSystem {
 
 			case ALIGN_TO_TAG_STATE:
 				System.out.println("x tag: " + rpi.getAprilTagX(1));
-				driveToTag(0, rpi.getAprilTagX(1), 0);
+				driveToTag(0, 0, rpi.getAprilTagYaw(1));
 				break;
 
 			default:
@@ -435,13 +435,13 @@ public class DriveFSMSystem {
 		}
 		double xSpeed = clamp(xDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT, -AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
 		double ySpeed = clamp(yDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT, -AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
-		double rotSpeed = rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT;
+		double rotSpeed = clamp(rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT, -AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
 		System.out.println("drive speed: " + ySpeed);
 		System.out.println ("xdist: " + xDist + " ydist: " + yDist + " rotFinal: " + rotFinal);
-		if (Math.abs(xDist) < 3 && Math.abs(yDist) < 3 && rotFinal < 1) {
-			drive(0, 0, 0, false, false);
+		if (Math.abs(xDist) < 3 && Math.abs(yDist) < 3 && Math.abs(rotFinal) < 5) {
+			drive(0, 0, 0, true, false);
 		} else {
-			drive(xSpeed, ySpeed, rotSpeed, true, true);
+			drive(xSpeed, ySpeed, rotSpeed, true, false);
 		}
 	}
 
