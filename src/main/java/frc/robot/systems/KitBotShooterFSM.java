@@ -1,6 +1,7 @@
 package frc.robot.systems;
 
 // WPILib Imports
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
@@ -90,7 +91,7 @@ public class KitBotShooterFSM {
 	 */
 	public void update(TeleopInput input) {
 
-		if (input != null) {
+		if (input == null) {
 			return;
 		}
 
@@ -107,7 +108,10 @@ public class KitBotShooterFSM {
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-
+		SmartDashboard.putString("Current State", currentState.toString());
+		SmartDashboard.putBoolean("Bottom Limit Switch Pressed", bottomLimitSwitch.isPressed());
+		SmartDashboard.putBoolean("Outtake Button Pressed", input.isOuttakeButtonPressed());
+		SmartDashboard.putBoolean("Intake Button Pressed", input.isIntakeButtonPressed());
 		currentState = nextState(input);
 	}
 
@@ -234,7 +238,7 @@ public class KitBotShooterFSM {
 	}
 
 	private boolean hasNote() {
-		return false;
+		return bottomLimitSwitch.isPressed();
 	}
 
 
