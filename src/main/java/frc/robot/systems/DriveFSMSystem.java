@@ -242,7 +242,8 @@ public class DriveFSMSystem {
 
 			case ALIGN_TO_TAG_STATE:
 				System.out.println("x tag: " + rpi.getAprilTagX(1));
-				driveToTag(0, 0, rpi.getAprilTagYaw(1));
+				driveToTag(1);
+				// LEAVE ROT FINAL AS ZERO (ANGLE OF APRIL TAG)
 				break;
 
 			default:
@@ -424,24 +425,31 @@ public class DriveFSMSystem {
 
 	/**
 	 * Drives the robot until it reaches a given position relative to the apriltag.
-	 * @param xDist constantly updating x distance to the point
-	 * @param yDist constantly updating y distance to the point
-	 * @param rotFinal constantly updating angular difference to the point
+	 * @param id april tag id
 	 */
-	public void driveToTag(double xDist, double yDist, double rotFinal) {
+	public void driveToTag(int id) {
 		if (xDist == 4000 || yDist == 4000 || rotFinal == 4000) {
 			drive(0, 0, 0, false, false);
 			return;
 		}
-		double xSpeed = clamp(xDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT, -AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
-		double ySpeed = clamp(yDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT, -AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
-		double rotSpeed = clamp(rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT, -AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
-		System.out.println("drive speed: " + ySpeed);
-		System.out.println ("xdist: " + xDist + " ydist: " + yDist + " rotFinal: " + rotFinal);
-		if (Math.abs(xDist) < 3 && Math.abs(yDist) < 3 && Math.abs(rotFinal) < 5) {
+		double transformedXDist = Math.hypot(rpi.getAprilTagX(id), rpi.getAprilTagY(id))
+			* Math.sin(Math.toRadians(-(getHeading() + rpi.getAprilTagYaw(id))));
+		double transformedYDist = Math.hypot(rpi.getAprilTagX(id), rpi.getAprilTagY(id))
+			* Math.cos(Math.toRadians(-(getHeading() + rpi.getAprilTagYaw(id))));
+
+		double xSpeed = clamp(transformedXDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
+		double ySpeed = clamp(transformedYDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
+		double rotSpeed = clamp(getHeading() / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
+			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+			AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
+		//System.out.println("drive speed: " + ySpeed);
+		//System.out.println ("xdist: " + xDist + " ydist: " + yDist + " rotFinal: " + rotFinal);
+		if (Math.abs(xDist) < 3 && Math.abs(yDist) < 3 && Math.abs(getHeading()) < 5) {
 			drive(0, 0, 0, true, false);
 		} else {
-			drive(xSpeed, ySpeed, rotSpeed, true, false);
+			drive(ySpeed, xSpeed, rotSpeed, true, false);
 		}
 	}
 
