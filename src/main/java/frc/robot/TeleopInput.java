@@ -2,7 +2,7 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.Joystick;
-
+import edu.wpi.first.wpilibj.PS5Controller;
 /**
  * Common class for providing driver inputs during Teleop.
  *
@@ -13,12 +13,15 @@ import edu.wpi.first.wpilibj.Joystick;
 public class TeleopInput {
 	/* ======================== Constants ======================== */
 	private static final int LEFT_JOYSTICK_PORT = 0;
-	private static final int RIGHT_JOYSTICK_PORT = 1;
+	private static final int PS5_CONTROLLER_PORT = 1;
+	private static final int INTAKE_BUTTON = 2;
+	private static final int OUTTAKE_BUTTON = 1;
+	private static final int SHOOT_BUTTON = 3;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
 	private Joystick leftJoystick;
-	private Joystick rightJoystick;
+	private PS5Controller controller;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -28,8 +31,7 @@ public class TeleopInput {
 	 */
 	public TeleopInput() {
 		leftJoystick = new Joystick(LEFT_JOYSTICK_PORT);
-
-		rightJoystick = new Joystick(RIGHT_JOYSTICK_PORT);
+		controller = new PS5Controller(PS5_CONTROLLER_PORT);
 	}
 
 	/* ======================== Public methods ======================== */
@@ -57,14 +59,22 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isShooterButtonPressed() {
-		return leftJoystick.getRawButton(1);
+		return leftJoystick.getRawButton(SHOOT_BUTTON);
 	}
 	/**
 	 * Get the value of the intake button.
 	 * @return True if button is pressed
 	 */
 	public boolean isIntakeButtonPressed() {
-		return leftJoystick.getRawButton(2);
+		return leftJoystick.getRawButton(INTAKE_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Outtake button.
+	 * @return True if button is pressed
+	 */
+	public boolean isOuttakeButtonPressed() {
+		return leftJoystick.getRawButton(OUTTAKE_BUTTON);
 	}
 
 	/* ------------------------ Right Joystick ------------------------ */
@@ -73,14 +83,14 @@ public class TeleopInput {
 	 * @return Axis value
 	 */
 	public double getRightJoystickX() {
-		return rightJoystick.getX();
+		return controller.getR2Axis();
 	}
 	/**
 	 * Get Y axis of Right Joystick.
 	 * @return Axis value
 	 */
 	public double getRightJoystickY() {
-		return rightJoystick.getY();
+		return controller.getL2Axis();
 	}
 
 	/* ======================== Private methods ======================== */
