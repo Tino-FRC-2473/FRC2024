@@ -15,7 +15,7 @@ CAM_HEIGHT = 0.4
 CAM_ANGLE = -15
 input = VisionInput(FOV, RES, CAM_HEIGHT, CAM_ANGLE)
 tag_module = AprilTag()
-ARUCO_LENGTH_METERS = 0.123
+ARUCO_LENGTH_METERS = 0.165
 
 while True:
     frame = input.getFrame()

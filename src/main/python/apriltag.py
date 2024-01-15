@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 #import matplotlib.pyplot as plt
 import os
+import math
 #import apriltag
 #from pupil_apriltags import Detector
 
@@ -114,14 +115,16 @@ class AprilTag():
             # Solve PnP problem to estimate pose
             _, rvec, tvec = cv2.solvePnP(marker_points_3d, image_points_2d, camera_matrix, dist_coeffs)
 
-            # Convert rotation vector to rotation matrix
-            rotation_matrix, _ = cv2.Rodrigues(rvec)
-            
-            # Invert the transformation to get the camera pose relative to the AprilTag
-            inverse_rotation_matrix = np.linalg.inv(rotation_matrix)
-            inverse_translation_vector = -np.dot(inverse_rotation_matrix, tvec)
+            return rvec, tvec * 39.3701
 
-            return self.rotation_matrix_to_euler_angles(inverse_rotation_matrix), inverse_translation_vector * 39.3701
+            # # Convert rotation vector to rotation matrix
+            # rotation_matrix, _ = cv2.Rodrigues(rvec)
+            
+            # # Invert the transformation to get the camera pose relative to the AprilTag
+            # inverse_rotation_matrix = np.linalg.inv(rotation_matrix)
+            # inverse_translation_vector = -np.dot(inverse_rotation_matrix, tvec)
+
+            # return self.rotation_matrix_to_euler_angles(inverse_rotation_matrix), inverse_translation_vector * 39.3701
 
 
         except Exception as e:
@@ -136,7 +139,7 @@ class AprilTag():
             # detector = cv2.aruco.ArucoDetector(aruco_dict)
             # corners, ids, rejected_img_points = detector.detectMarkers(gray)
             aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_APRILTAG_36h11)
-            corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, aruco_dict)	    
+            corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, aruco_dict)	  
 
             pose_data = {}
             num_tags = len(ids) if ids is not None else 0
@@ -150,6 +153,9 @@ class AprilTag():
                     # Estimate the pose
                     rvec, tvec= self.estimate_pose_single_marker(corners[i], ARUCO_LENGTH_METERS, self.camera_matrix, self.dist_coeffs)
                     pose_data[ids[i][0]] = (tvec, rvec)
+                    #print(corners[i])
+                    #print(self.get_yaw(corners[i]) )
+                    rvec[0][0] = self.get_yaw(corners[i])
                     # Draw the 3D pose axis on the image
                     #self.draw_axis_on_image(frame_ann, self.camera_matrix, self.dist_coeffs, rvec, tvec, 0.1)
 
@@ -179,3 +185,17 @@ class AprilTag():
         yaw_degrees, pitch_degrees, roll_degrees = np.degrees([yaw, pitch, roll])
 
         return np.array([[yaw_degrees], [pitch_degrees], [roll_degrees]])
+
+
+    def get_yaw(self, corners):
+        corners = np.array(corners)
+        
+        #print(corners)
+        x = np.mean(corners[:][0])
+        
+        center_tag = x
+        center_cam = 640/2
+        B = center_tag - center_cam
+        A = center_cam
+        theta = math.atan(B * math.tan(math.radians(50 / 2)) / A)
+        return math.degrees(theta)
