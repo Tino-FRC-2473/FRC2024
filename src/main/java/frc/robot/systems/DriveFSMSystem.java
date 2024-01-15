@@ -456,7 +456,7 @@ public class DriveFSMSystem {
 	 * Drives the robot until it reaches a given position relative to the apriltag.
 	 */
 	public void driveToTag() {
-		if (xDist == 4000 || yDist == 4000 || rotFinal == 4000) {
+		if (lastSeenTagX == 4000 || lastSeenTagY == 4000 || lastSeenTagYaw == 4000) {
 			drive(0, 0, 0, false, false);
 			return;
 		}
@@ -469,11 +469,11 @@ public class DriveFSMSystem {
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
 		double ySpeed = clamp(transformedYDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
-		double rotSpeed = clamp(getHeading() / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
+		double rotSpeed = clamp(lastSeenTagYaw / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
 			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
 
-		if (Math.abs(transformedXDist) < 3 && Math.abs(transformedYDist) < 3 && Math.abs(getHeading()) < 5) {
+		if (Math.abs(transformedXDist) < 3 && Math.abs(transformedYDist) < 3 && Math.abs(lastSeenTagYaw) < 5) {
 			drive(0, 0, 0, true, false);
 		} else {
 			drive(ySpeed, xSpeed, rotSpeed, true, false);
