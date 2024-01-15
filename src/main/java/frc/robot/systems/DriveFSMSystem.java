@@ -28,7 +28,6 @@ import frc.robot.RaspberryPI;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.SwerveConstants.AutoConstants;
-import frc.robot.Constants;
 
 public class DriveFSMSystem {
 	/* ======================== Constants ======================== */
@@ -41,7 +40,10 @@ public class DriveFSMSystem {
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
 	private int currentPointInPath;
-	private int n = 0;
+	private double lastSeenTagYaw;
+	private double lastSeenTagX;
+	private double lastSeenTagY;
+
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 
@@ -136,6 +138,10 @@ public class DriveFSMSystem {
 	public void reset() {
 		currentState = FSMState.TELEOP_STATE;
 
+		lastSeenTagX = 4000;
+		lastSeenTagY = 4000;
+		lastSeenTagYaw = 4000;
+
 		resetOdometry(new Pose2d());
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -152,6 +158,10 @@ public class DriveFSMSystem {
 
 	public void resetAutonomus() {
 		currentPointInPath = 0;
+
+		lastSeenTagX = 4000;
+		lastSeenTagY = 4000;
+		lastSeenTagYaw = 4000;
 
 		resetOdometry(new Pose2d());
 		// Call one tick of update to ensure outputs reflect start state
@@ -175,6 +185,16 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
 		System.out.println("X: " + getPose().getX());
 		System.out.println("Y: " + getPose().getY());
+
+		if (rpi.getAprilTagX(1) != 4000 && rpi.getAprilTagY(1) != 4000 && rpi.getAprilTagYaw(1) != 4000) {
+			lastSeenTagX = rpi.getAprilTagX(1);
+			lastSeenTagY = rpi.getAprilTagY(1);
+			lastSeenTagYaw = rpi.getAprilTagYaw(1);
+			SmartDashboard.putBoolean("Can See Tag", true);
+		} else {
+			SmartDashboard.putBoolean("Can See Tag", false);
+		}
+
 		switch (autoState) {
 			case AUTO_STATE:
 				ArrayList<Pose2d> points = new ArrayList<Pose2d>();
@@ -221,7 +241,16 @@ public class DriveFSMSystem {
 
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
-		n++;
+
+		if (rpi.getAprilTagX(1) != 4000 && rpi.getAprilTagY(1) != 4000 && rpi.getAprilTagYaw(1) != 4000) {
+			lastSeenTagX = rpi.getAprilTagX(1);
+			lastSeenTagY = rpi.getAprilTagY(1);
+			lastSeenTagYaw = rpi.getAprilTagYaw(1);
+			SmartDashboard.putBoolean("Can See Tag", true);
+		} else {
+			SmartDashboard.putBoolean("Can See Tag", false);
+		}
+
 		if (input == null) {
 			return;
 		}
@@ -242,7 +271,7 @@ public class DriveFSMSystem {
 
 			case ALIGN_TO_TAG_STATE:
 				System.out.println("x tag: " + rpi.getAprilTagX(1));
-				driveToTag(1);
+				driveToTag();
 				// LEAVE ROT FINAL AS ZERO (ANGLE OF APRIL TAG)
 				break;
 
@@ -265,15 +294,15 @@ public class DriveFSMSystem {
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case TELEOP_STATE:
-				//System.out.println("IN TELEOP STATE");
+				lastSeenTagX = 4000;
+				lastSeenTagY = 4000;
+				lastSeenTagYaw = 4000;
 				if (input.isCircleButtonPressed()) {
 					return FSMState.ALIGN_TO_TAG_STATE;
 				}
 				return FSMState.TELEOP_STATE;
 			case ALIGN_TO_TAG_STATE:
-				System.out.println("IN TAG STATE");
 				if (input.isCircleButtonReleased()) {
-					System.out.println("released");
 					return FSMState.TELEOP_STATE;
 				}
 				return FSMState.ALIGN_TO_TAG_STATE;
@@ -425,17 +454,16 @@ public class DriveFSMSystem {
 
 	/**
 	 * Drives the robot until it reaches a given position relative to the apriltag.
-	 * @param id april tag id
 	 */
-	public void driveToTag(int id) {
+	public void driveToTag() {
 		if (xDist == 4000 || yDist == 4000 || rotFinal == 4000) {
 			drive(0, 0, 0, false, false);
 			return;
 		}
-		double transformedXDist = Math.hypot(rpi.getAprilTagX(id), rpi.getAprilTagY(id))
-			* Math.sin(Math.toRadians(-(getHeading() + rpi.getAprilTagYaw(id))));
-		double transformedYDist = Math.hypot(rpi.getAprilTagX(id), rpi.getAprilTagY(id))
-			* Math.cos(Math.toRadians(-(getHeading() + rpi.getAprilTagYaw(id))));
+		double transformedXDist = Math.hypot(lastSeenTagX, lastSeenTagX)
+			* Math.sin(Math.toRadians(-(getHeading() + lastSeenTagYaw)));
+		double transformedYDist = Math.hypot(lastSeenTagX, lastSeenTagY)
+			* Math.cos(Math.toRadians(-(getHeading() + lastSeenTagYaw)));
 
 		double xSpeed = -clamp(transformedXDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
@@ -444,9 +472,8 @@ public class DriveFSMSystem {
 		double rotSpeed = clamp(getHeading() / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
 			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
-		//System.out.println("drive speed: " + ySpeed);
-		//System.out.println ("xdist: " + xDist + " ydist: " + yDist + " rotFinal: " + rotFinal);
-		if (Math.abs(xDist) < 3 && Math.abs(yDist) < 3 && Math.abs(getHeading()) < 5) {
+
+		if (Math.abs(transformedXDist) < 3 && Math.abs(transformedYDist) < 3 && Math.abs(getHeading()) < 5) {
 			drive(0, 0, 0, true, false);
 		} else {
 			drive(ySpeed, xSpeed, rotSpeed, true, false);
