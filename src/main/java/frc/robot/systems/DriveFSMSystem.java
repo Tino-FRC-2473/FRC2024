@@ -437,7 +437,7 @@ public class DriveFSMSystem {
 		double transformedYDist = Math.hypot(rpi.getAprilTagX(id), rpi.getAprilTagY(id))
 			* Math.cos(Math.toRadians(-(getHeading() + rpi.getAprilTagYaw(id))));
 
-		double xSpeed = clamp(transformedXDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+		double xSpeed = -clamp(transformedXDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
 		double ySpeed = clamp(transformedYDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
