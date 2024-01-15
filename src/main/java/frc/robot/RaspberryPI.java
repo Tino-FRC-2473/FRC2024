@@ -17,6 +17,8 @@ public class RaspberryPI {
 	private double previousTimeReceived = 0;
 	private Timer timer = new Timer();
 
+	public static final int APRIL_TAG_CONSTANT = 6;
+
 	/**Updates the FPS each iteration of the robot.*/
 	public RaspberryPI() {
 		timer.start();
@@ -51,7 +53,7 @@ public class RaspberryPI {
 	 * @return the x distance to the tag in inches
 	 */
 	public double getAprilTagX(int id) {
-		return tagSubscriber.get()[(6 * (id - 1))];
+		return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1))];
 	}
 	/**
 	 * Gives information about april tag.
@@ -59,7 +61,7 @@ public class RaspberryPI {
 	 * @return the y distance to the tag in inches
 	 */
 	public double getAprilTagY(int id) {
-		return tagSubscriber.get()[(6 * (id - 1)) + 1];
+		return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 1];
 	}
 	/**
 	 * Gives information about april tag.
@@ -67,7 +69,7 @@ public class RaspberryPI {
 	 * @return the y distance to the tag in inches
 	 */
 	public double getAprilTagZ(int id) {
-		return tagSubscriber.get()[(6 * (id - 1)) + 2];
+		return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2];
 	}
 	/**
 	 * Gives information about april tag.
@@ -75,7 +77,7 @@ public class RaspberryPI {
 	 * @return the yaw to the tag
 	 */
 	public double getAprilTagYaw(int id) {
-		return tagSubscriber.get()[(6 * (id - 1)) + 3];
+		return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 1];
 	}
 	/**
 	 * Gives information about april tag.
@@ -83,7 +85,7 @@ public class RaspberryPI {
 	 * @return the pitch to the tag
 	 */
 	public double getAprilTagPitch(int id) {
-		return tagSubscriber.get()[(6 * (id - 1)) + 4];
+		return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 2];
 	}
 	/**
 	 * Gives information about april tag.
@@ -91,6 +93,6 @@ public class RaspberryPI {
 	 * @return the roll to the tag
 	 */
 	public double getAprilTagRoll(int id) {
-		return tagSubscriber.get()[(6 * (id - 1)) + 5];
+		return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 2 + 1];
 	}
 }

@@ -180,6 +180,7 @@ public class DriveFSMSystem {
 		System.out.println("Y: " + getPose().getY());
 
 		switch (autoState) {
+			// POINTS TBD
 			case DRIVE_PATH_1:
 				ArrayList<Pose2d> path1Points = new ArrayList<Pose2d>();
 				if (blueAlliance) {
