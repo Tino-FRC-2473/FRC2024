@@ -46,9 +46,14 @@ public class RaspberryPI {
 
 	//If the number 4000 is returned from any of the methods below, that output is invalid and no tag of the inputted Id has been detected
 	public double getAprilTagX(int id) {
-		return tagSubscriber.get()[(6 * (id - 1))];
+		try {
+			return tagSubscriber.get()[(6 * (id - 1))];
+		} catch (NullPointerException e) {
+			System.out.print("CV NOT RUNNING");
+			return 4000;
+		}
 	}
-	
+
 	public double getAprilTagY(int id) {
 		return tagSubscriber.get()[(6 * (id - 1)) + 1];
 	}

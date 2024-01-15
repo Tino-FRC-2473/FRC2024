@@ -251,6 +251,10 @@ public class DriveFSMSystem {
 			SmartDashboard.putBoolean("Can See Tag", false);
 		}
 
+		SmartDashboard.putNumber("last seen x", lastSeenTagX);
+		SmartDashboard.putNumber("last seen y", lastSeenTagY);
+		SmartDashboard.putNumber("last seen yaw", lastSeenTagYaw);
+
 		if (input == null) {
 			return;
 		}
