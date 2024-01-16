@@ -486,19 +486,19 @@ public class DriveFSMSystem {
 		// }
 
 
-		double xSpeed = clamp(-lastSeenTagX / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+		double xSpeed = clamp(Math.abs(lastSeenTagX) / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
-		double ySpeed = clamp(lastSeenTagX / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+		double ySpeed = clamp((Math.abs(lastSeenTagY) - 30) / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
 		double rotSpeed = clamp(-lastSeenTagYaw / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
 			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
 
-		if (Math.abs(lastSeenTagX) < 3 && Math.abs(lastSeenTagY) < 20 && Math.abs(lastSeenTagYaw) < 5) {
+		if (Math.abs(lastSeenTagX) < 3 && Math.abs(lastSeenTagY) < 30 && Math.abs(lastSeenTagYaw) < 5) {
 			System.out.println("aligned");
 			drive(0, 0, 0, true, false);
 		} else {
-			drive(ySpeed, xSpeed, rotSpeed, true, false);
+			drive(ySpeed, 0, 0, true, false);
 		}
 	}
 

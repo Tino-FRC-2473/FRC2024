@@ -134,7 +134,7 @@ public final class SwerveConstants {
 		public static final double P_THETA_CONTROLLER = 1;
 
 		// tag detection/alignment
-		public static final double DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT = 100; //meters
+		public static final double DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT = 300; //meters
 		public static final double DRIVE_TO_TAG_ROTATIONAL_CONSTANT = 100;
 		//object detection/alignment
 		public static final double DRIVE_TO_OBJECT_TRANSLATIONAL_CONSTANT = 0.5; //meters (0.5)
