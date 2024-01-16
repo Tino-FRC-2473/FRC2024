@@ -183,8 +183,7 @@ public class DriveFSMSystem {
 
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
-		System.out.println("X: " + getPose().getX());
-		System.out.println("Y: " + getPose().getY());
+		SmartDashboard.putNumber("Heading", getHeading());
 
 		if (rpi.getAprilTagX(1) != 4000 && rpi.getAprilTagY(1) != 4000 && rpi.getAprilTagYaw(1) != 4000) {
 			lastSeenTagX = rpi.getAprilTagX(1);
@@ -241,6 +240,8 @@ public class DriveFSMSystem {
 
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
+		SmartDashboard.putNumber("Heading", getHeading());
+
 
 		if (rpi.getAprilTagX(1) != 4000 && rpi.getAprilTagY(1) != 4000 && rpi.getAprilTagYaw(1) != 4000) {
 			lastSeenTagX = rpi.getAprilTagX(1);
@@ -274,7 +275,7 @@ public class DriveFSMSystem {
 				break;
 
 			case ALIGN_TO_TAG_STATE:
-				System.out.println("x tag: " + rpi.getAprilTagX(1));
+				//System.out.println("x tag: " + rpi.getAprilTagX(1));
 				driveToTag();
 				// LEAVE ROT FINAL AS ZERO (ANGLE OF APRIL TAG)
 				break;
@@ -469,18 +470,19 @@ public class DriveFSMSystem {
 		double transformedYDist = Math.hypot(lastSeenTagX, lastSeenTagY)
 			* Math.cos(Math.toRadians(-(getHeading() + lastSeenTagYaw)));
 
-		double xSpeed = -clamp(transformedXDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+		double xSpeed = clamp(-transformedXDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
 		double ySpeed = clamp(transformedYDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
-		double rotSpeed = clamp(lastSeenTagYaw / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
+		double rotSpeed = clamp(-lastSeenTagYaw / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
 			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
 
-		if (Math.abs(transformedXDist) < 3 && Math.abs(transformedYDist) < 3 && Math.abs(lastSeenTagYaw) < 5) {
+		if (Math.abs(transformedXDist) < 3 && Math.abs(transformedYDist) < 20 && Math.abs(lastSeenTagYaw) < 5) {
+			System.out.println("aligned");
 			drive(0, 0, 0, true, false);
 		} else {
-			drive(ySpeed, xSpeed, rotSpeed, true, false);
+			drive(ySpeed, xSpeed, 0, true, false);
 		}
 	}
 

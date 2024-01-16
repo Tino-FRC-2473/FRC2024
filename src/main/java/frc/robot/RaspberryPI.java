@@ -49,28 +49,48 @@ public class RaspberryPI {
 		try {
 			return tagSubscriber.get()[(6 * (id - 1))];
 		} catch (NullPointerException e) {
-			System.out.print("CV NOT RUNNING");
+			System.out.println("cv no");
 			return 4000;
 		}
 	}
 
 	public double getAprilTagY(int id) {
-		return tagSubscriber.get()[(6 * (id - 1)) + 1];
+		try {
+			return tagSubscriber.get()[(6 * (id - 1)) + 1];
+		} catch (NullPointerException e) {
+			return 4000;
+		}
 	}
 
 	public double getAprilTagZ(int id) {
-		return tagSubscriber.get()[(6 * (id - 1)) + 2];
+		try {
+			return tagSubscriber.get()[(6 * (id - 1)) + 2];
+		} catch (NullPointerException e) {
+			return 4000;
+		}
 	}
 
 	public double getAprilTagYaw(int id) {
-		return tagSubscriber.get()[(6 * (id - 1)) + 3];
+		try {
+			return tagSubscriber.get()[(6 * (id - 1)) + 3];
+		} catch (NullPointerException e) {
+			return 4000;
+		}
 	}
 
 	public double getAprilTagPitch(int id) {
-		return tagSubscriber.get()[(6 * (id - 1)) + 4];
+		try {
+			return tagSubscriber.get()[(6 * (id - 1)) + 4];
+		} catch (NullPointerException e) {
+			return 4000;
+		}
 	}
 
 	public double getAprilTagRoll(int id) {
-		return tagSubscriber.get()[(6 * (id - 1)) + 5];
+		try {
+			return tagSubscriber.get()[(6 * (id - 1)) + 5];
+		} catch (NullPointerException e) {
+			return 4000;
+		}
 	}
 }
