@@ -14,12 +14,12 @@ public class AutoPathChooser {
 	 */
 	public AutoPathChooser() {
 		autoPathChooser = new SendableChooser<>();
-		autoPathChooser.setDefaultOption("Path 1", AutoPath.PATH1);
-		autoPathChooser.addOption("Path 2", AutoPath.PATH2);
-		autoPathChooser.addOption("Path 3", AutoPath.PATH3);
-		autoPathChooser.addOption("Path 4", AutoPath.PATH4);
-		autoPathChooser.addOption("Path 5", AutoPath.PATH5);
-		autoPathChooser.addOption("Path 6", AutoPath.PATH6);
+		autoPathChooser.setDefaultOption("Center Shoot and Leave", AutoPath.PATH1);
+		autoPathChooser.addOption("Source Side Shoot and Leave", AutoPath.PATH2);
+		autoPathChooser.addOption("Amp Side Shoot and Leave", AutoPath.PATH3);
+		autoPathChooser.addOption("Wait then Shoot and Leave", AutoPath.PATH4);
+		autoPathChooser.addOption("Leave Only", AutoPath.PATH5);
+		autoPathChooser.addOption("Shoot Only", AutoPath.PATH6);
 		SmartDashboard.putData("Auto Path", autoPathChooser);
 
 		allianceChooser = new SendableChooser<>();
