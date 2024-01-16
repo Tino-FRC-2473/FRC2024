@@ -49,7 +49,7 @@ public class KitBotShooterFSM {
 						CANSparkMax.MotorType.kBrushless);
 		lowMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
-		lowMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
+		bottomLimitSwitch = lowMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
 		bottomLimitSwitch.enableLimitSwitch(false);
 
 		highMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_UPPER,
