@@ -1,5 +1,8 @@
 package frc.robot.systems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.AutoPathChooser;
+
 public class AutoHandlerSystem {
 	/* ======================== Constants ======================== */
 	// Auto FSM state definitions
@@ -76,6 +79,14 @@ public class AutoHandlerSystem {
 	 * @param path the auto path to be executed
 	 */
 	public void reset(AutoPath path) {
+
+		if (AutoPathChooser.getSelectedPath() != null) {
+			AutoPathChooser.getSelectedPath();
+		}
+		SmartDashboard.putString("Auto Path Point", "" + currentState);
+
+		// FIX ABOVE
+		
 		driveSystem.resetAutonomus();
 
 		currentStateIndex = 0;

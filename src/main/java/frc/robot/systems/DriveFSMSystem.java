@@ -25,6 +25,7 @@ import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 import frc.robot.utils.SwerveUtils;
 import frc.robot.HardwareMap;
 import frc.robot.RaspberryPI;
+import frc.robot.Robot;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.SwerveConstants.AutoConstants;
@@ -155,7 +156,9 @@ public class DriveFSMSystem {
 
 	public void resetAutonomus() {
 		currentPointInPath = 0;
-		blueAlliance = AutoPathChooser.getSelectedAlliance();
+		if (AutoPathChooser.getAutoPathChooser() != null) {
+			blueAlliance = AutoPathChooser.getSelectedAlliance();
+		}
 		resetOdometry(new Pose2d());
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
