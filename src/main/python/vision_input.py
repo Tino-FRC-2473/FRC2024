@@ -25,3 +25,7 @@ class VisionInput:
 
         fr = cv2.resize(frame, (self.w, self.h), interpolation=cv2.INTER_AREA)
         return fr
+
+
+    def close(self):
+        self.cap.release()
