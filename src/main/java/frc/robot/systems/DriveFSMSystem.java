@@ -25,7 +25,6 @@ import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 import frc.robot.utils.SwerveUtils;
 import frc.robot.HardwareMap;
 import frc.robot.RaspberryPI;
-import frc.robot.Robot;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.SwerveConstants.AutoConstants;
@@ -52,7 +51,7 @@ public class DriveFSMSystem {
 	private AHRS gyro = new AHRS(SPI.Port.kMXP);
 
 	// The raspberry pi
-	private RaspberryPI rpi;
+	private RaspberryPI rpi = new RaspberryPI();
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double currentRotation = 0.0;
@@ -156,10 +155,10 @@ public class DriveFSMSystem {
 
 	public void resetAutonomus() {
 		currentPointInPath = 0;
+		resetOdometry(new Pose2d());
 		if (AutoPathChooser.getAutoPathChooser() != null) {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
 		}
-		resetOdometry(new Pose2d());
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -179,8 +178,7 @@ public class DriveFSMSystem {
 
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
-		System.out.println("X: " + getPose().getX());
-		System.out.println("Y: " + getPose().getY());
+		SmartDashboard.putNumber("Heading", getHeading());
 
 		switch (autoState) {
 			// POINTS TBD
@@ -306,6 +304,7 @@ public class DriveFSMSystem {
 
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
+		SmartDashboard.putNumber("Heading", getHeading());
 
 		if (input == null) {
 			return;
@@ -335,15 +334,15 @@ public class DriveFSMSystem {
 				break;
 
 			case ALIGN_TO_TAG_STATE:
-				double xdist =  rpi.getAprilTagX(1);
-				double ydist = rpi.getAprilTagY(1);
-				double angle = rpi.getAprilTagYaw(1);
-				boolean canSee = (xdist == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT
-					|| angle == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT
-					|| ydist == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT);
-				SmartDashboard.putBoolean("Can See Tag", canSee);
-				System.out.println("x tag: " + rpi.getAprilTagX(1));
-				driveToTag(0, xdist, 0);
+				// double xdist =  rpi.getAprilTagX(1);
+				// double ydist = rpi.getAprilTagY(1);
+				// double angle = rpi.getAprilTagYaw(1);
+				// boolean canSee = (xdist == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT
+				// 	|| angle == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT
+				// 	|| ydist == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT);
+				// SmartDashboard.putBoolean("Can See Tag", canSee);
+				// System.out.println("x tag: " + rpi.getAprilTagX(1));
+				// driveToTag(0, xdist, 0);
 				break;
 
 			default:
@@ -379,9 +378,7 @@ public class DriveFSMSystem {
 				return FSMState.ALIGN_TO_OBJECT_STATE;
 
 			case ALIGN_TO_TAG_STATE:
-				System.out.println("IN TAG STATE");
 				if (input.isCircleButtonReleased()) {
-					System.out.println("released");
 					return FSMState.TELEOP_STATE;
 				}
 				return FSMState.ALIGN_TO_TAG_STATE;

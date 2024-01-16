@@ -1,7 +1,9 @@
 package frc.robot.systems;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.AutoPathChooser;
+
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import frc.robot.AutoPathChooser;
 
 public class AutoHandlerSystem {
 	/* ======================== Constants ======================== */
@@ -80,13 +82,6 @@ public class AutoHandlerSystem {
 	 */
 	public void reset(AutoPath path) {
 
-		if (AutoPathChooser.getSelectedPath() != null) {
-			AutoPathChooser.getSelectedPath();
-		}
-		SmartDashboard.putString("Auto Path Point", "" + currentState);
-
-		// FIX ABOVE
-		
 		driveSystem.resetAutonomus();
 
 		currentStateIndex = 0;
@@ -115,6 +110,7 @@ public class AutoHandlerSystem {
 
 		boolean isCurrentStateFinished;
 		System.out.println("In State: " + getCurrentState());
+		SmartDashboard.putString("In Auto State: ", "" + getCurrentState());
 		switch (getCurrentState()) {
 			case DRIVE_PATH_1:
 				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DRIVE_PATH_1);
