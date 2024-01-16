@@ -465,24 +465,40 @@ public class DriveFSMSystem {
 			drive(0, 0, 0, false, false);
 			return;
 		}
-		double transformedXDist = Math.hypot(lastSeenTagX, lastSeenTagX)
-			* Math.sin(Math.toRadians(-(getHeading() + lastSeenTagYaw)));
-		double transformedYDist = Math.hypot(lastSeenTagX, lastSeenTagY)
-			* Math.cos(Math.toRadians(-(getHeading() + lastSeenTagYaw)));
+		// double transformedXDist = Math.hypot(lastSeenTagX, lastSeenTagX)
+		// 	* Math.sin(Math.toRadians(-(getHeading() + lastSeenTagYaw)));
+		// double transformedYDist = Math.hypot(lastSeenTagX, lastSeenTagY)
+		// 	* Math.cos(Math.toRadians(-(getHeading() + lastSeenTagYaw)));
 
-		double xSpeed = clamp(-transformedXDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+		// double xSpeed = clamp(-transformedXDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+		// 	-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
+		// double ySpeed = clamp(transformedYDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+		// 	-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
+		// double rotSpeed = clamp(-lastSeenTagYaw / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
+		// 	-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+		// 	AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
+
+		// if (Math.abs(transformedXDist) < 3 && Math.abs(transformedYDist) < 20 && Math.abs(lastSeenTagYaw) < 5) {
+		// 	System.out.println("aligned");
+		// 	drive(0, 0, 0, true, false);
+		// } else {
+		// 	drive(ySpeed, xSpeed, 0, true, false);
+		// }
+
+
+		double xSpeed = clamp(-lastSeenTagX / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
-		double ySpeed = clamp(transformedYDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+		double ySpeed = clamp(lastSeenTagX / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
 		double rotSpeed = clamp(-lastSeenTagYaw / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
 			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
 
-		if (Math.abs(transformedXDist) < 3 && Math.abs(transformedYDist) < 20 && Math.abs(lastSeenTagYaw) < 5) {
+		if (Math.abs(lastSeenTagX) < 3 && Math.abs(lastSeenTagY) < 20 && Math.abs(lastSeenTagYaw) < 5) {
 			System.out.println("aligned");
 			drive(0, 0, 0, true, false);
 		} else {
-			drive(ySpeed, xSpeed, 0, true, false);
+			drive(ySpeed, xSpeed, rotSpeed, true, false);
 		}
 	}
 
