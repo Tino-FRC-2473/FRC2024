@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -101,10 +102,6 @@ public class DriveFSMSystem {
 	 * the constructor is called only once when the robot boots.
 	 */
 	public DriveFSMSystem() {
-		// Perform hardware init
-		gyro = new AHRS(SPI.Port.kMXP);
-		rpi = new RaspberryPI();
-
 		// Reset state machine
 		reset();
 	}
@@ -138,7 +135,8 @@ public class DriveFSMSystem {
 
 	public void reset() {
 		currentState = FSMState.TELEOP_STATE;
-
+		gyro.reset();
+		resetEncoders();
 		resetOdometry(new Pose2d());
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -155,6 +153,8 @@ public class DriveFSMSystem {
 
 	public void resetAutonomus() {
 		currentPointInPath = 0;
+		gyro.reset();
+		resetEncoders();
 		resetOdometry(new Pose2d());
 		if (AutoPathChooser.getAutoPathChooser() != null) {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
@@ -178,14 +178,14 @@ public class DriveFSMSystem {
 
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
-		SmartDashboard.putNumber("Heading", getHeading());
+		SmartDashboard.putNumber("Heading", getPose().getRotation().getDegrees());
 
 		switch (autoState) {
 			// POINTS TBD
 			case DRIVE_PATH_1:
 				ArrayList<Pose2d> path1Points = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					path1Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					path1Points.add(new Pose2d(1, 0, new Rotation2d(Math.toRadians(0))));
 					// path1Points.add(new Pose2d(-1, 3, new Rotation2d(Math.toRadians(0))));
 					// path1Points.add(new Pose2d(-3.5, 5, new Rotation2d(Math.toRadians(90))));
 					// path1Points.add(new Pose2d(-6, 5, new Rotation2d(Math.toRadians(180))));
@@ -199,7 +199,7 @@ public class DriveFSMSystem {
 			case DRIVE_PATH_2:
 				ArrayList<Pose2d> path2Points = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					path2Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					path2Points.add(new Pose2d(1, 0, new Rotation2d(Math.toRadians(0))));
 					// points.add(new Pose2d(-1, 3, new Rotation2d(Math.toRadians(0))));
 					// points.add(new Pose2d(-3.5, 5, new Rotation2d(Math.toRadians(90))));
 					// points.add(new Pose2d(-6, 5, new Rotation2d(Math.toRadians(180))));
@@ -304,7 +304,7 @@ public class DriveFSMSystem {
 
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
-		SmartDashboard.putNumber("Heading", getHeading());
+		SmartDashboard.putNumber("Heading", getPose().getRotation().getDegrees());
 
 		if (input == null) {
 			return;
@@ -321,6 +321,8 @@ public class DriveFSMSystem {
 					OIConstants.DRIVE_DEADBAND), true, true);
 				if (input.isBackButtonPressed()) {
 					gyro.reset();
+					resetOdometry(new Pose2d(new Translation2d(getPose().getX(), getPose().getY()),
+					new Rotation2d(0)));
 				}
 				break;
 
@@ -489,9 +491,10 @@ public class DriveFSMSystem {
 		double yDiff = y - getPose().getY();
 		double aDiff = angle - getPose().getRotation().getDegrees();
 
-		System.out.println("Xdiff: " + xDiff);
-		System.out.println("Ydiff: " + yDiff);
-		System.out.println("adiff: " + aDiff);
+		SmartDashboard.putNumber("x diff", xDiff);
+		SmartDashboard.putNumber("y diff", yDiff);
+		SmartDashboard.putNumber("a diff", aDiff);
+
 		double xSpeed = Math.abs(xDiff) > AutoConstants.AUTO_DRIVE_METERS_MARGIN_OF_ERROR
 			? clamp(xDiff / AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND,
@@ -548,9 +551,6 @@ public class DriveFSMSystem {
 		double rotSpeed = clamp(rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
 			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
-
-		System.out.println("drive speed: " + ySpeed);
-		System.out.println("xdist: " + xDist + " ydist: " + yDist + " rotFinal: " + rotFinal);
 
 		if (Math.abs(xDist) < AutoConstants.DRIVE_TO_TAG_DISTANCE_MARGIN && Math.abs(yDist)
 			< AutoConstants.DRIVE_TO_TAG_DISTANCE_MARGIN && rotFinal

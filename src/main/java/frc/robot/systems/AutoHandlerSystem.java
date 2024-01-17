@@ -109,7 +109,6 @@ public class AutoHandlerSystem {
 		}
 
 		boolean isCurrentStateFinished;
-		System.out.println("In State: " + getCurrentState());
 		SmartDashboard.putString("In Auto State: ", "" + getCurrentState());
 		switch (getCurrentState()) {
 			case DRIVE_PATH_1:
