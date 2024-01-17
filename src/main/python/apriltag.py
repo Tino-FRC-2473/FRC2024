@@ -104,7 +104,7 @@ class AprilTag():
             corners = np.array(corners)
             # Define the 3D coordinates of the marker corners in the marker coordinate system
             #marker_points_3d = np.array([[0, 0, 0], [marker_size, 0, 0], [marker_size, marker_size, 0], [0, marker_size, 0]], dtype=np.float32)
-            marker_points_3d = np.array([[-marker_size / 2, -marker_size / 2, 0], [marker_size / 2, -marker_size / 2, 0], [marker_size / 2, marker_size / 2, 0], [-marker_size / 2, marker_size / 2, 0]], dtype=np.float32)
+            marker_points_3d = np.array([[-marker_size / 2, marker_size / 2, 0], [marker_size / 2, marker_size / 2, 0], [marker_size / 2, -marker_size / 2, 0], [-marker_size / 2, -marker_size / 2, 0]], dtype=np.float32)
 
             # Reshape the corners to a flat array
             image_points_2d = corners.reshape(-1, 2)
@@ -113,24 +113,14 @@ class AprilTag():
             image_points_2d = np.float32(image_points_2d)
 
             # Solve PnP problem to estimate pose
-            _, rvec, tvec = cv2.solvePnP(marker_points_3d, image_points_2d, camera_matrix, dist_coeffs)
+            _, rvec, tvec = cv2.solvePnP(marker_points_3d, image_points_2d, camera_matrix, dist_coeffs, flags=cv2.SOLVEPNP_IPPE_SQUARE)
             rvec = rvec.flatten()
             tvec = tvec.flatten()
 
-            R, _ = cv2.Rodrigues(rvec)
-            R_inv = np.linalg.inv(R)
-            tvec_marker = 39.37 * np.dot(R, tvec)
-
-            return rvec, tvec_marker
-            # # Convert rotation vector to rotation matrix
-            # rotation_matrix, _ = cv2.Rodrigues(rvec) 
-            # # Invert the transformation to get the camera pose relative to the AprilTag
-            # inverse_rotation_matrix = np.linalg.inv(rotation_matrix)
-            # inverse_translation_vector = -np.dot(inverse_rotation_matrix, tvec)
-
-            # return self.rotation_matrix_to_euler_angles(inverse_rotation_matrix), inverse_translation_vector * 39.3701
-
-
+            R_ct    = np.matrix(cv2.Rodrigues(rvec)[0])
+            R_tc    = R_ct.T
+            tvec_camera = -R_tc*np.matrix(tvec).T
+            return rvec, 39.37 * tvec_camera
         except Exception as e:
             print(f"An error occurred: {e}")
             return None, None
@@ -161,7 +151,7 @@ class AprilTag():
                     #print(self.get_yaw(corners[i]) )
                     rvec[0] = self.get_yaw(corners[i])
                     # Draw the 3D pose axis on the image
-                    self.draw_axis_on_image(frame_ann, self.camera_matrix, self.dist_coeffs, rvec, tvec, 0.1)
+                    #self.draw_axis_on_image(frame_ann, self.camera_matrix, self.dist_coeffs, rvec, tvec, 0.1)
 
                 # Display the result
                 #cv2.imshow('AprilTag Pose Estimation', image)
