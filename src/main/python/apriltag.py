@@ -63,7 +63,7 @@ class AprilTag():
         np.save('calibration_data/home_camera_dist.npy',dist)
         print('Calibration complete')
 
-    def draw_axis_on_image(self, image, camera_matrix, dist_coeffs, rvec, tvec, size=1):
+    def draw_axis_on_image(self, n, image, camera_matrix, dist_coeffs, rvec, tvec, size=1):
         try:
             # Define axis length
             length = size
@@ -88,7 +88,7 @@ class AprilTag():
             text_color = (255, 0, 255)  # White color
             text_position = (10, 30)  # Top-left corner coordinates
             # Add text to the image
-            text = str([list(tvec)[0], list(tvec)[2], list(rvec)[0]])
+            text = str(n)
             cv2.putText(image, text, text_position, font, font_scale, text_color, font_thickness)
 
 
@@ -120,7 +120,9 @@ class AprilTag():
             R_ct    = np.matrix(cv2.Rodrigues(rvec)[0])
             R_tc    = R_ct.T
             tvec_camera = -R_tc*np.matrix(tvec).T
-            return rvec, 39.37 * tvec_camera
+            print(tvec_camera)
+            print(tvec)
+            return rvec,  tvec, tvec_camera * 39.37
         except Exception as e:
             print(f"An error occurred: {e}")
             return None, None
@@ -145,13 +147,14 @@ class AprilTag():
                 # Estimate the pose of each detected marker
                 for i in range(len(ids)):
                     # Estimate the pose
-                    rvec, tvec= self.estimate_pose_single_marker(corners[i], ARUCO_LENGTH_METERS, self.camera_matrix, self.dist_coeffs)
-                    pose_data[ids[i][0]] = (tvec, rvec)
+                    rvec, tvec, n= self.estimate_pose_single_marker(corners[i], ARUCO_LENGTH_METERS, self.camera_matrix, self.dist_coeffs)
+                    #print(tvec,n)
+                    pose_data[ids[i][0]] = (n, rvec)
                     #print(corners[i])
                     #print(self.get_yaw(corners[i]) )
+                    self.draw_axis_on_image(n, frame_ann, self.camera_matrix, self.dist_coeffs, rvec, tvec, 0.1)
                     rvec[0] = self.get_yaw(corners[i])
                     # Draw the 3D pose axis on the image
-                    #self.draw_axis_on_image(frame_ann, self.camera_matrix, self.dist_coeffs, rvec, tvec, 0.1)
 
                 # Display the result
                 #cv2.imshow('AprilTag Pose Estimation', image)

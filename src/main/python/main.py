@@ -3,7 +3,7 @@ from apriltag import AprilTag
 import time
 import ntcore
 import numpy as np
-
+import cv2
 inst = ntcore.NetworkTableInstance.getDefault()
 inst.startClient4("python")
 inst.setServerTeam(2473)
@@ -26,8 +26,8 @@ while True:
 
         xPub = table.getDoubleTopic("fps_incremented_value").publish()
         xPub.set(frame.sum())
-
-        tagData = tag_module.estimate_3d_pose(frame, frame.copy(), ARUCO_LENGTH_METERS)
+        annotated_frame = frame.copy()
+        tagData = tag_module.estimate_3d_pose(frame, annotated_frame, ARUCO_LENGTH_METERS)
         # yaw = tag_module.get_yaw(frame)
 
         if n%30 == 0: print(tagData)
@@ -41,9 +41,13 @@ while True:
         
         n = n+1
 
-        
+        cv2.imshow('result', annotated_frame)
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q'):
+            break
         time.sleep(0.02)
-    except:
+    except KeyboardInterrupt:
+        print("keyboard interrupt")
         input.close()
         break
 
