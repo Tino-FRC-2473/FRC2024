@@ -7,7 +7,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 // Systems
-//import frc.robot.systems.FSMSystem;
 import frc.robot.systems.KitBotShooterFSM;
 import frc.robot.systems.AutoHandlerSystem;
 import frc.robot.systems.AutoHandlerSystem.AutoPath;
@@ -21,8 +20,6 @@ public class Robot extends TimedRobot {
 
 	// Systems
 	private KitBotShooterFSM shooterFSM;
-	//private FSMSystem subSystem2;
-	//private FSMSystem subSystem3;
 
 	private AutoHandlerSystem autoHandler;
 
@@ -37,9 +34,7 @@ public class Robot extends TimedRobot {
 
 		// Instantiate all systems here
 		shooterFSM = new KitBotShooterFSM();
-		//subSystem2 = new FSMSystem();
-		//subSystem3 = new FSMSystem();
-		//autoHandler = new AutoHandlerSystem(shooterFSM, subSystem2, subSystem3);
+		autoHandler = new AutoHandlerSystem(shooterFSM);
 	}
 
 	@Override

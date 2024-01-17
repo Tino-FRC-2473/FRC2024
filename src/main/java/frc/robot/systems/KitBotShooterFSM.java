@@ -41,10 +41,6 @@ public class KitBotShooterFSM {
 	 */
 	public KitBotShooterFSM() {
 		// Perform hardware init
-		// [Initialize lowMotor and highMotor]
-		//exampleMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER,
-		//CANSparkMax.MotorType.kBrushless);
-
 		lowMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_LOWER,
 						CANSparkMax.MotorType.kBrushless);
 		lowMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -97,7 +93,7 @@ public class KitBotShooterFSM {
 
 		switch (currentState) {
 			case IDLE_STOP:
-				handleStartState(input);
+				handleIdleState(input);
 				break;
 			case INTAKING:
 				handleIntakingState(input);
@@ -155,27 +151,20 @@ public class KitBotShooterFSM {
 				if (input.isIntakeButtonPressed() && !hasNote()
 					&& !input.isOuttakeButtonPressed()) {
 					return ShooterFSMState.INTAKING;
-				}
-				if ((input.isIntakeButtonPressed() && hasNote())
-					|| !(input.isOuttakeButtonPressed() || input.isIntakeButtonPressed())
-					|| (input.isIntakeButtonPressed() && input.isOuttakeButtonPressed())) {
+				} else {
 					return ShooterFSMState.IDLE_STOP;
 				}
 			case INTAKING:
 				if (input.isIntakeButtonPressed() && !hasNote()
 					&& !input.isOuttakeButtonPressed()) {
 					return ShooterFSMState.INTAKING;
-				}
-				if (!input.isIntakeButtonPressed() || hasNote()
-					|| (input.isIntakeButtonPressed() && input.isOuttakeButtonPressed())) {
+				} else {
 					return ShooterFSMState.IDLE_STOP;
 				}
 			case OUTTAKING:
 				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
 					return ShooterFSMState.OUTTAKING;
-				}
-				if (!input.isOuttakeButtonPressed()
-					|| (input.isIntakeButtonPressed() && input.isOuttakeButtonPressed())) {
+				} else {
 					return ShooterFSMState.IDLE_STOP;
 				}
 			default:
@@ -189,7 +178,7 @@ public class KitBotShooterFSM {
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-	private void handleStartState(TeleopInput input) {
+	private void handleIdleState(TeleopInput input) {
 		lowMotor.set(0);
 		highMotor.set(0);
 	}
