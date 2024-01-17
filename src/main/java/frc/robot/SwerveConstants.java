@@ -149,6 +149,80 @@ public final class SwerveConstants {
 		public static final double AUTO_DRIVE_ANGULAR_SPEED_ACCEL_CONSTANT = 120;
 		public static final double AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT = 3;
 
+		/*
+		Auto Coordinate Constants
+		Refer to the following document for point references
+		Link: http://tinyurl.com/2023-auto-planning
+		GD Dir: (FRC > 23-24 > 24 Season > Autonomous > Autonomous Path Planning)
+		*/
+
+		// -----------------Blue Alliance--------------------
+
+		// Path 1
+		public static final double BLUE_PATH1_POINT2_X = -1;
+		public static final double BLUE_PATH1_POINT2_Y = 3;
+		public static final double BLUE_PATH1_POINT3_X = -3.5;
+		public static final double BLUE_PATH1_POINT3_Y = 5;
+		public static final double BLUE_PATH1_POINT4_X = -6;
+		public static final double BLUE_PATH1_POINT4_Y = 5;
+
+		// Path 2
+		public static final double BLUE_PATH2_POINT2_X = -3.5;
+		public static final double BLUE_PATH2_POINT2_Y = 4;
+		public static final double BLUE_PATH2_POINT3_X = -6;
+		public static final double BLUE_PATH2_POINT3_Y = 4;
+
+		// Path 3
+		public static final double BLUE_PATH3_POINT2_X = -4.5;
+		public static final double BLUE_PATH3_POINT2_Y = 0;
+		public static final double BLUE_PATH3_POINT3_X = -6;
+		public static final double BLUE_PATH3_POINT3_Y = 1;
+		public static final double BLUE_PATH3_POINT4_X = -6;
+		public static final double BLUE_PATH3_POINT4_Y = 3.5;
+
+		// Path 4
+		public static final double BLUE_PATH4_POINT2_X = 0;
+		public static final double BLUE_PATH4_POINT2_Y = -2;
+		public static final double BLUE_PATH4_POINT3_X = -1;
+		public static final double BLUE_PATH4_POINT3_Y = -1;
+		public static final double BLUE_PATH4_POINT4_X = -3.5;
+		public static final double BLUE_PATH4_POINT4_Y = 3;
+		public static final double BLUE_PATH4_POINT5_X = -6;
+		public static final double BLUE_PATH4_POINT5_Y = 3;
+
+		// ------------------ Red Alliance ------------------
+
+		// Path 1
+		public static final double RED_PATH1_POINT2_X = -1;
+		public static final double RED_PATH1_POINT2_Y = -3;
+		public static final double RED_PATH1_POINT3_X = -3.5;
+		public static final double RED_PATH1_POINT3_Y = -5;
+		public static final double RED_PATH1_POINT4_X = -6;
+		public static final double RED_PATH1_POINT4_Y = -5;
+
+		// Path 2
+		public static final double RED_PATH2_POINT2_X = -3.5;
+		public static final double RED_PATH2_POINT2_Y = -4;
+		public static final double RED_PATH2_POINT3_X = -6;
+		public static final double RED_PATH2_POINT3_Y = -4;
+
+		// Path 3
+		public static final double RED_PATH3_POINT2_X = -4.5;
+		public static final double RED_PATH3_POINT2_Y = 0;
+		public static final double RED_PATH3_POINT3_X = -6;
+		public static final double RED_PATH3_POINT3_Y = -1;
+		public static final double RED_PATH3_POINT4_X = -6;
+		public static final double RED_PATH3_POINT4_Y = -3.5;
+
+		// Path 4
+		public static final double RED_PATH4_POINT2_X = 0;
+		public static final double RED_PATH4_POINT2_Y = 2;
+		public static final double RED_PATH4_POINT3_X = -1;
+		public static final double RED_PATH4_POINT3_Y = 1;
+		public static final double RED_PATH4_POINT4_X = -3.5;
+		public static final double RED_PATH4_POINT4_Y = -3;
+		public static final double RED_PATH4_POINT5_X = -6;
+		public static final double RED_PATH4_POINT5_Y = -3;
 
 		// Constraint for the motion profiled robot angle controller
 		public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS
