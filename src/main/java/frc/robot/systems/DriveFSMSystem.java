@@ -486,7 +486,7 @@ public class DriveFSMSystem {
 		// }
 
 
-		double xSpeed = clamp(Math.abs(lastSeenTagX) / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+		double xSpeed = clamp(-lastSeenTagX / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
 		double ySpeed = clamp((Math.abs(lastSeenTagY) - 30) / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
