@@ -1,31 +1,37 @@
 package frc.robot.systems;
 
 // WPILib Imports
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkLimitSwitch;
 
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
 import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 
-public class FSMSystem {
+public class KitBotShooterFSM {
 	/* ======================== Constants ======================== */
 	// FSM state definitions
-	public enum FSMState {
-		START_STATE,
-		OTHER_STATE
+	public enum ShooterFSMState {
+		IDLE_STOP,
+		INTAKING,
+		OUTTAKING
 	}
 
-	private static final float MOTOR_RUN_POWER = 0.1f;
+	private static final float L_MOTOR_RUN_POWER = 0.05f;
+	private static final float U_MOTOR_RUN_POWER = 0.1f;
 
 	/* ======================== Private variables ======================== */
-	private FSMState currentState;
+	private ShooterFSMState currentState;
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
-	private CANSparkMax exampleMotor;
+	private CANSparkMax lowMotor;
+	private CANSparkMax highMotor;
+	private SparkLimitSwitch bottomLimitSwitch;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -33,10 +39,18 @@ public class FSMSystem {
 	 * one-time initialization or configuration of hardware required. Note
 	 * the constructor is called only once when the robot boots.
 	 */
-	public FSMSystem() {
+	public KitBotShooterFSM() {
 		// Perform hardware init
-		exampleMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER,
-										CANSparkMax.MotorType.kBrushless);
+		lowMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_LOWER,
+						CANSparkMax.MotorType.kBrushless);
+		lowMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+		bottomLimitSwitch = lowMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
+		bottomLimitSwitch.enableLimitSwitch(false);
+
+		highMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_UPPER,
+		CANSparkMax.MotorType.kBrushless);
+		highMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
 		// Reset state machine
 		reset();
@@ -47,7 +61,7 @@ public class FSMSystem {
 	 * Return current FSM state.
 	 * @return Current FSM state
 	 */
-	public FSMState getCurrentState() {
+	public ShooterFSMState getCurrentState() {
 		return currentState;
 	}
 	/**
@@ -59,7 +73,7 @@ public class FSMSystem {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		currentState = FSMState.START_STATE;
+		currentState = ShooterFSMState.IDLE_STOP;
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -72,18 +86,28 @@ public class FSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
+
+		if (input == null) {
+			return;
+		}
+
 		switch (currentState) {
-			case START_STATE:
-				handleStartState(input);
+			case IDLE_STOP:
+				handleIdleState(input);
 				break;
-
-			case OTHER_STATE:
-				handleOtherState(input);
+			case INTAKING:
+				handleIntakingState(input);
 				break;
-
+			case OUTTAKING:
+				handleOuttakingState(input);
+				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
+		SmartDashboard.putString("Current State", currentState.toString());
+		SmartDashboard.putBoolean("Bottom Limit Switch Pressed", bottomLimitSwitch.isPressed());
+		SmartDashboard.putBoolean("Outtake Button Pressed", input.isOuttakeButtonPressed());
+		SmartDashboard.putBoolean("Intake Button Pressed", input.isIntakeButtonPressed());
 		currentState = nextState(input);
 	}
 
@@ -115,18 +139,34 @@ public class FSMSystem {
 	 *        the robot is in autonomous mode.
 	 * @return FSM state for the next iteration
 	 */
-	private FSMState nextState(TeleopInput input) {
+	private ShooterFSMState nextState(TeleopInput input) {
+		if (input == null) {
+			return ShooterFSMState.IDLE_STOP;
+		}
 		switch (currentState) {
-			case START_STATE:
-				if (input != null) {
-					return FSMState.OTHER_STATE;
-				} else {
-					return FSMState.START_STATE;
+			case IDLE_STOP:
+				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+					return ShooterFSMState.OUTTAKING;
 				}
-
-			case OTHER_STATE:
-				return FSMState.OTHER_STATE;
-
+				if (input.isIntakeButtonPressed() && !hasNote()
+					&& !input.isOuttakeButtonPressed()) {
+					return ShooterFSMState.INTAKING;
+				} else {
+					return ShooterFSMState.IDLE_STOP;
+				}
+			case INTAKING:
+				if (input.isIntakeButtonPressed() && !hasNote()
+					&& !input.isOuttakeButtonPressed()) {
+					return ShooterFSMState.INTAKING;
+				} else {
+					return ShooterFSMState.IDLE_STOP;
+				}
+			case OUTTAKING:
+				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+					return ShooterFSMState.OUTTAKING;
+				} else {
+					return ShooterFSMState.IDLE_STOP;
+				}
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -138,16 +178,28 @@ public class FSMSystem {
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-	private void handleStartState(TeleopInput input) {
-		exampleMotor.set(0);
+	private void handleIdleState(TeleopInput input) {
+		lowMotor.set(0);
+		highMotor.set(0);
 	}
 	/**
-	 * Handle behavior in OTHER_STATE.
+	 * Handle behavior in INTAKING state.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-	private void handleOtherState(TeleopInput input) {
-		exampleMotor.set(MOTOR_RUN_POWER);
+	private void handleIntakingState(TeleopInput input) {
+		lowMotor.set(-L_MOTOR_RUN_POWER);
+		highMotor.set(-U_MOTOR_RUN_POWER);
+	}
+
+	/**
+	 * Handle behavior in OUTTAKING state.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 */
+	private void handleOuttakingState(TeleopInput input) {
+		lowMotor.set(L_MOTOR_RUN_POWER);
+		highMotor.set(U_MOTOR_RUN_POWER);
 	}
 
 	/**
@@ -173,4 +225,11 @@ public class FSMSystem {
 	private boolean handleAutoState3() {
 		return true;
 	}
+
+	private boolean hasNote() {
+		return bottomLimitSwitch.isPressed();
+	}
+
+
+
 }
