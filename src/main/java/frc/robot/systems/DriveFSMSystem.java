@@ -182,88 +182,78 @@ public class DriveFSMSystem {
 
 		switch (autoState) {
 			// POINTS TBD
+			// INITIAL ANGLES TBD
 			case DRIVE_PATH_1:
 				ArrayList<Pose2d> path1Points = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					path1Points.add(new Pose2d(1, 0, new Rotation2d(Math.toRadians(0))));
-					// path1Points.add(new Pose2d(-1, 3, new Rotation2d(Math.toRadians(0))));
-					// path1Points.add(new Pose2d(-3.5, 5, new Rotation2d(Math.toRadians(90))));
-					// path1Points.add(new Pose2d(-6, 5, new Rotation2d(Math.toRadians(180))));
+					path1Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					path1Points.add(new Pose2d(-1, 3, new Rotation2d(Math.toRadians(0))));
+					path1Points.add(new Pose2d(-3.5, 5, new Rotation2d(Math.toRadians(0))));
+					path1Points.add(new Pose2d(-6, 5, new Rotation2d(Math.toRadians(0))));
 				} else {
 					path1Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					// path1Points.add(new Pose2d(1, 3, new Rotation2d(Math.toRadians(0))));
-					// path1Points.add(new Pose2d(3.5, 5, new Rotation2d(Math.toRadians(90))));
-					// path1Points.add(new Pose2d(6, 5, new Rotation2d(Math.toRadians(180))));
+					path1Points.add(new Pose2d(-1, -3, new Rotation2d(Math.toRadians(0))));
+					path1Points.add(new Pose2d(-3.5, -5, new Rotation2d(Math.toRadians(0))));
+					path1Points.add(new Pose2d(-6, -5, new Rotation2d(Math.toRadians(0))));
 				}
 				return driveAlongPath(path1Points);
 			case DRIVE_PATH_2:
 				ArrayList<Pose2d> path2Points = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					path2Points.add(new Pose2d(1, 0, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(-1, 3, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(-3.5, 5, new Rotation2d(Math.toRadians(90))));
-					// points.add(new Pose2d(-6, 5, new Rotation2d(Math.toRadians(180))));
+					path2Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					path2Points.add(new Pose2d(-3.5, 4, new Rotation2d(Math.toRadians(0))));
+					path2Points.add(new Pose2d(-6, 4, new Rotation2d(Math.toRadians(0))));
 				} else {
 					path2Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(1, 3, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(3.5, 5, new Rotation2d(Math.toRadians(90))));
-					// points.add(new Pose2d(6, 5, new Rotation2d(Math.toRadians(180))));
+					path2Points.add(new Pose2d(-3.5, -4, new Rotation2d(Math.toRadians(0))));
+					path2Points.add(new Pose2d(-6, -4, new Rotation2d(Math.toRadians(0))));
 				}
 				return driveAlongPath(path2Points);
 			case DRIVE_PATH_3:
 				ArrayList<Pose2d> path3Points = new ArrayList<Pose2d>();
 				if (blueAlliance) {
 					path3Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(-1, 3, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(-3.5, 5, new Rotation2d(Math.toRadians(90))));
-					// points.add(new Pose2d(-6, 5, new Rotation2d(Math.toRadians(180))));
+					path3Points.add(new Pose2d(-4.5, 0, new Rotation2d(Math.toRadians(0))));
+					path3Points.add(new Pose2d(-6, 1, new Rotation2d(Math.toRadians(0))));
+					path3Points.add(new Pose2d(-6, 3.5, new Rotation2d(Math.toRadians(0))));
 				} else {
 					path3Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(1, 3, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(3.5, 5, new Rotation2d(Math.toRadians(90))));
-					// points.add(new Pose2d(6, 5, new Rotation2d(Math.toRadians(180))));
+					path3Points.add(new Pose2d(-4.5, 0, new Rotation2d(Math.toRadians(0))));
+					path3Points.add(new Pose2d(-6, -1, new Rotation2d(Math.toRadians(0))));
 				}
 				return driveAlongPath(path3Points);
 			case DRIVE_PATH_4_STATE_1:
 				ArrayList<Pose2d> path4Points1 = new ArrayList<Pose2d>();
 				if (blueAlliance) {
 					path4Points1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(-1, 3, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(-3.5, 5, new Rotation2d(Math.toRadians(90))));
-					// points.add(new Pose2d(-6, 5, new Rotation2d(Math.toRadians(180))));
+					path4Points1.add(new Pose2d(0, -2, new Rotation2d(Math.toRadians(0))));
 				} else {
 					path4Points1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(1, 3, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(3.5, 5, new Rotation2d(Math.toRadians(90))));
-					// points.add(new Pose2d(6, 5, new Rotation2d(Math.toRadians(180))));
+					path4Points1.add(new Pose2d(0, 2, new Rotation2d(Math.toRadians(0))));
 				}
 				return driveAlongPath(path4Points1);
 			case DRIVE_PATH_4_STATE_2:
 				ArrayList<Pose2d> path4Points2 = new ArrayList<Pose2d>();
 				if (blueAlliance) {
 					path4Points2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(-1, 3, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(-3.5, 5, new Rotation2d(Math.toRadians(90))));
-					// points.add(new Pose2d(-6, 5, new Rotation2d(Math.toRadians(180))));
+					path4Points2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
+					path4Points2.add(new Pose2d(-3.5, 5, new Rotation2d(Math.toRadians(0))));
+					path4Points2.add(new Pose2d(-6, 5, new Rotation2d(Math.toRadians(0))));
 				} else {
 					path4Points2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(1, 3, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(3.5, 5, new Rotation2d(Math.toRadians(90))));
-					// points.add(new Pose2d(6, 5, new Rotation2d(Math.toRadians(180))));
+					path4Points2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
+					path4Points2.add(new Pose2d(-3.5, -5, new Rotation2d(Math.toRadians(0))));
+					path4Points2.add(new Pose2d(-6, -3, new Rotation2d(Math.toRadians(0))));
 				}
 				return driveAlongPath(path4Points2);
 			case DRIVE_PATH_5:
 				ArrayList<Pose2d> path5Points = new ArrayList<Pose2d>();
 				if (blueAlliance) {
 					path5Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(-1, 3, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(-3.5, 5, new Rotation2d(Math.toRadians(90))));
-					// points.add(new Pose2d(-6, 5, new Rotation2d(Math.toRadians(180))));
+					path5Points.add(new Pose2d(-6, 0, new Rotation2d(Math.toRadians(0))));
 				} else {
 					path5Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(1, 3, new Rotation2d(Math.toRadians(0))));
-					// points.add(new Pose2d(3.5, 5, new Rotation2d(Math.toRadians(90))));
-					// points.add(new Pose2d(6, 5, new Rotation2d(Math.toRadians(180))));
+					path5Points.add(new Pose2d(-6, 0, new Rotation2d(Math.toRadians(0))));
 				}
 				return driveAlongPath(path5Points);
 			default:
