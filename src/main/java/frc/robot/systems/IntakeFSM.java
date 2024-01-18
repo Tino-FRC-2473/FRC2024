@@ -4,6 +4,7 @@ package frc.robot.systems;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkLimitSwitch;
 
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -27,6 +28,8 @@ public class IntakeFSM {
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax intakeMotor;
+	private SparkLimitSwitch bottomLimitSwitch;
+
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -38,6 +41,12 @@ public class IntakeFSM {
 		// Perform hardware init
 		intakeMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_INTAKE_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
+
+		intakeMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+		bottomLimitSwitch =
+			intakeMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
+		bottomLimitSwitch.enableLimitSwitch(false);
 
 		// Reset state machine
 		reset();
@@ -89,6 +98,7 @@ public class IntakeFSM {
 
 			case OUTTAKING:
 				handleOuttakingState(input);
+				break;
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -130,44 +140,35 @@ public class IntakeFSM {
 		}
 		switch (currentState) {
 			case IDLE_STOP:
-				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed() && hasNote()) {
 					return IntakeFSMState.OUTTAKING;
 				}
 
-				if (input.isIntakeButtonPressed() && !input.isOuttakeButtonPressed()) {
+				if (input.isIntakeButtonPressed() && !input.isOuttakeButtonPressed()
+					&& !hasNote()) {
 					return IntakeFSMState.INTAKING;
 				}
 
-				if ((!input.isIntakeButtonPressed() && !input.isOuttakeButtonPressed())
-					|| (input.isIntakeButtonPressed() && input.isOuttakeButtonPressed())) {
+				if (input.isIntakeButtonPressed() == input.isOuttakeButtonPressed()) {
 					return IntakeFSMState.IDLE_STOP;
 				}
 
 			case INTAKING:
-				if (input.isIntakeButtonPressed() && !input.isOuttakeButtonPressed()) {
+				if (input.isIntakeButtonPressed() && !input.isOuttakeButtonPressed()
+					&& !hasNote()) {
 					return IntakeFSMState.INTAKING;
 				}
 
-				if (!input.isIntakeButtonPressed() && input.isOuttakeButtonPressed()) {
-					return IntakeFSMState.OUTTAKING;
-				}
-
-				if ((!input.isIntakeButtonPressed() && !input.isOuttakeButtonPressed())
-					|| (input.isIntakeButtonPressed() && input.isOuttakeButtonPressed())) {
+				if (!input.isIntakeButtonPressed() || input.isOuttakeButtonPressed()
+					|| hasNote()) {
 					return IntakeFSMState.IDLE_STOP;
 				}
-
 			case OUTTAKING:
 				if (!input.isIntakeButtonPressed() && input.isOuttakeButtonPressed()) {
 					return IntakeFSMState.OUTTAKING;
 				}
 
-				if (input.isIntakeButtonPressed() && !input.isOuttakeButtonPressed()) {
-					return IntakeFSMState.INTAKING;
-				}
-
-				if ((!input.isIntakeButtonPressed() && !input.isOuttakeButtonPressed())
-					|| (input.isIntakeButtonPressed() && input.isOuttakeButtonPressed())) {
+				if (!input.isOuttakeButtonPressed() || input.isIntakeButtonPressed()) {
 					return IntakeFSMState.IDLE_STOP;
 				}
 
@@ -225,5 +226,9 @@ public class IntakeFSM {
 	 */
 	private boolean handleAutoState3() {
 		return true;
+	}
+
+	private boolean hasNote() {
+		return bottomLimitSwitch.isPressed();
 	}
 }
