@@ -19,6 +19,9 @@ public class MBRShooterFSM {
 	}
 
 	private static final float SHOOTING_POWER = 0.1f;
+	private boolean buttonToggle = false;
+	private boolean buttonPressedLastFrame = false;
+
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
@@ -75,6 +78,18 @@ public class MBRShooterFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
+
+		if (input == null) {
+			return;
+		}
+
+		if (input.isShooterButtonPressed() && !buttonPressedLastFrame) {
+			buttonToggle = !buttonToggle;
+			buttonPressedLastFrame = true;
+		} else if (!input.isShooterButtonPressed()) {
+			buttonPressedLastFrame = false;
+		}
+
 		switch (currentState) {
 			case IDLE_STOP:
 				handleIdleState(input);
@@ -121,20 +136,15 @@ public class MBRShooterFSM {
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case IDLE_STOP:
-				if (input.isShooterButtonPressed()) {
+				if (buttonToggle) {
 					return FSMState.SHOOTING;
-				}
-
-				if (!input.isShooterButtonPressed()) {
+				} else {
 					return FSMState.IDLE_STOP;
 				}
-
 			case SHOOTING:
-				if (input.isShooterButtonPressed()) {
+				if (buttonToggle) {
 					return FSMState.SHOOTING;
-				}
-
-				if (!input.isShooterButtonPressed()) {
+				} else {
 					return FSMState.IDLE_STOP;
 				}
 

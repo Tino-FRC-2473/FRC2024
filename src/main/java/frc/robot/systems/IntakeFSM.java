@@ -73,6 +73,11 @@ public class IntakeFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
+
+		if (input == null) {
+			return;
+		}
+
 		switch (currentState) {
 			case IDLE_STOP:
 				handleIdleState(input);
