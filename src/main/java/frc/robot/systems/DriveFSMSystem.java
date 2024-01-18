@@ -485,14 +485,22 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("y diff", yDiff);
 		SmartDashboard.putNumber("a diff", aDiff);
 
+		double autoAccelConst = AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT;
+		if (xDiff >= yDiff && Math.abs(xDiff / autoAccelConst)
+			> AutoConstants.MAX_SPEED_METERS_PER_SECOND) {
+			autoAccelConst = AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.abs(xDiff);
+		} else if (Math.abs(yDiff / autoAccelConst) > AutoConstants.MAX_SPEED_METERS_PER_SECOND) {
+			autoAccelConst = AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.abs(yDiff);
+		}
+
+		if (xDiff < 0.1 && yDiff < 0.1) {
+			autoAccelConst = 1;
+		}
+
 		double xSpeed = Math.abs(xDiff) > AutoConstants.AUTO_DRIVE_METERS_MARGIN_OF_ERROR
-			? clamp(xDiff / AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT,
-			-AutoConstants.MAX_SPEED_METERS_PER_SECOND,
-			AutoConstants.MAX_SPEED_METERS_PER_SECOND) : 0;
+			? xDiff / autoAccelConst : 0;
 		double ySpeed = Math.abs(yDiff) > AutoConstants.AUTO_DRIVE_METERS_MARGIN_OF_ERROR
-			? clamp(yDiff / AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT,
-			-AutoConstants.MAX_SPEED_METERS_PER_SECOND,
-			AutoConstants.MAX_SPEED_METERS_PER_SECOND) : 0;
+			? yDiff / autoAccelConst : 0;
 		double aSpeed = Math.abs(aDiff) > AutoConstants.AUTO_DRIVE_DEGREES_MARGIN_OF_ERROR
 			? (aDiff > 0 ? Math.min(AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff
 			/ AutoConstants.AUTO_DRIVE_ANGULAR_SPEED_ACCEL_CONSTANT) : Math.max(
