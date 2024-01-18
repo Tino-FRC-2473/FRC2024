@@ -136,6 +136,7 @@ public class AutoHandlerSystem {
 		}
 		if (isCurrentStateFinished) {
 			currentStateIndex++;
+			driveSystem.currentPointInPath = 0;
 		}
 	}
 }

@@ -42,7 +42,7 @@ public class DriveFSMSystem {
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
-	private int currentPointInPath;
+	public int currentPointInPath;
 	private boolean blueAlliance;
 
 	// Hardware devices should be owned by one and only one system. They must
@@ -102,6 +102,7 @@ public class DriveFSMSystem {
 	 * the constructor is called only once when the robot boots.
 	 */
 	public DriveFSMSystem() {
+		gyro = new AHRS(SPI.Port.kMXP);
 		// Reset state machine
 		reset();
 	}
@@ -136,7 +137,7 @@ public class DriveFSMSystem {
 	public void reset() {
 		currentState = FSMState.TELEOP_STATE;
 		gyro.reset();
-		resetEncoders();
+		//resetEncoders();
 		resetOdometry(new Pose2d());
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -154,7 +155,7 @@ public class DriveFSMSystem {
 	public void resetAutonomus() {
 		currentPointInPath = 0;
 		gyro.reset();
-		resetEncoders();
+		//resetEncoders();
 		resetOdometry(new Pose2d());
 		if (AutoPathChooser.getAutoPathChooser() != null) {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
@@ -179,6 +180,7 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
 		SmartDashboard.putNumber("Heading", getPose().getRotation().getDegrees());
+		SmartDashboard.putNumber("Auto point #", currentPointInPath);
 
 		switch (autoState) {
 			// POINTS TBD
@@ -186,12 +188,10 @@ public class DriveFSMSystem {
 			case DRIVE_PATH_1:
 				ArrayList<Pose2d> path1Points = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					//path1Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					path1Points.add(new Pose2d(-1, 3, new Rotation2d(Math.toRadians(0))));
 					path1Points.add(new Pose2d(-3.5, 5, new Rotation2d(Math.toRadians(0))));
 					path1Points.add(new Pose2d(-6, 5, new Rotation2d(Math.toRadians(0))));
 				} else {
-					//path1Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					path1Points.add(new Pose2d(-1, -3, new Rotation2d(Math.toRadians(0))));
 					path1Points.add(new Pose2d(-3.5, -5, new Rotation2d(Math.toRadians(0))));
 					path1Points.add(new Pose2d(-6, -5, new Rotation2d(Math.toRadians(0))));

@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
 		AutoPath path = AutoPath.PATH1;
-		if (AutoPathChooser.getSelectedPath() == null) {
+		if (AutoPathChooser.getSelectedPath() != null) {
 			path = AutoPathChooser.getSelectedPath();
 		}
 		autoHandler.reset(path);
