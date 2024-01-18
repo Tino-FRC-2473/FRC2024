@@ -14,7 +14,8 @@ public class AutoHandlerSystem {
 		DRIVE_PATH_3,
 		DRIVE_PATH_4_STATE_1,
 		DRIVE_PATH_4_STATE_2,
-		DRIVE_PATH_5
+		DRIVE_PATH_5,
+		PENDING
 	}
 	public enum AutoPath {
 		PATH1,
@@ -46,7 +47,7 @@ public class AutoHandlerSystem {
 		AutoFSMState.DRIVE_PATH_3};
 
 	private static final AutoFSMState[] PATH4 = new AutoFSMState[]{
-		AutoFSMState.DRIVE_PATH_4_STATE_1, AutoFSMState.DRIVE_PATH_4_STATE_2};
+		AutoFSMState.DRIVE_PATH_4_STATE_1, AutoFSMState.PENDING, AutoFSMState.DRIVE_PATH_4_STATE_2};
 
 	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{
 		AutoFSMState.DRIVE_PATH_5};
