@@ -18,6 +18,8 @@ public final class HardwareMap {
 	public static final int CAN_ID_SPARK_ARM_MOTOR = 7;
 	public static final int CAN_ID_SPARK_RSHOOTER_MOTOR = 8;
 
+	public static final int CAN_SPARK_PIVOT_MOTOR = 10;
+
 	// Pneumatics channel numbers
 	public static final int PCM_CHANNEL_INTAKE_CYLINDER_FORWARD = 1;
 	public static final int PCM_CHANNEL_INTAKE_CYLINDER_REVERSE = 2;
