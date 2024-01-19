@@ -155,7 +155,6 @@ public class DriveFSMSystem {
 	public void reset() {
 		currentState = FSMState.TELEOP_STATE;
 		gyro.reset();
-		//resetEncoders();
 		resetOdometry(new Pose2d());
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -173,7 +172,6 @@ public class DriveFSMSystem {
 	public void resetAutonomus() {
 		currentPointInPath = 0;
 		gyro.reset();
-		//resetEncoders();
 		resetOdometry(new Pose2d());
 		if (AutoPathChooser.getAutoPathChooser() != null) {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
@@ -200,6 +198,12 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("Heading", getPose().getRotation().getDegrees());
 		SmartDashboard.putNumber("Auto point #", currentPointInPath);
 
+		/*
+		Auto Path Points
+		Refer to the following document for point references
+		Link: http://tinyurl.com/2023-auto-planning
+		GD Dir: (FRC > 23-24 > 24 Season > Autonomous > Autonomous Path Planning)
+		*/
 		switch (autoState) {
 			case DRIVE_PATH_1:
 				ArrayList<Pose2d> path1Points = new ArrayList<Pose2d>();
@@ -507,13 +511,17 @@ public class DriveFSMSystem {
 	 * @return if the robot has driven to the current position
 	 */
 	public boolean driveToPose(Pose2d pose) {
-		double x = pose.getX() / 2; // remove /2 after testing
-		double y = pose.getY() / 2; //remove /2
+		double x = pose.getX() / 2; // remove / 2 after testing
+		double y = pose.getY() / 2; // remove / 2 after testing
 		double angle = pose.getRotation().getDegrees();
 
 		double xDiff = x - getPose().getX();
 		double yDiff = y - getPose().getY();
 		double aDiff = angle - getPose().getRotation().getDegrees();
+
+		SmartDashboard.putNumber("x diff", xDiff);
+		SmartDashboard.putNumber("y diff", yDiff);
+		SmartDashboard.putNumber("a diff", aDiff);
 
 		double xSpeed;
 		double ySpeed;
@@ -538,9 +546,6 @@ public class DriveFSMSystem {
 				xSpeed = ySpeed * (xDiff / yDiff);
 			}
 		}
-		SmartDashboard.putNumber("x diff", xDiff);
-		SmartDashboard.putNumber("y diff", yDiff);
-		SmartDashboard.putNumber("a diff", aDiff);
 
 		xSpeed = Math.abs(xDiff) > AutoConstants.AUTO_DRIVE_METERS_MARGIN_OF_ERROR
 			? xSpeed : 0;
@@ -551,10 +556,6 @@ public class DriveFSMSystem {
 			/ AutoConstants.AUTO_DRIVE_ANGULAR_SPEED_ACCEL_CONSTANT) : Math.max(
 			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff
 			/ AutoConstants.AUTO_DRIVE_ANGULAR_SPEED_ACCEL_CONSTANT)) : 0;
-
-		SmartDashboard.putNumber("x speed", xSpeed);
-		SmartDashboard.putNumber("y speed", ySpeed);
-		SmartDashboard.putNumber("a speed", aSpeed);
 
 		drive(xSpeed, ySpeed, aSpeed, true, false);
 		if (xSpeed == 0 && ySpeed == 0 && aSpeed == 0) {
@@ -625,8 +626,6 @@ public class DriveFSMSystem {
 		if ((dist < AutoConstants.DISTANCE_MARGIN_TO_DRIVE_TO_OBJECT && Math.abs(rotFinal)
 			<= AutoConstants.ANGLE_MARGIN_TO_DRIVE_TO_OBJECT) || (dist == -1 || rotFinal == -1)) {
 			drive(0, 0, 0, false, false);
-		// } else if (Math.abs(rotFinal) > 5) {
-		// 	drive(0, 0, rotSpeed, false, false);
 		} else {
 			drive(power, 0, rotSpeed, false, false);
 		}
