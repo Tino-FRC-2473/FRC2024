@@ -32,13 +32,12 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
-		driveFSMSystem = new DriveFSMSystem();
-		autoHandler = new AutoHandlerSystem(driveFSMSystem);
 		autoPathChooser = new AutoPathChooser();
+		driveFSMSystem = new DriveFSMSystem();
 		shooterFSM = new KitBotShooterFSM();
-		autoHandler = new AutoHandlerSystem(shooterFSM);
+		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
 	}
-  
+
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
