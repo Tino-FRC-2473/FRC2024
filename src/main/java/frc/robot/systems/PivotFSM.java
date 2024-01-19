@@ -5,7 +5,12 @@ package frc.robot.systems;
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkLimitSwitch;
+//import com.revrobotics.SparkPIDController;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Timer;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
@@ -14,30 +19,70 @@ import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 public class PivotFSM {
 	/* ======================== Constants ======================== */
 	// FSM state definitions
-	public enum IntakeFSMState {
+	public enum PivotFSMState {
 		IDLE_STOP,
 		MANUAL_IN,
 		MANUAL_OUT,
 		SHOOTING,
 		SOURCE,
 		AMP,
-		GROUND
+		GROUND,
+		ZEROING
 	}
 
 	private static final float INTAKE_POWER = 0.1f;
+	private static final double MIN_TURN_SPEED = -0.2;
+	private static final double MAX_TURN_SPEED = 0.2;
+
+	private static final double MAX_VELOCITY = 5;
+	private static final double MAX_ACCEL = 10;
+
+	private static final double PID_CONSTANT_PIVOT_P = 0.001;
+	private static final double PID_CONSTANT_PIVOT_I = 0.001;
+	private static final double PID_CONSTANT_PIVOT_D = 0.001;
+	private static final double PID_VOLTAGE_CONSTANT = 0;
+	private static final double PID_STATIC_CONSTANT = 0;
+	private static final double PID_GRAVITY_CONSTANT = 0;
+
+
+	private static final double JOYSTICK_DEAD_ZONE = 0.15;
+	private static final double MIN_ENCODER_ROTATIONS = -100;
+	private static final double MAX_ENCODER_ROTATIONS = 100;
+	private static final double GROUND_ENCODER_ROTATIONS = 10;
+	private static final double AMP_ENCODER_ROTATIONS = 20;
+	private static final double SOURCE_ENCODER_ROTATIONS = 30;
+	private static final double SHOOTER_ENCODER_ROTATIONS = 0;
+
 
 	/* ======================== Private variables ======================== */
-	private IntakeFSMState currentState;
+	private PivotFSMState currentState;
+	private double currentEncoder = 0;
+	private double currentTime;
+	private double lastLoopTime;
+	private double lastSpeed;
+
+	private boolean zeroed = false;
+	private boolean lastLimitHit = false;
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax pivotMotor;
-	private SparkLimitSwitch bottomLimitSwitch;
+
+	private ProfiledPIDController pidPivotController;
+	//private SparkPIDController pidPivotController;
+	private SparkLimitSwitch lastLimitSwitch;
+	private SparkLimitSwitch hasNoteSwitch;
+	private final ArmFeedforward pivotFeedforward;
+
+	private boolean hasTimerStarted = false;
+
+
+
 
 
 	/* ======================== Constructor ======================== */
 	/**
-	 * Create IntakeFSM and initialize to starting state. Also perform any
+	 * Create PivotFSM and initialize to starting state. Also perform any
 	 * one-time initialization or configuration of hardware required. Note
 	 * the constructor is called only once when the robot boots.
 	 */
@@ -47,7 +92,33 @@ public class PivotFSM {
 										CANSparkMax.MotorType.kBrushless);
 
 		pivotMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-		
+
+		lastLimitSwitch =
+		pivotMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
+
+		lastLimitSwitch.enableLimitSwitch(false);
+
+		hasNoteSwitch =
+		pivotMotor.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
+
+		hasNoteSwitch.enableLimitSwitch(false);
+
+		/*pidPivotController = pivotMotor.getPIDController();
+		pidPivotController.setP(PID_CONSTANT_PIVOT_P);
+		pidPivotController.setI(PID_CONSTANT_PIVOT_I);
+		pidPivotController.setD(PID_CONSTANT_PIVOT_D);
+		pidPivotController.setOutputRange(MIN_TURN_SPEED, MAX_TURN_SPEED);*/
+
+		pidPivotController = new ProfiledPIDController(PID_CONSTANT_PIVOT_P,
+			PID_CONSTANT_PIVOT_I, PID_CONSTANT_PIVOT_D,
+			new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL));
+
+		pivotFeedforward = new ArmFeedforward(PID_STATIC_CONSTANT, PID_GRAVITY_CONSTANT, PID_VOLTAGE_CONSTANT);
+
+		pivotMotor.getEncoder().setPosition(0);
+
+		currentEncoder = 0;
+
 		// Reset state machine
 		reset();
 	}
@@ -57,7 +128,7 @@ public class PivotFSM {
 	 * Return current FSM state.
 	 * @return Current FSM state
 	 */
-	public IntakeFSMState getCurrentState() {
+	public PivotFSMState getCurrentState() {
 		return currentState;
 	}
 	/**
@@ -69,7 +140,7 @@ public class PivotFSM {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		currentState = IntakeFSMState.IDLE_STOP;
+		currentState = PivotFSMState.IDLE_STOP;
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -87,23 +158,57 @@ public class PivotFSM {
 			return;
 		}
 
+		if (lastLimitSwitch.isPressed()) {
+			lastLimitHit = true;
+		}
+
+		if (currentState != PivotFSMState.IDLE_STOP) {
+			currentEncoder = pivotMotor.getEncoder().getPosition();
+		}
+
+		if (currentTime != 0) {
+			lastLoopTime = currentTime;
+		}
+
 		switch (currentState) {
 			case IDLE_STOP:
 				handleIdleState(input);
 				break;
 
-			case INTAKING:
-				handleIntakingState(input);
+			case SHOOTING:
+				handleShootingState(input);
 				break;
 
-			case OUTTAKING:
-				handleOuttakingState(input);
+			case ZEROING:
+				handleZeroingState(input);
+				break;
+
+			case MANUAL_IN:
+				handleManualState(input, true);
+				break;
+
+			case MANUAL_OUT:
+				handleManualState(input, false);
+				break;
+
+			case GROUND:
+				handleGroundState(input);
+				break;
+
+			case AMP:
+				handleAmpState(input);
+				break;
+
+			case SOURCE:
+				handleSourceState(input);
 				break;
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
+
 		currentState = nextState(input);
+		currentTime = Timer.getFPGATimestamp();
 	}
 
 	/**
@@ -134,42 +239,39 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 * @return FSM state for the next iteration
 	 */
-	private IntakeFSMState nextState(TeleopInput input) {
+	private PivotFSMState nextState(TeleopInput input) {
 		if (input == null) {
-			return IntakeFSMState.IDLE_STOP;
+			return PivotFSMState.IDLE_STOP;
 		}
 		switch (currentState) {
 			case IDLE_STOP:
-				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed() && hasNote()) {
-					return IntakeFSMState.OUTTAKING;
+				if (!zeroed && !lastLimitHit) {
+					return PivotFSMState.ZEROING;
+				} else if (currentEncoder > MIN_ENCODER_ROTATIONS
+					&& input.getLeftJoystickY() < -JOYSTICK_DEAD_ZONE) {
+					return PivotFSMState.MANUAL_IN;
+				} else if (currentEncoder <= MAX_ENCODER_ROTATIONS
+					&& input.getLeftJoystickY() > JOYSTICK_DEAD_ZONE) {
+					return PivotFSMState.MANUAL_OUT;
+				} else if (input.isGroundButtonPressed()
+					&& !inRange(currentEncoder, GROUND_ENCODER_ROTATIONS)) {
+					return PivotFSMState.GROUND;
+				} else if (input.isAmpButtonPressed()
+					&& !inRange(currentEncoder, AMP_ENCODER_ROTATIONS)) {
+					return PivotFSMState.AMP;
+				} else if (input.isSourceButtonPressed()
+					&& !inRange(currentEncoder, SOURCE_ENCODER_ROTATIONS)) {
+					return PivotFSMState.SOURCE;
+				} else if (input.isShooterButtonPressed()
+					&& !inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)) {
+					return PivotFSMState.SHOOTING;
 				}
 
-				if (input.isIntakeButtonPressed() && !input.isOuttakeButtonPressed()
-					&& !hasNote()) {
-					return IntakeFSMState.INTAKING;
-				}
-
-				if (input.isIntakeButtonPressed() == input.isOuttakeButtonPressed()) {
-					return IntakeFSMState.IDLE_STOP;
-				}
-
-			case INTAKING:
-				if (input.isIntakeButtonPressed() && !input.isOuttakeButtonPressed()
-					&& !hasNote()) {
-					return IntakeFSMState.INTAKING;
-				}
-
-				if (!input.isIntakeButtonPressed() || input.isOuttakeButtonPressed()
-					|| hasNote()) {
-					return IntakeFSMState.IDLE_STOP;
-				}
-			case OUTTAKING:
-				if (!input.isIntakeButtonPressed() && input.isOuttakeButtonPressed()) {
-					return IntakeFSMState.OUTTAKING;
-				}
-
-				if (!input.isOuttakeButtonPressed() || input.isIntakeButtonPressed()) {
-					return IntakeFSMState.IDLE_STOP;
+			case ZEROING:
+				if (!zeroed && !lastLimitHit && !input.isAbortButtonPressed()) {
+					return PivotFSMState.ZEROING;
+				} else {
+					return PivotFSMState.IDLE_STOP;
 				}
 
 			default:
@@ -184,7 +286,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleIdleState(TeleopInput input) {
-		intakeMotor.set(0);
+		pivotMotor.set(0);
 	}
 	/**
 	 * Handle behavior in INTAKING.
@@ -192,7 +294,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleIntakingState(TeleopInput input) {
-		intakeMotor.set(INTAKE_POWER);
+		pivotMotor.set(INTAKE_POWER);
 	}
 
 	/**
@@ -201,7 +303,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleOuttakingState(TeleopInput input) {
-		intakeMotor.set(-INTAKE_POWER); // DO NOT FORGET THE - SIGN
+		pivotMotor.set(-INTAKE_POWER); // DO NOT FORGET THE - SIGN
 	}
 
 	/**
@@ -228,7 +330,18 @@ public class PivotFSM {
 		return true;
 	}
 
-	private boolean hasNote() {
-		return bottomLimitSwitch.isPressed();
+	private boolean inRange(double a, double b) {
+		return Math.abs(a - b) > 0.5; //EXPERIMENTAL
+	}
+
+	public void pidToPosition(double goalPosition) {
+		double pidVal = pidPivotController.calculate(
+			pivotMotor.getEncoder().getPosition(), goalPosition);
+		double acceleration = (pidPivotController.getSetpoint().velocity
+			- lastSpeed) / (currentTime - lastLoopTime);
+	
+		pivotMotor.setVoltage(pidVal + pivotFeedforward.calculate(pidPivotController.getSetpoint().velocity, acceleration));
+
+		lastSpeed = pidPivotController.getSetpoint().velocity;
 	}
 }

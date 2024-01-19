@@ -17,6 +17,11 @@ public class TeleopInput {
 	private static final int INTAKE_BUTTON = 2;
 	private static final int OUTTAKE_BUTTON = 1;
 	private static final int SHOOT_BUTTON = 3;
+	private static final int GROUND_BUTTON = 4;
+	private static final int AMP_BUTTON = 5;
+	private static final int SOURCE_BUTTON = 6;
+	private static final int SHOOTER_BUTTON = 7;
+	private static final int ABORT_BUTTON = 8;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
@@ -75,6 +80,39 @@ public class TeleopInput {
 	 */
 	public boolean isOuttakeButtonPressed() {
 		return leftJoystick.getRawButton(OUTTAKE_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Outtake button.
+	 * @return True if button is pressed
+	 */
+	public boolean isGroundButtonPressed() {
+		return leftJoystick.getRawButton(GROUND_BUTTON);
+	}
+
+
+	/**
+	 * Get the value of the Outtake button.
+	 * @return True if button is pressed
+	 */
+	public boolean isSourceButtonPressed() {
+		return leftJoystick.getRawButton(SOURCE_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Outtake button.
+	 * @return True if button is pressed
+	 */
+	public boolean isAbortButtonPressed() {
+		return leftJoystick.getRawButton(ABORT_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Outtake button.
+	 * @return True if button is pressed
+	 */
+	public boolean isAmpButtonPressed() {
+		return leftJoystick.getRawButton(AMP_BUTTON);
 	}
 
 	/* ------------------------ Right Joystick ------------------------ */
