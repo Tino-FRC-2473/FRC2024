@@ -273,6 +273,34 @@ public class PivotFSM {
 				} else {
 					return PivotFSMState.IDLE_STOP;
 				}
+			
+			case GROUND:
+				if(!input.isAbortButtonPressed() && !inRange(currentEncoder, GROUND_ENCODER_ROTATIONS)){
+					return PivotFSMState.GROUND;
+				} else {
+					return PivotFSMState.IDLE_STOP;
+				}
+			
+			case AMP:
+				if(!input.isAbortButtonPressed() && inRange(currentEncoder, AMP_ENCODER_ROTATIONS)){
+					return PivotFSMState.AMP;
+				} else {
+					return PivotFSMState.IDLE_STOP;
+				}
+
+			case SOURCE:
+				if(!input.isAbortButtonPressed() && inRange(currentEncoder, SOURCE_ENCODER_ROTATIONS)){
+					return PivotFSMState.SOURCE;
+				} else {
+					return PivotFSMState.IDLE_STOP;
+				}
+
+			case SHOOTING:
+				if(!input.isAbortButtonPressed() && inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)){
+					return PivotFSMState.SHOOTING;
+				} else {
+					return PivotFSMState.IDLE_STOP;
+				}
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
