@@ -19,11 +19,12 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
-	private FSMSystem subSystem1;
-	private FSMSystem subSystem2;
-	private FSMSystem subSystem3;
+	// private FSMSystem subSystem1;
+	// private FSMSystem subSystem2;
+	// private FSMSystem subSystem3;
 
-	private AutoHandlerSystem autoHandler;
+	// private AutoHandlerSystem autoHandler;
+	private LED led;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -33,38 +34,41 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		System.out.println("robotInit");
 		input = new TeleopInput();
+		led = new LED();
 
 		// Instantiate all systems here
-		subSystem1 = new FSMSystem();
-		subSystem2 = new FSMSystem();
-		subSystem3 = new FSMSystem();
-		autoHandler = new AutoHandlerSystem(subSystem1, subSystem2, subSystem3);
+		// subSystem1 = new FSMSystem();
+		// subSystem2 = new FSMSystem();
+		// subSystem3 = new FSMSystem();
+		// autoHandler = new AutoHandlerSystem(subSystem1, subSystem2, subSystem3);
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		autoHandler.reset(AutoPath.PATH1);
+		//autoHandler.reset(AutoPath.PATH1);
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		autoHandler.update();
+		//led.rainbow();
+		led.greenLight();
+		//autoHandler.update();
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		subSystem1.reset();
-		subSystem2.reset();
-		subSystem3.reset();
+		// subSystem1.reset();
+		// subSystem2.reset();
+		// subSystem3.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		subSystem1.update(input);
-		subSystem2.update(input);
-		subSystem3.update(input);
+		// subSystem1.update(input);
+		// subSystem2.update(input);
+		// subSystem3.update(input);
 	}
 
 	@Override
