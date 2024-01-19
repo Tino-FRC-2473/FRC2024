@@ -61,7 +61,6 @@ public class PivotFSM {
 	private double currentTime;
 	private double lastLoopTime;
 	private double lastSpeed;
-	private double manualPower;
 	private boolean zeroed = false;
 	private boolean lastLimitHit = false;
 
@@ -186,11 +185,11 @@ public class PivotFSM {
 				break;
 
 			case MANUAL_IN:
-				handleManualInState(input, true);
+				handleManualInState(input);
 				break;
 
 			case MANUAL_OUT:
-				handleManualOutState(input, false);
+				handleManualOutState(input);
 				break;
 
 			case GROUND:
@@ -294,14 +293,15 @@ public class PivotFSM {
 
 			case GROUND:
 				if (!input.isAbortButtonPressed()
-					&& !inRange(currentEncoder, GROUND_ENCODER_ROTATIONS)){
+					&& !inRange(currentEncoder, GROUND_ENCODER_ROTATIONS)) {
 					return PivotFSMState.GROUND;
 				} else {
 					return PivotFSMState.IDLE_STOP;
 				}
 
 			case AMP:
-				if (!input.isAbortButtonPressed() && inRange(currentEncoder, AMP_ENCODER_ROTATIONS)){
+				if (!input.isAbortButtonPressed()
+					&& inRange(currentEncoder, AMP_ENCODER_ROTATIONS)) {
 					return PivotFSMState.AMP;
 				} else {
 					return PivotFSMState.IDLE_STOP;
@@ -309,7 +309,7 @@ public class PivotFSM {
 
 			case SOURCE:
 				if (!input.isAbortButtonPressed()
-					&& inRange(currentEncoder, SOURCE_ENCODER_ROTATIONS)){
+					&& inRange(currentEncoder, SOURCE_ENCODER_ROTATIONS)) {
 					return PivotFSMState.SOURCE;
 				} else {
 					return PivotFSMState.IDLE_STOP;
@@ -317,7 +317,7 @@ public class PivotFSM {
 
 			case SHOOTER:
 				if (!input.isAbortButtonPressed()
-					&& inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)){
+					&& inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)) {
 					return PivotFSMState.SHOOTER;
 				} else {
 					return PivotFSMState.IDLE_STOP;
@@ -387,7 +387,7 @@ public class PivotFSM {
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-	public void handleManualInState(TeleopInput input){
+	public void handleManualInState(TeleopInput input) {
 		pivotMotor.set(input.getLeftJoystickY());
 	}
 
@@ -396,7 +396,7 @@ public class PivotFSM {
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-	public void handleManualOutState(TeleopInput input){
+	public void handleManualOutState(TeleopInput input) {
 		pivotMotor.set(input.getLeftJoystickY());
 	}
 
@@ -425,10 +425,10 @@ public class PivotFSM {
 	}
 
 	/**
-	 * 
+	 * Calculates inrange value for encoder precision.
 	 * @param a
 	 * @param b
-	 * @return
+	 * @return if the action carried out has finished executing
 	 */
 	private boolean inRange(double a, double b) {
 		return Math.abs(a - b) > INRANGE_VALUE; //EXPERIMENTAL

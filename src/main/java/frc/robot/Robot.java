@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 // Systems
 import frc.robot.systems.IntakeFSM;
 import frc.robot.systems.MBRShooterFSM;
+import frc.robot.systems.PivotFSM;
 import frc.robot.systems.AutoHandlerSystem;
 import frc.robot.systems.AutoHandlerSystem.AutoPath;
 
@@ -22,6 +23,7 @@ public class Robot extends TimedRobot {
 	// Systems
 	private IntakeFSM subSystem1;
 	private MBRShooterFSM subSystem2;
+	private PivotFSM subSystem3;
 
 	private AutoHandlerSystem autoHandler;
 
@@ -37,7 +39,7 @@ public class Robot extends TimedRobot {
 		// Instantiate all systems here
 		subSystem1 = new IntakeFSM();
 		subSystem2 = new MBRShooterFSM();
-		autoHandler = new AutoHandlerSystem(subSystem1, subSystem2);
+		autoHandler = new AutoHandlerSystem(subSystem1, subSystem2, subSystem3);
 	}
 
 	@Override
@@ -56,12 +58,14 @@ public class Robot extends TimedRobot {
 		System.out.println("-------- Teleop Init --------");
 		subSystem1.reset();
 		subSystem2.reset();
+		subSystem3.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		subSystem1.update(input);
 		subSystem2.update(input);
+		subSystem3.update(input);
 	}
 
 	@Override
