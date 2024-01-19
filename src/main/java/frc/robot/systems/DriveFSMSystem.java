@@ -42,7 +42,7 @@ public class DriveFSMSystem {
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
-	public int currentPointInPath;
+	private int currentPointInPath;
 	private boolean blueAlliance;
 
 	// Hardware devices should be owned by one and only one system. They must
@@ -117,6 +117,24 @@ public class DriveFSMSystem {
 	}
 
 	/**
+	 * Returns the current autonomus point the robot is at.
+	 *
+	 * @return current point in path.
+	 */
+	public int getCurrentPointInPath() {
+		return currentPointInPath;
+	}
+
+	/**
+	 * Sets the current autonomus point the robot is at.
+	 *
+	 * @param point current point in path.
+	 */
+	public void setCurrentPointInPath(int point) {
+		currentPointInPath = point;
+	}
+
+	/**
 	 * Returns the currently-estimated pose of the robot.
 	 *
 	 * @return The pose.
@@ -183,76 +201,93 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("Auto point #", currentPointInPath);
 
 		switch (autoState) {
-			// POINTS TBD
-			// INITIAL ANGLES TBD
 			case DRIVE_PATH_1:
 				ArrayList<Pose2d> path1Points = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					path1Points.add(new Pose2d(-1, 3, new Rotation2d(Math.toRadians(0))));
-					path1Points.add(new Pose2d(-3.5, 5, new Rotation2d(Math.toRadians(-90))));
-					path1Points.add(new Pose2d(-6, 5, new Rotation2d(Math.toRadians(-180))));
+					path1Points.add(new Pose2d(-1, AutoConstants.N_3,
+						new Rotation2d(Math.toRadians(0))));
+					path1Points.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_5,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+					path1Points.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
 				} else {
-					path1Points.add(new Pose2d(-1, -3, new Rotation2d(Math.toRadians(0))));
-					path1Points.add(new Pose2d(-3.5, -5, new Rotation2d(Math.toRadians(90))));
-					path1Points.add(new Pose2d(-6, -5, new Rotation2d(Math.toRadians(180))));
+					path1Points.add(new Pose2d(-1, -AutoConstants.N_3,
+						new Rotation2d(Math.toRadians(0))));
+					path1Points.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_5,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
+					path1Points.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_5,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				}
 				return driveAlongPath(path1Points);
 			case DRIVE_PATH_2:
 				ArrayList<Pose2d> path2Points = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					path2Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(-45))));
-					path2Points.add(new Pose2d(-3.5, 4, new Rotation2d(Math.toRadians(-90))));
-					path2Points.add(new Pose2d(-6, 4, new Rotation2d(Math.toRadians(-180))));
+					path2Points.add(new Pose2d(0, 0,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
+					path2Points.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_4,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+					path2Points.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_4,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
 				} else {
-					path2Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(45))));
-					path2Points.add(new Pose2d(-3.5, -4, new Rotation2d(Math.toRadians(90))));
-					path2Points.add(new Pose2d(-6, -4, new Rotation2d(Math.toRadians(180))));
+					path2Points.add(new Pose2d(0, 0,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
+					path2Points.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_4,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
+					path2Points.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_4,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				}
 				return driveAlongPath(path2Points);
 			case DRIVE_PATH_3:
 				ArrayList<Pose2d> path3Points = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					path3Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(45))));
-					path3Points.add(new Pose2d(-5, 0, new Rotation2d(Math.toRadians(90))));
-					path3Points.add(new Pose2d(-6, 4, new Rotation2d(Math.toRadians(180))));
+					path3Points.add(new Pose2d(0, 0,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
+					path3Points.add(new Pose2d(-AutoConstants.N_5, 0,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
+					path3Points.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				} else {
-					path3Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(-45))));
-					path3Points.add(new Pose2d(-5, 0, new Rotation2d(Math.toRadians(-90))));
-					path3Points.add(new Pose2d(-6, -4, new Rotation2d(Math.toRadians(-180))));
+					path3Points.add(new Pose2d(0, 0,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
+					path3Points.add(new Pose2d(-AutoConstants.N_5, 0,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+					path3Points.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_5,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
 				}
 				return driveAlongPath(path3Points);
 			case DRIVE_PATH_4_STATE_1:
 				ArrayList<Pose2d> path4Points1 = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					//path4Points1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					path4Points1.add(new Pose2d(0, -2, new Rotation2d(Math.toRadians(0))));
+					path4Points1.add(new Pose2d(0, -AutoConstants.N_2,
+						new Rotation2d(Math.toRadians(0))));
 				} else {
-					//path4Points1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					path4Points1.add(new Pose2d(0, 2, new Rotation2d(Math.toRadians(0))));
 				}
 				return driveAlongPath(path4Points1);
 			case DRIVE_PATH_4_STATE_2:
 				ArrayList<Pose2d> path4Points2 = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					//path4Points2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					path4Points2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
-					path4Points2.add(new Pose2d(-3.5, 5, new Rotation2d(Math.toRadians(-90))));
-					path4Points2.add(new Pose2d(-6, 5, new Rotation2d(Math.toRadians(-180))));
-				} else {
-					//path4Points2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					path4Points2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
-					path4Points2.add(new Pose2d(-3.5, -5, new Rotation2d(Math.toRadians(90))));
-					path4Points2.add(new Pose2d(-6, -3, new Rotation2d(Math.toRadians(180))));
+					path4Points2.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_3,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+					path4Points2.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_3,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
+				} else {
+					path4Points2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
+					path4Points2.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_5,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
+					path4Points2.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_3,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				}
 				return driveAlongPath(path4Points2);
 			case DRIVE_PATH_5:
 				ArrayList<Pose2d> path5Points = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					//path5Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					path5Points.add(new Pose2d(-6, 0, new Rotation2d(Math.toRadians(180))));
+					path5Points.add(new Pose2d(-AutoConstants.N_6, 0,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				} else {
-					//path5Points.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					path5Points.add(new Pose2d(-6, 0, new Rotation2d(Math.toRadians(180))));
+					path5Points.add(new Pose2d(-AutoConstants.N_6, 0,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				}
 				return driveAlongPath(path5Points);
 			default:
@@ -472,8 +507,8 @@ public class DriveFSMSystem {
 	 * @return if the robot has driven to the current position
 	 */
 	public boolean driveToPose(Pose2d pose) {
-		double x = pose.getX() / 2;
-		double y = pose.getY() / 2;
+		double x = pose.getX() / 2; // remove /2 after testing
+		double y = pose.getY() / 2; //remove /2
 		double angle = pose.getRotation().getDegrees();
 
 		double xDiff = x - getPose().getX();
@@ -486,8 +521,9 @@ public class DriveFSMSystem {
 			xSpeed = clamp(xDiff / AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
 			ySpeed = xSpeed * (yDiff / xDiff);
-			if (Math.abs(xDiff) < 0.2 && Math.abs(yDiff) < 0.2) {
-				xSpeed = (0.2 * xDiff / Math.abs(xDiff))
+			if (Math.abs(xDiff) < AutoConstants.CONSTANT_SPEED_THRESHOLD && Math.abs(yDiff)
+				< AutoConstants.CONSTANT_SPEED_THRESHOLD) {
+				xSpeed = (AutoConstants.CONSTANT_SPEED_THRESHOLD * xDiff / Math.abs(xDiff))
 					/ AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT;
 				ySpeed = xSpeed * (yDiff / xDiff);
 			}
@@ -495,8 +531,9 @@ public class DriveFSMSystem {
 			ySpeed = clamp(yDiff / AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
 			xSpeed = ySpeed * (xDiff / yDiff);
-			if (Math.abs(xDiff) < 0.2 && Math.abs(yDiff) < 0.2) {
-				ySpeed = (0.2 * yDiff / Math.abs(yDiff))
+			if (Math.abs(xDiff) < AutoConstants.CONSTANT_SPEED_THRESHOLD && Math.abs(yDiff)
+				< AutoConstants.CONSTANT_SPEED_THRESHOLD) {
+				ySpeed = (AutoConstants.CONSTANT_SPEED_THRESHOLD * yDiff / Math.abs(yDiff))
 					/ AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT;
 				xSpeed = ySpeed * (xDiff / yDiff);
 			}
@@ -504,20 +541,6 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("x diff", xDiff);
 		SmartDashboard.putNumber("y diff", yDiff);
 		SmartDashboard.putNumber("a diff", aDiff);
-
-		// double autoAccelConst = AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT;
-		// if (xDiff >= yDiff && Math.abs(xDiff / autoAccelConst)
-		// 	> AutoConstants.MAX_SPEED_METERS_PER_SECOND) {
-		// 	autoAccelConst = Math.abs(xDiff) / AutoConstants.MAX_SPEED_METERS_PER_SECOND;
-		// 	System.out.println("here1");
-		// } else if (xDiff < yDiff && Math.abs(yDiff / autoAccelConst)
-		// 	> AutoConstants.MAX_SPEED_METERS_PER_SECOND) {
-		// 	autoAccelConst = Math.abs(yDiff) / AutoConstants.MAX_SPEED_METERS_PER_SECOND;
-		// }
-
-		// if (Math.abs(xDiff) < 0.1 && Math.abs(yDiff) < 0.1) {
-		// 	autoAccelConst = 1;
-		// }
 
 		xSpeed = Math.abs(xDiff) > AutoConstants.AUTO_DRIVE_METERS_MARGIN_OF_ERROR
 			? xSpeed : 0;
