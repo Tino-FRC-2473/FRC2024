@@ -35,6 +35,7 @@ public class AutoHandlerSystem {
 
 	//FSM Systems that the autoHandlerFSM uses
 	private DriveFSMSystem driveSystem;
+	private KitBotShooterFSM shooterFSM;
 
 	//Predefined auto paths
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
@@ -59,8 +60,9 @@ public class AutoHandlerSystem {
 	 * Initializes any subsystems such as driveFSM, armFSM, ect.
 	 * @param fsm1 the first subsystem that the auto handler will call functions on
 	 */
-	public AutoHandlerSystem(DriveFSMSystem fsm1) {
+	public AutoHandlerSystem(DriveFSMSystem fsm1, KitBotShooterFSM fsm2) {
 		driveSystem = fsm1;
+    shooterFSM = fsm2;
 	}
 
 	/* ======================== Public methods ======================== */
@@ -84,6 +86,7 @@ public class AutoHandlerSystem {
 	public void reset(AutoPath path) {
 
 		driveSystem.resetAutonomus();
+		shooterFSM.reset();
 
 		currentStateIndex = 0;
 		if (path == AutoPath.PATH1) {
@@ -131,6 +134,15 @@ public class AutoHandlerSystem {
 				break;
 			case DRIVE_PATH_5:
 				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DRIVE_PATH_5);
+        break;
+			case STATE1:
+				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.STATE1);
+				break;
+			case STATE2:
+				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.STATE2);
+				break;
+			case STATE3:
+				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.STATE3);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());

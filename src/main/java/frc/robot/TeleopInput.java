@@ -15,7 +15,9 @@ public class TeleopInput {
 	/* ======================== Constants ======================== */
 	private static final int LEFT_JOYSTICK_PORT = 1;
 	private static final int RIGHT_JOYSTICK_PORT = 2;
-	public static final int DRIVER_CONTROLLER_PORT = 0;
+	private static final int INTAKE_BUTTON = 2;
+	private static final int OUTTAKE_BUTTON = 1;
+  public static final int DRIVER_CONTROLLER_PORT = 0;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
@@ -33,7 +35,6 @@ public class TeleopInput {
 		leftJoystick = new Joystick(LEFT_JOYSTICK_PORT);
 		rightJoystick = new Joystick(RIGHT_JOYSTICK_PORT);
 		driverController = new PS4Controller(DRIVER_CONTROLLER_PORT);
-
 	}
 
 	/* ======================== Public methods ======================== */
@@ -128,6 +129,20 @@ public class TeleopInput {
 	public boolean isShooterButtonPressed() {
 		return leftJoystick.getRawButton(1);
 	}
+	/**
+	 * Get the value of the intake button.
+	 * @return True if button is pressed
+	 */
+	public boolean isIntakeButtonPressed() {
+		return leftJoystick.getRawButton(INTAKE_BUTTON);
+	}
+	/**
+	 * Get the value of the outtake button.
+	 * @return True if button is pressed
+	 */
+	public boolean isOuttakeButtonPressed() {
+		return leftJoystick.getRawButton(OUTTAKE_BUTTON);
+	}
 
 	/* ------------------------ Right Joystick ------------------------ */
 	/**
@@ -144,7 +159,6 @@ public class TeleopInput {
 	public double getRightJoystickY() {
 		return rightJoystick.getY();
 	}
-
 	/**
 	 * Get the value of the release button.
 	 * @return True if button is pressed
@@ -152,7 +166,6 @@ public class TeleopInput {
 	public boolean isOuttakeButtonPressed() {
 		return leftJoystick.getTrigger();
 	}
-
 	/**
 	 * Get the value of the throttle.
 	 * @return True throttle is forward
