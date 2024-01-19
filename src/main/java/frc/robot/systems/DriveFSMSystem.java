@@ -350,7 +350,7 @@ public class DriveFSMSystem {
 				if (input.isBackButtonPressed()) {
 					gyro.reset();
 					resetOdometry(new Pose2d(new Translation2d(getPose().getX(), getPose().getY()),
-					new Rotation2d(0)));
+						new Rotation2d(0)));
 				}
 				break;
 
