@@ -60,14 +60,14 @@ public class PivotFSM {
 	private double currentTime;
 	private double lastLoopTime;
 	private double lastSpeed;
-
+	private double manualPower;
 	private boolean zeroed = false;
 	private boolean lastLimitHit = false;
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax pivotMotor;
-
+	
 	private ProfiledPIDController pidPivotController;
 	//private SparkPIDController pidPivotController;
 	private SparkLimitSwitch lastLimitSwitch;
@@ -184,11 +184,11 @@ public class PivotFSM {
 				break;
 
 			case MANUAL_IN:
-				handleManualState(input, true);
+				handleManualInState(input, true);
 				break;
 
 			case MANUAL_OUT:
-				handleManualState(input, false);
+				handleManualOutState(input, false);
 				break;
 
 			case GROUND:
@@ -361,7 +361,14 @@ public class PivotFSM {
 	private boolean inRange(double a, double b) {
 		return Math.abs(a - b) > 0.5; //EXPERIMENTAL
 	}
-
+	public void handleManualInState(TeleopInput input){
+		manualPower = input.getLeftJoystickX();
+		pivotMotor.set(manualPower);
+	}
+	public void handleManualOutState(TeleopInput input){
+		manualPower = input.getLeftJoystickY();
+		pivotMotor.set(manualPower);
+	}
 	public void pidToPosition(double goalPosition) {
 		double pidVal = pidPivotController.calculate(
 			pivotMotor.getEncoder().getPosition(), goalPosition);
@@ -372,4 +379,17 @@ public class PivotFSM {
 
 		lastSpeed = pidPivotController.getSetpoint().velocity;
 	}
+	
+	/*
+      void updatePos() {
+         double error = goalCount - currentCount;
+         double dt = time - lastTime;
+         errorSum += dt * error;
+         double errorRate = (error - lastError) / dt;
+         double output = (Kp * error) + (Ki * errorSum) + (Kd * errorRate);
+		 intakeMotor.set(output);
+         lastTime = time;
+         lastError = error;
+ }
+ */
 }
