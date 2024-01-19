@@ -148,6 +148,9 @@ public class AutoHandlerSystem {
 			case SHOOTER_STATE_3:
 				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_3);
 				break;
+			case PENDING:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.PENDING);
+				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());
 		}

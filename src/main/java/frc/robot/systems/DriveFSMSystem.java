@@ -294,6 +294,8 @@ public class DriveFSMSystem {
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				}
 				return driveAlongPath(path5Points);
+			case PENDING:
+				return pause(AutoConstants.WAIT_TIME);
 			default:
 				return false;
 		}
@@ -629,6 +631,16 @@ public class DriveFSMSystem {
 		} else {
 			drive(power, 0, rotSpeed, false, false);
 		}
+	}
+
+	/**
+	 * Drives the robot until it reaches a given object.
+	 * @param seconds seconds to wait
+	 * @return whether or not the wait time has been completed
+	 */
+	public boolean pause(double seconds) {
+		// after seconds...
+		return true;
 	}
 
 	/**

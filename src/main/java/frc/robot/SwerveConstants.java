@@ -132,6 +132,7 @@ public final class SwerveConstants {
 		public static final double AUTO_DRIVE_ANGULAR_SPEED_ACCEL_CONSTANT = 120;
 		public static final double AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT = 3;
 		public static final double CONSTANT_SPEED_THRESHOLD = 0.2; // meters
+		public static final double WAIT_TIME = 5; // seconds
 
 		// tag detection/alignment
 		public static final double DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT = 600; //meters
