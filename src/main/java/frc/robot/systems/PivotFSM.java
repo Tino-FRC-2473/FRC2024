@@ -23,14 +23,14 @@ public class PivotFSM {
 		IDLE_STOP,
 		MANUAL_IN,
 		MANUAL_OUT,
-		SHOOTING,
+		SHOOTER,
 		SOURCE,
 		AMP,
 		GROUND,
 		ZEROING
 	}
 
-	private static final float INTAKE_POWER = 0.1f;
+	private static final float MANUAL_POWER = 0.1f;
 	private static final double MIN_TURN_SPEED = -0.2;
 	private static final double MAX_TURN_SPEED = 0.2;
 
@@ -52,6 +52,7 @@ public class PivotFSM {
 	private static final double AMP_ENCODER_ROTATIONS = 20;
 	private static final double SOURCE_ENCODER_ROTATIONS = 30;
 	private static final double SHOOTER_ENCODER_ROTATIONS = 0;
+	private static final double INRANGE_VALUE = 0.5;
 
 
 	/* ======================== Private variables ======================== */
@@ -67,7 +68,7 @@ public class PivotFSM {
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax pivotMotor;
-	
+
 	private ProfiledPIDController pidPivotController;
 	//private SparkPIDController pidPivotController;
 	private SparkLimitSwitch lastLimitSwitch;
@@ -113,7 +114,8 @@ public class PivotFSM {
 			PID_CONSTANT_PIVOT_I, PID_CONSTANT_PIVOT_D,
 			new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL));
 
-		pivotFeedforward = new ArmFeedforward(PID_STATIC_CONSTANT, PID_GRAVITY_CONSTANT, PID_VOLTAGE_CONSTANT);
+		pivotFeedforward = new ArmFeedforward(PID_STATIC_CONSTANT,
+			PID_GRAVITY_CONSTANT, PID_VOLTAGE_CONSTANT);
 
 		pivotMotor.getEncoder().setPosition(0);
 
@@ -175,8 +177,8 @@ public class PivotFSM {
 				handleIdleState(input);
 				break;
 
-			case SHOOTING:
-				handleShootingState(input);
+			case SHOOTER:
+				handleShooterState(input);
 				break;
 
 			case ZEROING:
@@ -209,6 +211,22 @@ public class PivotFSM {
 
 		currentState = nextState(input);
 		currentTime = Timer.getFPGATimestamp();
+	}
+
+	/**
+	 *
+	 * @param goalPosition
+	 *@return
+	 */
+	public void pidToPosition(double goalPosition) {
+		double pidVal = pidPivotController.calculate(
+			pivotMotor.getEncoder().getPosition(), goalPosition);
+		double acceleration = (pidPivotController.getSetpoint().velocity
+			- lastSpeed) / (currentTime - lastLoopTime);
+
+		pivotMotor.set(pidVal
+			+ pivotFeedforward.calculate(pidPivotController.getSetpoint().velocity, acceleration));
+		lastSpeed = pidPivotController.getSetpoint().velocity;
 	}
 
 	/**
@@ -264,7 +282,7 @@ public class PivotFSM {
 					return PivotFSMState.SOURCE;
 				} else if (input.isShooterButtonPressed()
 					&& !inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)) {
-					return PivotFSMState.SHOOTING;
+					return PivotFSMState.SHOOTER;
 				}
 
 			case ZEROING:
@@ -273,31 +291,34 @@ public class PivotFSM {
 				} else {
 					return PivotFSMState.IDLE_STOP;
 				}
-			
+
 			case GROUND:
-				if(!input.isAbortButtonPressed() && !inRange(currentEncoder, GROUND_ENCODER_ROTATIONS)){
+				if (!input.isAbortButtonPressed()
+					&& !inRange(currentEncoder, GROUND_ENCODER_ROTATIONS)){
 					return PivotFSMState.GROUND;
 				} else {
 					return PivotFSMState.IDLE_STOP;
 				}
-			
+
 			case AMP:
-				if(!input.isAbortButtonPressed() && inRange(currentEncoder, AMP_ENCODER_ROTATIONS)){
+				if (!input.isAbortButtonPressed() && inRange(currentEncoder, AMP_ENCODER_ROTATIONS)){
 					return PivotFSMState.AMP;
 				} else {
 					return PivotFSMState.IDLE_STOP;
 				}
 
 			case SOURCE:
-				if(!input.isAbortButtonPressed() && inRange(currentEncoder, SOURCE_ENCODER_ROTATIONS)){
+				if (!input.isAbortButtonPressed()
+					&& inRange(currentEncoder, SOURCE_ENCODER_ROTATIONS)){
 					return PivotFSMState.SOURCE;
 				} else {
 					return PivotFSMState.IDLE_STOP;
 				}
 
-			case SHOOTING:
-				if(!input.isAbortButtonPressed() && inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)){
-					return PivotFSMState.SHOOTING;
+			case SHOOTER:
+				if (!input.isAbortButtonPressed()
+					&& inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)){
+					return PivotFSMState.SHOOTER;
 				} else {
 					return PivotFSMState.IDLE_STOP;
 				}
@@ -317,21 +338,66 @@ public class PivotFSM {
 		pivotMotor.set(0);
 	}
 	/**
-	 * Handle behavior in INTAKING.
+	 * Handle behavior in SHOOTER.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-	private void handleIntakingState(TeleopInput input) {
-		pivotMotor.set(INTAKE_POWER);
+	private void handleShooterState(TeleopInput input) {
+		pidToPosition(SHOOTER_ENCODER_ROTATIONS);
 	}
 
 	/**
-	 * Handle behavior in OUTTAKING.
+	 * Handle behavior in AMP.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-	private void handleOuttakingState(TeleopInput input) {
-		pivotMotor.set(-INTAKE_POWER); // DO NOT FORGET THE - SIGN
+	private void handleAmpState(TeleopInput input) {
+		pidToPosition(AMP_ENCODER_ROTATIONS);
+	}
+
+	/**
+	 * Handle behavior in GROUND.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 */
+	private void handleGroundState(TeleopInput input) {
+		pidToPosition(GROUND_ENCODER_ROTATIONS);
+	}
+
+	/**
+	 * Handle behavior in SOURCE.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 */
+	private void handleSourceState(TeleopInput input) {
+		pidToPosition(SOURCE_ENCODER_ROTATIONS);
+	}
+
+	/**
+	 * Handle behavior in ZEROING.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 */
+	private void handleZeroingState(TeleopInput input) {
+		pidToPosition(SHOOTER_ENCODER_ROTATIONS);
+	}
+
+	/**
+	 * Handle behavior in MANUAL_IN.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 */
+	public void handleManualInState(TeleopInput input){
+		pivotMotor.set(input.getLeftJoystickY());
+	}
+
+	/**
+	 * Handle behavior in MANUAL_OUT.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 */
+	public void handleManualOutState(TeleopInput input){
+		pivotMotor.set(input.getLeftJoystickY());
 	}
 
 	/**
@@ -358,28 +424,16 @@ public class PivotFSM {
 		return true;
 	}
 
+	/**
+	 * 
+	 * @param a
+	 * @param b
+	 * @return
+	 */
 	private boolean inRange(double a, double b) {
-		return Math.abs(a - b) > 0.5; //EXPERIMENTAL
+		return Math.abs(a - b) > INRANGE_VALUE; //EXPERIMENTAL
 	}
-	public void handleManualInState(TeleopInput input){
-		manualPower = input.getLeftJoystickX();
-		pivotMotor.set(manualPower);
-	}
-	public void handleManualOutState(TeleopInput input){
-		manualPower = input.getLeftJoystickY();
-		pivotMotor.set(manualPower);
-	}
-	public void pidToPosition(double goalPosition) {
-		double pidVal = pidPivotController.calculate(
-			pivotMotor.getEncoder().getPosition(), goalPosition);
-		double acceleration = (pidPivotController.getSetpoint().velocity
-			- lastSpeed) / (currentTime - lastLoopTime);
-	
-		pivotMotor.setVoltage(pidVal + pivotFeedforward.calculate(pidPivotController.getSetpoint().velocity, acceleration));
 
-		lastSpeed = pidPivotController.getSetpoint().velocity;
-	}
-	
 	/*
       void updatePos() {
          double error = goalCount - currentCount;

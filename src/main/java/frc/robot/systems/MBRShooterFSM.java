@@ -83,10 +83,10 @@ public class MBRShooterFSM {
 			return;
 		}
 
-		if (input.isShooterButtonPressed() && !buttonPressedLastFrame) {
+		if (input.isShootButtonPressed() && !buttonPressedLastFrame) {
 			buttonToggle = !buttonToggle;
 			buttonPressedLastFrame = true;
-		} else if (!input.isShooterButtonPressed()) {
+		} else if (!input.isShootButtonPressed()) {
 			buttonPressedLastFrame = false;
 		}
 

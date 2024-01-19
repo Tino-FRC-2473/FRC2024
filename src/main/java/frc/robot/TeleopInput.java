@@ -63,7 +63,7 @@ public class TeleopInput {
 	 * Get the value of the shooter button.
 	 * @return True if button is pressed
 	 */
-	public boolean isShooterButtonPressed() {
+	public boolean isShootButtonPressed() {
 		return leftJoystick.getRawButton(SHOOT_BUTTON);
 	}
 	/**
@@ -113,6 +113,14 @@ public class TeleopInput {
 	 */
 	public boolean isAmpButtonPressed() {
 		return leftJoystick.getRawButton(AMP_BUTTON);
+	}
+
+	/**
+	 * Get the value of the Outtake button.
+	 * @return True if button is pressed
+	 */
+	public boolean isShooterButtonPressed() {
+		return leftJoystick.getRawButton(SHOOTER_BUTTON);
 	}
 
 	/* ------------------------ Right Joystick ------------------------ */
