@@ -39,6 +39,7 @@ public class Robot extends TimedRobot {
 		// Instantiate all systems here
 		subSystem1 = new IntakeFSM();
 		subSystem2 = new MBRShooterFSM();
+		subSystem3 = new PivotFSM();
 		autoHandler = new AutoHandlerSystem(subSystem1, subSystem2, subSystem3);
 	}
 
@@ -56,15 +57,15 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		subSystem1.reset();
-		subSystem2.reset();
+		//subSystem1.reset();
+		//subSystem2.reset();
 		subSystem3.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		subSystem1.update(input);
-		subSystem2.update(input);
+		//subSystem1.update(input);
+		//subSystem2.update(input);
 		subSystem3.update(input);
 	}
 

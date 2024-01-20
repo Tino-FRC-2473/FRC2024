@@ -11,6 +11,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
@@ -40,18 +41,19 @@ public class PivotFSM {
 	private static final double PID_CONSTANT_PIVOT_P = 0.001;
 	private static final double PID_CONSTANT_PIVOT_I = 0.001;
 	private static final double PID_CONSTANT_PIVOT_D = 0.001;
-	private static final double PID_VOLTAGE_CONSTANT = 0;
-	private static final double PID_STATIC_CONSTANT = 0;
-	private static final double PID_GRAVITY_CONSTANT = 0;
+
+	private static final double PID_VOLTAGE_CONSTANT = 0.001;
+	private static final double PID_STATIC_CONSTANT = 0.001;
+	private static final double PID_GRAVITY_CONSTANT = 0.001;
 
 
 	private static final double JOYSTICK_DEAD_ZONE = 0.15;
-	private static final double MIN_ENCODER_ROTATIONS = -100;
-	private static final double MAX_ENCODER_ROTATIONS = 100;
-	private static final double GROUND_ENCODER_ROTATIONS = 10;
-	private static final double AMP_ENCODER_ROTATIONS = 20;
-	private static final double SOURCE_ENCODER_ROTATIONS = 30;
-	private static final double SHOOTER_ENCODER_ROTATIONS = 0;
+	private static final double MIN_ENCODER_ROTATIONS = -1;
+	private static final double MAX_ENCODER_ROTATIONS = 80;
+	private static final double GROUND_ENCODER_ROTATIONS = 50;
+	private static final double AMP_ENCODER_ROTATIONS = 30;
+	private static final double SOURCE_ENCODER_ROTATIONS = 25;
+	private static final double SHOOTER_ENCODER_ROTATIONS = 5;
 	private static final double INRANGE_VALUE = 0.5;
 
 
@@ -63,6 +65,8 @@ public class PivotFSM {
 	private double lastSpeed;
 	private boolean zeroed = false;
 	private boolean lastLimitHit = false;
+	private double pidVal;
+	private double acceleration;
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -71,7 +75,6 @@ public class PivotFSM {
 	private ProfiledPIDController pidPivotController;
 	//private SparkPIDController pidPivotController;
 	private SparkLimitSwitch lastLimitSwitch;
-	private SparkLimitSwitch hasNoteSwitch;
 	private final ArmFeedforward pivotFeedforward;
 
 	private boolean hasTimerStarted = false;
@@ -97,11 +100,6 @@ public class PivotFSM {
 		pivotMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
 
 		lastLimitSwitch.enableLimitSwitch(false);
-
-		hasNoteSwitch =
-		pivotMotor.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
-
-		hasNoteSwitch.enableLimitSwitch(false);
 
 		/*pidPivotController = pivotMotor.getPIDController();
 		pidPivotController.setP(PID_CONSTANT_PIVOT_P);
@@ -167,9 +165,20 @@ public class PivotFSM {
 			currentEncoder = pivotMotor.getEncoder().getPosition();
 		}
 
-		if (currentTime != 0) {
-			lastLoopTime = currentTime;
-		}
+		SmartDashboard.putString("Current State", currentState.toString());
+		SmartDashboard.putNumber("Motor Power", pivotMotor.get());
+		SmartDashboard.putNumber("Encoder Value", currentEncoder);
+		SmartDashboard.putBoolean("Zeroed", zeroed);
+		SmartDashboard.putBoolean("GROUND BUTTON", input.isGroundButtonPressed());
+		SmartDashboard.putBoolean("SHOOT BUTTON", input.isShootButtonPressed());
+		SmartDashboard.putBoolean("SOURCE BUTTON", input.isSourceButtonPressed());
+		SmartDashboard.putBoolean("AMP BUTTON", input.isAmpButtonPressed());
+		SmartDashboard.putBoolean("ABORT BUTTON", input.isAbortButtonPressed());
+		SmartDashboard.putNumber("PidVAL", pidVal);
+		SmartDashboard.putNumber("Accel", acceleration);
+		SmartDashboard.putNumber("Velocity", pidPivotController.getSetpoint().velocity);
+		SmartDashboard.putNumber(" velocity dif ", pidPivotController.getSetpoint().velocity - lastSpeed);
+		SmartDashboard.putNumber("time diff", currentTime - lastLoopTime);
 
 		switch (currentState) {
 			case IDLE_STOP:
@@ -210,21 +219,6 @@ public class PivotFSM {
 
 		currentState = nextState(input);
 		currentTime = Timer.getFPGATimestamp();
-	}
-
-	/**
-	 * Calculates the position to PID to and the motor power required.
-	 * @param goalPosition The position the arm is supposed to go to
-	 */
-	public void pidToPosition(double goalPosition) {
-		double pidVal = pidPivotController.calculate(
-			pivotMotor.getEncoder().getPosition(), goalPosition);
-		double acceleration = (pidPivotController.getSetpoint().velocity
-			- lastSpeed) / (currentTime - lastLoopTime);
-
-		pivotMotor.set(pidVal
-			+ pivotFeedforward.calculate(pidPivotController.getSetpoint().velocity, acceleration));
-		lastSpeed = pidPivotController.getSetpoint().velocity;
 	}
 
 	/**
@@ -281,6 +275,24 @@ public class PivotFSM {
 				} else if (input.isShooterButtonPressed()
 					&& !inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)) {
 					return PivotFSMState.SHOOTER;
+				} else {
+					return PivotFSMState.IDLE_STOP;
+				}
+
+			case MANUAL_OUT:
+				if (currentEncoder < MAX_ENCODER_ROTATIONS
+					&& input.getLeftJoystickY() >= JOYSTICK_DEAD_ZONE) {
+					return PivotFSMState.MANUAL_OUT;
+				} else {
+					return PivotFSMState.IDLE_STOP;
+				}
+
+			case MANUAL_IN:
+				if (currentEncoder > MIN_ENCODER_ROTATIONS
+					&& input.getLeftJoystickY() < -JOYSTICK_DEAD_ZONE) {
+					return PivotFSMState.MANUAL_IN;
+				} else {
+					return PivotFSMState.IDLE_STOP;
 				}
 
 			case ZEROING:
@@ -378,7 +390,12 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleZeroingState(TeleopInput input) {
-		pidToPosition(SHOOTER_ENCODER_ROTATIONS);
+		pivotMotor.set(MANUAL_POWER);
+
+		if (lastLimitHit && !zeroed) {
+			zeroed = true;
+			currentEncoder = 0;
+		}
 	}
 
 	/**
@@ -430,7 +447,7 @@ public class PivotFSM {
 	 * @return if the action carried out has finished executing
 	 */
 	private boolean inRange(double a, double b) {
-		return Math.abs(a - b) > INRANGE_VALUE; //EXPERIMENTAL
+		return Math.abs(a - b) < INRANGE_VALUE; //EXPERIMENTAL
 	}
 
 	/*
@@ -445,4 +462,28 @@ public class PivotFSM {
          lastError = error;
  }
  */
+	public double clamp(double power) {
+		return Math.min(MAX_TURN_SPEED, Math.min(MIN_TURN_SPEED, power));
+	}
+
+	/**
+	 * Calculates the position to PID to and the motor power required.
+	 * @param goalPosition The position the arm is supposed to go to
+	 */
+	public void pidToPosition(double goalPosition) {
+		pidVal = pidPivotController.calculate(
+			currentEncoder, goalPosition);
+		acceleration = (pidPivotController.getSetpoint().velocity
+			- lastSpeed) / (currentTime - lastLoopTime);
+
+		pivotMotor.setVoltage((pidVal
+			+ pivotFeedforward.calculate(pidPivotController.getSetpoint().velocity,
+			acceleration)));
+
+		lastSpeed = pidPivotController.getSetpoint().velocity;
+
+		if (currentTime != 0) {
+			lastLoopTime = currentTime;
+		}
+	}
 }
