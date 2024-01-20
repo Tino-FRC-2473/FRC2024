@@ -177,7 +177,8 @@ public class PivotFSM {
 		SmartDashboard.putNumber("PidVAL", pidVal);
 		SmartDashboard.putNumber("Accel", acceleration);
 		SmartDashboard.putNumber("Velocity", pidPivotController.getSetpoint().velocity);
-		SmartDashboard.putNumber(" velocity dif ", pidPivotController.getSetpoint().velocity - lastSpeed);
+		SmartDashboard.putNumber(" velocity dif ",
+			pidPivotController.getSetpoint().velocity - lastSpeed);
 		SmartDashboard.putNumber("time diff", currentTime - lastLoopTime);
 
 		switch (currentState) {
@@ -461,6 +462,11 @@ public class PivotFSM {
          lastTime = time;
          lastError = error;
  }
+ */
+/**
+ * Limits the motor from spinning faster than the maximum speed.
+ * @param power
+ * @return Maximum and Minimum power the motor is allowed to run at
  */
 	public double clamp(double power) {
 		return Math.min(MAX_TURN_SPEED, Math.min(MIN_TURN_SPEED, power));
