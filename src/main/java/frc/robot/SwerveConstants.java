@@ -234,12 +234,12 @@ public final class SwerveConstants {
 		public static final double FREE_SPEED_RPM = 5676;
 	}
 	public static final class VisionConstants {
-		public static final double MAX_SPEED_METERS_PER_SECOND = 0.15;
-		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 6;
-		public static final double SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT = 1;//TWEAK
-		public static final double SPEAKER_ROTATIONAL_ACCEL_CONSTANT = 1;//TWEAK
-		public static final double X_MARGIN_TO_SPEAKER = 0.02;
-		public static final double Z_MARGIN_TO_SPEAKER = 1.25;
+		public static final double MAX_SPEED_METERS_PER_SECOND = 0.2;
+		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 10;
+		public static final double SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT = 5;//TWEAK
+		public static final double SPEAKER_ROTATIONAL_ACCEL_CONSTANT = 6;//TWEAK
+		public static final double X_MARGIN_TO_SPEAKER = 0.03;
+		public static final double Z_MARGIN_TO_SPEAKER = 1.1;
 		public static final double Z_MARGIN_SPEAKER_OFFSET = 0.05;
 	}
 }

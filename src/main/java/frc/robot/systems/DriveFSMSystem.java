@@ -98,6 +98,8 @@ public class DriveFSMSystem {
 
 	private boolean facingSpeakerTag;
 	private boolean closeToSpeakerTag;
+	private double lastSeenX;
+	private double lastSeenZ;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -144,6 +146,8 @@ public class DriveFSMSystem {
 		resetOdometry(new Pose2d());
 		facingSpeakerTag = false;
 		closeToSpeakerTag = false;
+		lastSeenX = 4000;
+		lastSeenZ = 4000;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -331,14 +335,17 @@ public class DriveFSMSystem {
 
 			case ALIGN_TO_SPEAKER_STATE:
 				if (rpi.getAprilTagZ(4) != 4000 && rpi.getAprilTagX(4) != 4000) {
-					alignToSpeaker(rpi.getAprilTagZ(4),rpi.getAprilTagX(4));
+					lastSeenX = rpi.getAprilTagX(4);
+					lastSeenZ = rpi.getAprilTagZ(4);
+					alignToSpeaker(lastSeenZ,lastSeenX);
 				} else if(rpi.getAprilTagZ(7) != 4000 && rpi.getAprilTagX(7) != 4000) {
-					alignToSpeaker(rpi.getAprilTagZ(7),rpi.getAprilTagX(7));
+					lastSeenX = rpi.getAprilTagX(7);
+					lastSeenZ = rpi.getAprilTagZ(7);
+					alignToSpeaker(lastSeenZ,lastSeenX);
 				} else {
-					alignToSpeaker(4000,4000);
+					alignToSpeaker(lastSeenZ,lastSeenX);
 				}
 				break;
-
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -375,6 +382,8 @@ public class DriveFSMSystem {
 				if (input.isCircleButtonReleased()) {
 					facingSpeakerTag = false;
 					closeToSpeakerTag = false;
+					lastSeenX = 4000;
+					lastSeenZ = 4000;
 					return FSMState.TELEOP_STATE;
 				}
 				return FSMState.ALIGN_TO_SPEAKER_STATE;
@@ -579,7 +588,9 @@ public class DriveFSMSystem {
 
 	//Compute current (Tag -> camera pose) and use rvec[1] and tvec[2] to determine how many degrees
 	//you need to turn and how many inches you need to travel forward. Use gyro-encoder to travel these amounts
-	public void alignToSource() {}
+	public void alignToSource() {
+
+	}
 	public void alignToSpeaker(double dist, double rotFinal) {
 		if (dist == 4000 && rotFinal == 4000) {
 			//no tag was seen
@@ -592,17 +603,21 @@ public class DriveFSMSystem {
 		double rotSpeed = clamp(-rotFinal / VisionConstants.SPEAKER_ROTATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
+		SmartDashboard.putNumber("Forward speaker power", forwardPower);
+		SmartDashboard.putNumber("Rotational speaker power", rotSpeed);
+		SmartDashboard.putNumber("CV Z value", dist);
+		SmartDashboard.putNumber("CV X value", rotFinal);
 		if (!facingSpeakerTag) {
 			drive(0, 0, rotSpeed, false, false);
-			if (Math.abs(rotFinal) <= VisionConstants.X_MARGIN_TO_SPEAKER) {
+			if (Math.abs(rotSpeed) <= 0.02) {
 				facingSpeakerTag = true;
 			}
 		} else {
 			if (!closeToSpeakerTag) {
-				drive(forwardPower, 0, 0, false, false);
-				if (dist < VisionConstants.Z_MARGIN_TO_SPEAKER + VisionConstants.Z_MARGIN_SPEAKER_OFFSET) {
-					closeToSpeakerTag = true;
-				}
+			 	drive(forwardPower, 0, 0, false, false);
+			 	if (dist < VisionConstants.Z_MARGIN_TO_SPEAKER + VisionConstants.Z_MARGIN_SPEAKER_OFFSET) {
+			 		closeToSpeakerTag = true;
+			 	}
 			} else {
 				drive(0, 0, 0, false, false);
 			}
