@@ -213,9 +213,8 @@ public class PivotFSM {
 	}
 
 	/**
-	 *
-	 * @param goalPosition
-	 *@return
+	 * Calculates the position to PID to and the motor power required.
+	 * @param goalPosition The position the arm is supposed to go to
 	 */
 	public void pidToPosition(double goalPosition) {
 		double pidVal = pidPivotController.calculate(
@@ -301,7 +300,7 @@ public class PivotFSM {
 
 			case AMP:
 				if (!input.isAbortButtonPressed()
-					&& inRange(currentEncoder, AMP_ENCODER_ROTATIONS)) {
+					&& !inRange(currentEncoder, AMP_ENCODER_ROTATIONS)) {
 					return PivotFSMState.AMP;
 				} else {
 					return PivotFSMState.IDLE_STOP;
@@ -309,7 +308,7 @@ public class PivotFSM {
 
 			case SOURCE:
 				if (!input.isAbortButtonPressed()
-					&& inRange(currentEncoder, SOURCE_ENCODER_ROTATIONS)) {
+					&& !inRange(currentEncoder, SOURCE_ENCODER_ROTATIONS)) {
 					return PivotFSMState.SOURCE;
 				} else {
 					return PivotFSMState.IDLE_STOP;
@@ -317,7 +316,7 @@ public class PivotFSM {
 
 			case SHOOTER:
 				if (!input.isAbortButtonPressed()
-					&& inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)) {
+					&& !inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)) {
 					return PivotFSMState.SHOOTER;
 				} else {
 					return PivotFSMState.IDLE_STOP;
