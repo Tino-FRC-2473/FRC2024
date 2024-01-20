@@ -19,6 +19,7 @@ public class Robot extends TimedRobot {
 	// Systems
 	private DriveFSMSystem driveFSMSystem;
 	private AutoHandlerSystem autoHandler;
+	private AutoPathChooser autoPathChooser;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -31,11 +32,16 @@ public class Robot extends TimedRobot {
 		// Instantiate all systems here
 		driveFSMSystem = new DriveFSMSystem();
 		autoHandler = new AutoHandlerSystem(driveFSMSystem);
+		autoPathChooser = new AutoPathChooser();
 	}
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		autoHandler.reset(AutoPath.PATH1);
+		AutoPath path = AutoPath.PATH1;
+		if (AutoPathChooser.getSelectedPath() != null) {
+			path = AutoPathChooser.getSelectedPath();
+		}
+		autoHandler.reset(path);
 	}
 
 	@Override
