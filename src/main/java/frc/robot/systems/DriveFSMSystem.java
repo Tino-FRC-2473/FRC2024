@@ -577,6 +577,9 @@ public class DriveFSMSystem {
 		}
 	}
 
+	//Compute current (Tag -> camera pose) and use rvec[1] and tvec[2] to determine how many degrees
+	//you need to turn and how many inches you need to travel forward. Use gyro-encoder to travel these amounts
+	public void alignToSource() {}
 	public void alignToSpeaker(double dist, double rotFinal) {
 		if (dist == 4000 && rotFinal == 4000) {
 			//no tag was seen

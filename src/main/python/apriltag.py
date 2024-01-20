@@ -88,7 +88,11 @@ class AprilTag():
             text_color = (255, 0, 255)  # White color
             text_position = (10, 30)  # Top-left corner coordinates
             # Add text to the image
-            text = str(rvec * 180/3.14)
+            rvec = rvec.reshape((3, 1))
+            tvec = tvec.reshape((3,1))
+            R, _ = cv2.Rodrigues(rvec)
+            Cesc = (-R.T @ tvec).reshape(3) 
+            text = str(Cesc* 39.37) + '\n' + str(rvec.flatten() * 180 / 3.14)
             cv2.putText(image, text, text_position, font, font_scale, text_color, font_thickness)
 
 
@@ -116,12 +120,6 @@ class AprilTag():
             _, rvec, tvec = cv2.solvePnP(marker_points_3d, image_points_2d, camera_matrix, dist_coeffs, flags=cv2.SOLVEPNP_IPPE_SQUARE)
             rvec = rvec.flatten()
             tvec = tvec.flatten()
-
-            # R_ct    = np.matrix(cv2.Rodrigues(rvec)[0])
-            # R_tc    = R_ct.T
-            # tvec_camera = -R_tc*np.matrix(tvec).T
-            # print(tvec_camera)
-            # print(tvec)
             return rvec,  tvec
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -152,7 +150,7 @@ class AprilTag():
                     pose_data[ids[i][0]] = (tvec, rvec)
                     #print(corners[i])
                     #print(self.get_yaw(corners[i]) )
-                    #self.draw_axis_on_image(frame_ann, self.camera_matrix, self.dist_coeffs, rvec, tvec, 0.1)
+                    self.draw_axis_on_image(frame_ann, self.camera_matrix, self.dist_coeffs, rvec, tvec, 0.1)
                     #rvec[0] = self.get_yaw(corners[i])
                     # Draw the 3D pose axis on the image
 
