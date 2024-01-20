@@ -63,7 +63,7 @@ class AprilTag():
         np.save('calibration_data/home_camera_dist.npy',dist)
         print('Calibration complete')
 
-    def draw_axis_on_image(self, n, image, camera_matrix, dist_coeffs, rvec, tvec, size=1):
+    def draw_axis_on_image(self, image, camera_matrix, dist_coeffs, rvec, tvec, size=1):
         try:
             # Define axis length
             length = size
@@ -88,7 +88,7 @@ class AprilTag():
             text_color = (255, 0, 255)  # White color
             text_position = (10, 30)  # Top-left corner coordinates
             # Add text to the image
-            text = str(n)
+            text = str(rvec * 180/3.14)
             cv2.putText(image, text, text_position, font, font_scale, text_color, font_thickness)
 
 
@@ -117,12 +117,12 @@ class AprilTag():
             rvec = rvec.flatten()
             tvec = tvec.flatten()
 
-            R_ct    = np.matrix(cv2.Rodrigues(rvec)[0])
-            R_tc    = R_ct.T
-            tvec_camera = -R_tc*np.matrix(tvec).T
-            print(tvec_camera)
-            print(tvec)
-            return rvec,  tvec, tvec_camera * 39.37
+            # R_ct    = np.matrix(cv2.Rodrigues(rvec)[0])
+            # R_tc    = R_ct.T
+            # tvec_camera = -R_tc*np.matrix(tvec).T
+            # print(tvec_camera)
+            # print(tvec)
+            return rvec,  tvec
         except Exception as e:
             print(f"An error occurred: {e}")
             return None, None
@@ -147,13 +147,13 @@ class AprilTag():
                 # Estimate the pose of each detected marker
                 for i in range(len(ids)):
                     # Estimate the pose
-                    rvec, tvec, n= self.estimate_pose_single_marker(corners[i], ARUCO_LENGTH_METERS, self.camera_matrix, self.dist_coeffs)
+                    rvec, tvec= self.estimate_pose_single_marker(corners[i], ARUCO_LENGTH_METERS, self.camera_matrix, self.dist_coeffs)
                     #print(tvec,n)
-                    pose_data[ids[i][0]] = (n, rvec)
+                    pose_data[ids[i][0]] = (tvec, rvec)
                     #print(corners[i])
                     #print(self.get_yaw(corners[i]) )
-                    self.draw_axis_on_image(n, frame_ann, self.camera_matrix, self.dist_coeffs, rvec, tvec, 0.1)
-                    rvec[0] = self.get_yaw(corners[i])
+                    #self.draw_axis_on_image(frame_ann, self.camera_matrix, self.dist_coeffs, rvec, tvec, 0.1)
+                    #rvec[0] = self.get_yaw(corners[i])
                     # Draw the 3D pose axis on the image
 
                 # Display the result
@@ -162,26 +162,6 @@ class AprilTag():
                 #print("No AprilTags detected in the image.")
                 pass
             return pose_data
-    def rotation_matrix_to_euler_angles(self, rotation_matrix):
-        # Ensure the matrix is a valid rotation matrix
-        rotation_matrix = np.array(rotation_matrix)
-        #assert np.allclose(np.linalg.det(rotation_matrix), 1.0)
-
-        # Extract yaw, pitch, and roll angles
-        # Yaw (around y-axis)
-        yaw = np.arctan2(rotation_matrix[0, 2], rotation_matrix[2, 2])
-
-        # Pitch (around x-axis)
-        pitch = -np.arcsin(rotation_matrix[1, 2])
-
-        # Roll (around z-axis)
-        roll = np.arctan2(rotation_matrix[1, 0], rotation_matrix[1, 1])
-
-        # Convert angles to degrees
-        yaw_degrees, pitch_degrees, roll_degrees = np.degrees([yaw, pitch, roll])
-
-        return np.array([[yaw_degrees], [pitch_degrees], [roll_degrees]])
-
 
     def get_yaw(self, corners):
         corners = np.array(corners)

@@ -30,14 +30,15 @@ import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.SwerveConstants.AutoConstants;
 import frc.robot.AutoPathChooser;
+import frc.robot.SwerveConstants.VisionConstants;
 
 public class DriveFSMSystem {
 	/* ======================== Constants ======================== */
 	// FSM state definitions
 	public enum FSMState {
 		TELEOP_STATE,
-		ALIGN_TO_TAG_STATE,
-		ALIGN_TO_OBJECT_STATE
+		ALIGN_TO_SPEAKER_STATE,
+		ALIGN_TO_SOURCE_STATE
 	}
 
 	/* ======================== Private variables ======================== */
@@ -95,6 +96,8 @@ public class DriveFSMSystem {
 			rearRight.getPosition()
 		});
 
+	private boolean facingSpeakerTag;
+	private boolean closeToSpeakerTag;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -139,6 +142,8 @@ public class DriveFSMSystem {
 		gyro.reset();
 		//resetEncoders();
 		resetOdometry(new Pose2d());
+		facingSpeakerTag = false;
+		closeToSpeakerTag = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -315,7 +320,7 @@ public class DriveFSMSystem {
 				}
 				break;
 
-			case ALIGN_TO_OBJECT_STATE:
+			case ALIGN_TO_SOURCE_STATE:
 				//double dist = rpi.getConeDistance();
 				//double angle = rpi.getConeYaw();
 				//boolean canSee = (dist == -1 || angle == -1);
@@ -324,16 +329,14 @@ public class DriveFSMSystem {
 				//driveUntilObject(dist, angle);
 				break;
 
-			case ALIGN_TO_TAG_STATE:
-				// double xdist =  rpi.getAprilTagX(1);
-				// double ydist = rpi.getAprilTagY(1);
-				// double angle = rpi.getAprilTagYaw(1);
-				// boolean canSee = (xdist == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT
-				// 	|| angle == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT
-				// 	|| ydist == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT);
-				// SmartDashboard.putBoolean("Can See Tag", canSee);
-				// System.out.println("x tag: " + rpi.getAprilTagX(1));
-				// driveToTag(0, xdist, 0);
+			case ALIGN_TO_SPEAKER_STATE:
+				if (rpi.getAprilTagZ(4) != 4000 && rpi.getAprilTagX(4) != 4000) {
+					alignToSpeaker(rpi.getAprilTagZ(4),rpi.getAprilTagX(4));
+				} else if(rpi.getAprilTagZ(7) != 4000 && rpi.getAprilTagX(7) != 4000) {
+					alignToSpeaker(rpi.getAprilTagZ(7),rpi.getAprilTagX(7));
+				} else {
+					alignToSpeaker(4000,4000);
+				}
 				break;
 
 			default:
@@ -356,23 +359,25 @@ public class DriveFSMSystem {
 		switch (currentState) {
 			case TELEOP_STATE:
 				if (input.isCircleButtonPressed()) {
-					return FSMState.ALIGN_TO_TAG_STATE;
+					return FSMState.ALIGN_TO_SPEAKER_STATE;
 				} else if (input.isTriangleButtonPressed()) {
-					return FSMState.ALIGN_TO_OBJECT_STATE;
+					return FSMState.ALIGN_TO_SOURCE_STATE;
 				}
 				return FSMState.TELEOP_STATE;
 
-			case ALIGN_TO_OBJECT_STATE:
+			case ALIGN_TO_SOURCE_STATE:
 				if (input.isTriangleButtonReleased()) {
 					return FSMState.TELEOP_STATE;
 				}
-				return FSMState.ALIGN_TO_OBJECT_STATE;
+				return FSMState.ALIGN_TO_SOURCE_STATE;
 
-			case ALIGN_TO_TAG_STATE:
+			case ALIGN_TO_SPEAKER_STATE:
 				if (input.isCircleButtonReleased()) {
+					facingSpeakerTag = false;
+					closeToSpeakerTag = false;
 					return FSMState.TELEOP_STATE;
 				}
-				return FSMState.ALIGN_TO_TAG_STATE;
+				return FSMState.ALIGN_TO_SPEAKER_STATE;
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -472,8 +477,8 @@ public class DriveFSMSystem {
 	 * @return if the robot has driven to the current position
 	 */
 	public boolean driveToPose(Pose2d pose) {
-		double x = pose.getX() / 2;
-		double y = pose.getY() / 2;
+		double x = pose.getX();
+		double y = pose.getY();
 		double angle = pose.getRotation().getDegrees();
 
 		double xDiff = x - getPose().getX();
@@ -504,20 +509,6 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("x diff", xDiff);
 		SmartDashboard.putNumber("y diff", yDiff);
 		SmartDashboard.putNumber("a diff", aDiff);
-
-		// double autoAccelConst = AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT;
-		// if (xDiff >= yDiff && Math.abs(xDiff / autoAccelConst)
-		// 	> AutoConstants.MAX_SPEED_METERS_PER_SECOND) {
-		// 	autoAccelConst = Math.abs(xDiff) / AutoConstants.MAX_SPEED_METERS_PER_SECOND;
-		// 	System.out.println("here1");
-		// } else if (xDiff < yDiff && Math.abs(yDiff / autoAccelConst)
-		// 	> AutoConstants.MAX_SPEED_METERS_PER_SECOND) {
-		// 	autoAccelConst = Math.abs(yDiff) / AutoConstants.MAX_SPEED_METERS_PER_SECOND;
-		// }
-
-		// if (Math.abs(xDiff) < 0.1 && Math.abs(yDiff) < 0.1) {
-		// 	autoAccelConst = 1;
-		// }
 
 		xSpeed = Math.abs(xDiff) > AutoConstants.AUTO_DRIVE_METERS_MARGIN_OF_ERROR
 			? xSpeed : 0;
@@ -586,6 +577,34 @@ public class DriveFSMSystem {
 		}
 	}
 
+	public void alignToSpeaker(double dist, double rotFinal) {
+		if (dist == 4000 && rotFinal == 4000) {
+			//no tag was seen
+			drive(0, 0, 0, false, false);
+			return;
+		}
+		double forwardPower = clamp((dist - VisionConstants.Z_MARGIN_TO_SPEAKER)
+		/ VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,
+		-VisionConstants.MAX_SPEED_METERS_PER_SECOND, VisionConstants.MAX_SPEED_METERS_PER_SECOND);
+		double rotSpeed = clamp(-rotFinal / VisionConstants.SPEAKER_ROTATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
+		if (!facingSpeakerTag) {
+			drive(0, 0, rotSpeed, false, false);
+			if (Math.abs(rotFinal) <= VisionConstants.X_MARGIN_TO_SPEAKER) {
+				facingSpeakerTag = true;
+			}
+		} else {
+			if (!closeToSpeakerTag) {
+				drive(forwardPower, 0, 0, false, false);
+				if (dist < VisionConstants.Z_MARGIN_TO_SPEAKER + VisionConstants.Z_MARGIN_SPEAKER_OFFSET) {
+					closeToSpeakerTag = true;
+				}
+			} else {
+				drive(0, 0, 0, false, false);
+			}
+		}
+	}
 	/**
 	 * Drives the robot until it reaches a given object.
 	 * @param dist constantly updating distance to the object
