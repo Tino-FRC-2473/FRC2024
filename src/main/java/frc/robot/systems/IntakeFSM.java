@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkLimitSwitch;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -23,6 +24,8 @@ public class IntakeFSM {
 	}
 
 	private static final float INTAKE_POWER = 0.1f;
+	private static final float AUTO_INTAKING_TIME = 2.0f;
+	private static final float AUTO_OUTTAKING_TIME = 2.0f;
 
 	/* ======================== Private variables ======================== */
 	private IntakeFSMState currentState;
@@ -35,6 +38,13 @@ public class IntakeFSM {
 	private DigitalInput break2;
 	private DigitalInput break3;
 
+	private boolean autoIntakingTimerStarted;
+	private double autoIntakingTimerStart;
+	private boolean autoOuttakingTimerStarted;
+	private double autoOuttakingTimerStart;
+
+	private Timer timer;
+
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -44,6 +54,7 @@ public class IntakeFSM {
 	 */
 	public IntakeFSM() {
 		// Perform hardware init
+		timer = new Timer();
 		intakeMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_INTAKE_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 
@@ -240,6 +251,46 @@ public class IntakeFSM {
 	 */
 	private boolean handleAutoState3() {
 		return true;
+	}
+
+	private boolean handleAutoOuttakingState() {
+
+		if (!autoOuttakingTimerStarted) {
+			autoOuttakingTimerStarted = true;
+			autoOuttakingTimerStart = timer.get();
+		}
+
+		if ((autoOuttakingTimerStarted
+			&& !timer.hasElapsed(autoOuttakingTimerStart + AUTO_OUTTAKING_TIME))
+			|| !breakBeamSwitch.get()) {
+
+			intakeMotor.set(-INTAKE_POWER);
+		} else {
+			intakeMotor.set(0);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean handleAutoIntakingState() {
+
+		if (!autoIntakingTimerStarted) {
+			autoIntakingTimerStarted = true;
+			autoIntakingTimerStart = timer.get();
+		}
+
+		if ((autoIntakingTimerStarted
+			&& !timer.hasElapsed(autoIntakingTimerStart + AUTO_INTAKING_TIME))
+			|| !breakBeamSwitch.get()) {
+			intakeMotor.set(-INTAKE_POWER);
+		} else {
+			intakeMotor.set(0);
+			return true;
+		}
+
+		return false;
 	}
 
 	private boolean hasNote() {
