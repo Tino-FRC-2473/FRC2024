@@ -1,5 +1,6 @@
 package frc.robot.systems;
 
+import edu.wpi.first.wpilibj.Timer;
 // WPILib Imports
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -23,6 +24,8 @@ public class KitBotShooterFSM {
 
 	private static final float L_MOTOR_RUN_POWER = 0.05f;
 	private static final float U_MOTOR_RUN_POWER = 0.1f;
+	private static final float AUTO_OUTTAKING_TIME = 2.0f;
+	private static final float AUTO_INTAKING_TIME = 2.0f;
 
 	/* ======================== Private variables ======================== */
 	private ShooterFSMState currentState;
@@ -32,6 +35,13 @@ public class KitBotShooterFSM {
 	private CANSparkMax lowMotor;
 	private CANSparkMax highMotor;
 	private SparkLimitSwitch bottomLimitSwitch;
+	private boolean autoOuttakingTimerStarted;
+	private double autoOuttakingTimerStart;
+	private boolean autoIntakingTimerStarted;
+	private double autoIntakingTimerStart;
+	private Timer timer;
+
+
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -52,6 +62,8 @@ public class KitBotShooterFSM {
 		CANSparkMax.MotorType.kBrushless);
 		highMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
+		autoOuttakingTimerStarted = false;
+		timer = new Timer();
 		// Reset state machine
 		reset();
 	}
@@ -225,6 +237,49 @@ public class KitBotShooterFSM {
 	private boolean handleAutoState3() {
 		return true;
 	}
+
+	private boolean handleAutoOuttakingState() {
+
+		if (!autoOuttakingTimerStarted) {
+			autoOuttakingTimerStarted = true;
+			autoOuttakingTimerStart = timer.get();
+		}
+
+		if (autoOuttakingTimerStarted
+			&& !timer.hasElapsed(autoOuttakingTimerStart + AUTO_OUTTAKING_TIME)) {
+			lowMotor.set(L_MOTOR_RUN_POWER);
+			highMotor.set(U_MOTOR_RUN_POWER);
+		} else {
+			lowMotor.set(0);
+			highMotor.set(0);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean handleAutoIntakingState() {
+
+		if (!autoIntakingTimerStarted) {
+			autoIntakingTimerStarted = true;
+			autoIntakingTimerStart = timer.get();
+		}
+
+		if (autoIntakingTimerStarted
+			&& !timer.hasElapsed(autoIntakingTimerStart + AUTO_INTAKING_TIME)) {
+			lowMotor.set(-L_MOTOR_RUN_POWER);
+			highMotor.set(-U_MOTOR_RUN_POWER);
+		} else {
+			lowMotor.set(0);
+			highMotor.set(0);
+
+			return true;
+		}
+
+		return false;
+	}
+
 
 	private boolean hasNote() {
 		return bottomLimitSwitch.isPressed();
