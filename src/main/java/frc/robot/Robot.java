@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 // Systems
 import frc.robot.systems.DriveFSMSystem;
+import frc.robot.systems.KitBotShooterFSM;
 import frc.robot.systems.AutoHandlerSystem;
 import frc.robot.systems.AutoHandlerSystem.AutoPath;
 
@@ -18,7 +19,9 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 	// Systems
 	private DriveFSMSystem driveFSMSystem;
+	private KitBotShooterFSM shooterFSM;
 	private AutoHandlerSystem autoHandler;
+	private AutoPathChooser autoPathChooser;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -29,13 +32,20 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
+		autoPathChooser = new AutoPathChooser();
 		driveFSMSystem = new DriveFSMSystem();
-		autoHandler = new AutoHandlerSystem(driveFSMSystem);
+		shooterFSM = new KitBotShooterFSM();
+		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
 	}
+
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		autoHandler.reset(AutoPath.PATH1);
+		AutoPath path = AutoPath.PATH1;
+		if (AutoPathChooser.getSelectedPath() != null) {
+			path = AutoPathChooser.getSelectedPath();
+		}
+		autoHandler.reset(path);
 	}
 
 	@Override
@@ -47,12 +57,13 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
 		driveFSMSystem.reset();
+		shooterFSM.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		driveFSMSystem.update(input);
-
+		shooterFSM.update(input);
 	}
 
 	@Override

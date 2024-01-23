@@ -16,4 +16,12 @@ public final class HardwareMap {
 	public static final int REAR_LEFT_TURNING_CAN_ID = 1;
 	public static final int REAR_RIGHT_TURNING_CAN_ID = 3;
 
+	// Overlaping can #s with drive
+	public static final int CAN_ID_SPARK_DRIVE_FRONT_RIGHT = 1;
+	public static final int CAN_ID_SPARK_DRIVE_BACK_RIGHT = 2;
+	public static final int CAN_ID_SPARK_DRIVE_FRONT_LEFT = 3;
+	public static final int CAN_ID_SPARK_DRIVE_BACK_LEFT = 4;
+
+	public static final int CAN_ID_SPARK_SHOOTER_UPPER = 31;
+	public static final int CAN_ID_SPARK_SHOOTER_LOWER = 32;
 }
