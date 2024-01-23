@@ -57,7 +57,6 @@ public class RaspberryPI {
 		try {
 			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1))];
 		} catch (NullPointerException e) {
-			System.out.println("cv no");
 			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
