@@ -5,6 +5,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.SwerveConstants.AutoConstants;
 
 public class RaspberryPI {
 	private double fps = 0;
@@ -46,8 +47,8 @@ public class RaspberryPI {
 	}
 
 	//If the number 4000 is returned from any of the methods below, that output is
-  //invalid and no tag of the inputted Id has been detected
-  /**
+	//invalid and no tag of the inputted Id has been detected
+	/**
 	 * Gives information about april tag.
 	 * @param id takes the id of tag
 	 * @return the x distance to the tag in inches
@@ -57,11 +58,11 @@ public class RaspberryPI {
 			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1))];
 		} catch (NullPointerException e) {
 			System.out.println("cv no");
-			return 4000;
+			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
-  	/**
+	/**
 	 * Gives information about april tag.
 	 * @param id takes the id of tag
 	 * @return the y distance to the tag in inches
@@ -70,11 +71,11 @@ public class RaspberryPI {
 		try {
 			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 1];
 		} catch (NullPointerException e) {
-			return 4000;
+			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
-  /**
+	/**
 	 * Gives information about april tag.
 	 * @param id takes the id of tag
 	 * @return the z distance to the tag in inches
@@ -83,11 +84,11 @@ public class RaspberryPI {
 		try {
 			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2];
 		} catch (NullPointerException e) {
-			return 4000;
+			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
-  /**
+	/**
 	 * Gives information about april tag.
 	 * @param id takes the id of tag
 	 * @return the yaw to the tag
@@ -96,11 +97,11 @@ public class RaspberryPI {
 		try {
 			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 1];
 		} catch (NullPointerException e) {
-			return 4000;
+			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
-  /**
+	/**
 	 * Gives information about april tag.
 	 * @param id takes the id of tag
 	 * @return the pitch to the tag
@@ -109,11 +110,11 @@ public class RaspberryPI {
 		try {
 			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 2];
 		} catch (NullPointerException e) {
-			return 4000;
+			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
-  /**
+	/**
 	 * Gives information about april tag.
 	 * @param id takes the id of tag
 	 * @return the roll to the tag
@@ -122,7 +123,7 @@ public class RaspberryPI {
 		try {
 			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 2 + 1];
 		} catch (NullPointerException e) {
-			return 4000;
+			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 }
