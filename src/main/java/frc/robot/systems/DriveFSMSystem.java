@@ -43,6 +43,9 @@ public class DriveFSMSystem {
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
 	private int currentPointInPath;
+	private double lastSeenTagYaw;
+	private double lastSeenTagX;
+	private double lastSeenTagY;
 	private boolean blueAlliance;
 
 	// Hardware devices should be owned by one and only one system. They must
@@ -154,6 +157,9 @@ public class DriveFSMSystem {
 
 	public void reset() {
 		currentState = FSMState.TELEOP_STATE;
+		lastSeenTagX = AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+		lastSeenTagY = AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+		lastSeenTagYaw = AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		gyro.reset();
 		resetOdometry(new Pose2d());
 		// Call one tick of update to ensure outputs reflect start state
@@ -171,6 +177,9 @@ public class DriveFSMSystem {
 
 	public void resetAutonomus() {
 		currentPointInPath = 0;
+		lastSeenTagX = AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+		lastSeenTagY = AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+		lastSeenTagYaw = AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		gyro.reset();
 		resetOdometry(new Pose2d());
 		if (AutoPathChooser.getAutoPathChooser() != null) {
@@ -197,6 +206,17 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
 		SmartDashboard.putNumber("Heading", getPose().getRotation().getDegrees());
 		SmartDashboard.putNumber("Auto point #", currentPointInPath);
+
+		if (rpi.getAprilTagX(1) != AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT && rpi.getAprilTagY(1)
+			!= AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT && rpi.getAprilTagYaw(1)
+			!= AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+			lastSeenTagX = rpi.getAprilTagX(1);
+			lastSeenTagY = rpi.getAprilTagY(1);
+			lastSeenTagYaw = rpi.getAprilTagYaw(1);
+			SmartDashboard.putBoolean("Can See Tag", true);
+		} else {
+			SmartDashboard.putBoolean("Can See Tag", false);
+		}
 
 		/*
 		Auto Path Points
@@ -336,6 +356,22 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
 		SmartDashboard.putNumber("Heading", getPose().getRotation().getDegrees());
 
+
+		if (rpi.getAprilTagX(1) != AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT && rpi.getAprilTagY(1)
+			!= AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT && rpi.getAprilTagYaw(1)
+			!= AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+			lastSeenTagX = rpi.getAprilTagX(1);
+			lastSeenTagY = rpi.getAprilTagY(1);
+			lastSeenTagYaw = rpi.getAprilTagYaw(1);
+			SmartDashboard.putBoolean("Can See Tag", true);
+		} else {
+			SmartDashboard.putBoolean("Can See Tag", false);
+		}
+
+		SmartDashboard.putNumber("last seen x", lastSeenTagX);
+		SmartDashboard.putNumber("last seen y", lastSeenTagY);
+		SmartDashboard.putNumber("last seen yaw", lastSeenTagYaw);
+
 		if (input == null) {
 			return;
 		}
@@ -366,15 +402,7 @@ public class DriveFSMSystem {
 				break;
 
 			case ALIGN_TO_TAG_STATE:
-				// double xdist =  rpi.getAprilTagX(1);
-				// double ydist = rpi.getAprilTagY(1);
-				// double angle = rpi.getAprilTagYaw(1);
-				// boolean canSee = (xdist == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT
-				// 	|| angle == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT
-				// 	|| ydist == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT);
-				// SmartDashboard.putBoolean("Can See Tag", canSee);
-				// System.out.println("x tag: " + rpi.getAprilTagX(1));
-				// driveToTag(0, xdist, 0);
+				driveToTag();
 				break;
 
 			default:
@@ -396,6 +424,9 @@ public class DriveFSMSystem {
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case TELEOP_STATE:
+				lastSeenTagX = AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+				lastSeenTagY = AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+				lastSeenTagYaw = AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 				if (input.isCircleButtonPressed()) {
 					return FSMState.ALIGN_TO_TAG_STATE;
 				} else if (input.isTriangleButtonPressed()) {
@@ -584,31 +615,25 @@ public class DriveFSMSystem {
 
 	/**
 	 * Drives the robot until it reaches a given position relative to the apriltag.
-	 * @param xDist constantly updating x distance to the point
-	 * @param yDist constantly updating y distance to the point
-	 * @param rotFinal constantly updating angular difference to the point
 	 */
-	public void driveToTag(double xDist, double yDist, double rotFinal) {
-		if (xDist == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT
-			|| yDist == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT
-			|| rotFinal == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
-			drive(0, 0, 0, false, false);
-			return;
-		}
-		double xSpeed = clamp(xDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+	public void driveToTag() {
+
+		double xSpeed = clamp(-lastSeenTagX / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
-		double ySpeed = clamp(yDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
+		double ySpeed = clamp((Math.abs(lastSeenTagY) - AutoConstants.DRIVE_TO_TAG_DISTANCE_MARGIN)
+			/ AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
 			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
-		double rotSpeed = clamp(rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
+		double rotSpeed = clamp(-lastSeenTagYaw / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
 			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
 
-		if (Math.abs(xDist) < AutoConstants.DRIVE_TO_TAG_DISTANCE_MARGIN && Math.abs(yDist)
-			< AutoConstants.DRIVE_TO_TAG_DISTANCE_MARGIN && rotFinal
-			< AutoConstants.DRIVE_TO_TAG_ANGLE_MARGIN) {
-			drive(0, 0, 0, false, false);
+		if (Math.abs(lastSeenTagX) < AutoConstants.DRIVE_TO_TAG_ANGLE_MARGIN
+			&& Math.abs(lastSeenTagY) < AutoConstants.DRIVE_TO_TAG_DISTANCE_MARGIN
+			&& Math.abs(lastSeenTagYaw) < AutoConstants.DRIVE_TO_TAG_ANGLE_MARGIN) {
+			System.out.println("aligned");
+			drive(0, 0, 0, true, false);
 		} else {
-			drive(xSpeed, ySpeed, rotSpeed, true, true);
+			drive(ySpeed, 0, 0, true, false);
 		}
 	}
 

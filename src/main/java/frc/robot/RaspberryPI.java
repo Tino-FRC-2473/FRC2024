@@ -5,6 +5,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.SwerveConstants.AutoConstants;
 
 public class RaspberryPI {
 	private double fps = 0;
@@ -53,46 +54,76 @@ public class RaspberryPI {
 	 * @return the x distance to the tag in inches
 	 */
 	public double getAprilTagX(int id) {
-		return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1))];
+		try {
+			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1))];
+		} catch (NullPointerException e) {
+			System.out.println("cv no");
+			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+		}
 	}
+
 	/**
 	 * Gives information about april tag.
 	 * @param id takes the id of tag
 	 * @return the y distance to the tag in inches
 	 */
 	public double getAprilTagY(int id) {
-		return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 1];
+		try {
+			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 1];
+		} catch (NullPointerException e) {
+			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+		}
 	}
+
 	/**
 	 * Gives information about april tag.
 	 * @param id takes the id of tag
-	 * @return the y distance to the tag in inches
+	 * @return the z distance to the tag in inches
 	 */
 	public double getAprilTagZ(int id) {
-		return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2];
+		try {
+			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2];
+		} catch (NullPointerException e) {
+			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+		}
 	}
+
 	/**
 	 * Gives information about april tag.
 	 * @param id takes the id of tag
 	 * @return the yaw to the tag
 	 */
 	public double getAprilTagYaw(int id) {
-		return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 1];
+		try {
+			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 1];
+		} catch (NullPointerException e) {
+			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+		}
 	}
+
 	/**
 	 * Gives information about april tag.
 	 * @param id takes the id of tag
 	 * @return the pitch to the tag
 	 */
 	public double getAprilTagPitch(int id) {
-		return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 2];
+		try {
+			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 2];
+		} catch (NullPointerException e) {
+			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+		}
 	}
+
 	/**
 	 * Gives information about april tag.
 	 * @param id takes the id of tag
 	 * @return the roll to the tag
 	 */
 	public double getAprilTagRoll(int id) {
-		return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 2 + 1];
+		try {
+			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 2 + 1];
+		} catch (NullPointerException e) {
+			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+		}
 	}
 }

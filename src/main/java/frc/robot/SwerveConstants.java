@@ -135,7 +135,7 @@ public final class SwerveConstants {
 		public static final double WAIT_TIME = 5; // seconds
 
 		// tag detection/alignment
-		public static final double DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT = 600; //meters
+		public static final double DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT = 300; //meters
 		public static final double DRIVE_TO_TAG_ROTATIONAL_CONSTANT = 100;
 		public static final double DRIVE_TO_TAG_DISTANCE_MARGIN = 3;
 		public static final double DRIVE_TO_TAG_ANGLE_MARGIN = 5;
