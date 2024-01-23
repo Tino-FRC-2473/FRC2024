@@ -4,7 +4,6 @@ package frc.robot.systems;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkLimitSwitch;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
@@ -33,10 +32,7 @@ public class IntakeFSM {
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax intakeMotor;
-	private SparkLimitSwitch bottomLimitSwitch;
 	private DigitalInput breakBeamSwitch;
-	private DigitalInput break2;
-	private DigitalInput break3;
 
 	private boolean autoIntakingTimerStarted;
 	private double autoIntakingTimerStart;
@@ -60,13 +56,7 @@ public class IntakeFSM {
 
 		intakeMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
-		/*bottomLimitSwitch =
-			intakeMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
-		bottomLimitSwitch.enableLimitSwitch(false);*/
-
 		breakBeamSwitch = new DigitalInput(HardwareMap.INPUT_BREAK_BEAM_PORT);
-		break2 = new DigitalInput(1);
-		break3 = new DigitalInput(2);
 
 
 		// Reset state machine
@@ -109,8 +99,6 @@ public class IntakeFSM {
 		}
 
 		SmartDashboard.putBoolean("Brake Beam Switch DIO PORT 0", hasNote());
-		SmartDashboard.putBoolean("Brake Beam Switch DIO PORT 1", !break2.get());
-		SmartDashboard.putBoolean("Brake Beam Switch DIO PORT 2", !break3.get());
 
 		switch (currentState) {
 			case IDLE_STOP:
