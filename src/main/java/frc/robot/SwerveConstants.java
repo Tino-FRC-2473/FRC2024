@@ -134,19 +134,6 @@ public final class SwerveConstants {
 		public static final double CONSTANT_SPEED_THRESHOLD = 0.2; // meters
 		public static final double WAIT_TIME = 5; // seconds
 
-		// tag detection/alignment
-		public static final double DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT = 300; //meters
-		public static final double DRIVE_TO_TAG_ROTATIONAL_CONSTANT = 100;
-		public static final double DRIVE_TO_TAG_DISTANCE_MARGIN = 3;
-		public static final double DRIVE_TO_TAG_ANGLE_MARGIN = 5;
-		public static final double UNABLE_TO_SEE_TAG_CONSTANT = 4000;
-
-		//object detection/alignment
-		public static final double DRIVE_TO_OBJECT_TRANSLATIONAL_CONSTANT = 0.5;
-		public static final double DRIVE_TO_OBJECT_ROTATIONAL_CONSTANT = 100;
-		public static final double DISTANCE_MARGIN_TO_DRIVE_TO_OBJECT = 0.58; // meters
-		public static final double ANGLE_MARGIN_TO_DRIVE_TO_OBJECT = 5; // degrees
-
 		// constants for auto path points
 		public static final double N_1_5 = 1.5;
 		public static final double N_2 = 2;
