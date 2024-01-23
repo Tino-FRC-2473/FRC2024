@@ -43,7 +43,7 @@ public class PivotFSM {
 	private static final double PID_CONSTANT_PIVOT_D = 0.001;
 
 	private static final double PID_VOLTAGE_CONSTANT = 0.001;
-	private static final double PID_STATIC_CONSTANT = 0.001;
+	private static final double PID_STATIC_CONSTANT = 0.01;
 	private static final double PID_GRAVITY_CONSTANT = 0.001;
 
 
@@ -55,6 +55,8 @@ public class PivotFSM {
 	private static final double SOURCE_ENCODER_ROTATIONS = 25;
 	private static final double SHOOTER_ENCODER_ROTATIONS = 5;
 	private static final double INRANGE_VALUE = 0.5;
+	private static final double JOYSTICK_SCALING_CONSTANT = 0.4;
+
 
 
 	/* ======================== Private variables ======================== */
@@ -78,7 +80,6 @@ public class PivotFSM {
 	private final ArmFeedforward pivotFeedforward;
 
 	private boolean hasTimerStarted = false;
-
 
 
 
@@ -170,7 +171,7 @@ public class PivotFSM {
 		SmartDashboard.putNumber("Encoder Value", currentEncoder);
 		SmartDashboard.putBoolean("Zeroed", zeroed);
 		SmartDashboard.putBoolean("GROUND BUTTON", input.isGroundButtonPressed());
-		SmartDashboard.putBoolean("SHOOT BUTTON", input.isShootButtonPressed());
+		SmartDashboard.putBoolean("SHOOT BUTTON", input.isShooterButtonPressed());
 		SmartDashboard.putBoolean("SOURCE BUTTON", input.isSourceButtonPressed());
 		SmartDashboard.putBoolean("AMP BUTTON", input.isAmpButtonPressed());
 		SmartDashboard.putBoolean("ABORT BUTTON", input.isAbortButtonPressed());
@@ -180,6 +181,8 @@ public class PivotFSM {
 		SmartDashboard.putNumber(" velocity dif ",
 			pidPivotController.getSetpoint().velocity - lastSpeed);
 		SmartDashboard.putNumber("time diff", currentTime - lastLoopTime);
+		SmartDashboard.putBoolean("IN range shooter yippee",
+			inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS));
 
 		switch (currentState) {
 			case IDLE_STOP:
@@ -348,6 +351,7 @@ public class PivotFSM {
 	 */
 	private void handleIdleState(TeleopInput input) {
 		pivotMotor.set(0);
+		lastLoopTime = currentTime;
 	}
 	/**
 	 * Handle behavior in SHOOTER.
@@ -405,7 +409,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void handleManualInState(TeleopInput input) {
-		pivotMotor.set(input.getLeftJoystickY());
+		pivotMotor.set(input.getLeftJoystickY() * JOYSTICK_SCALING_CONSTANT);
 	}
 
 	/**
@@ -414,7 +418,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void handleManualOutState(TeleopInput input) {
-		pivotMotor.set(input.getLeftJoystickY());
+		pivotMotor.set(input.getLeftJoystickY() * JOYSTICK_SCALING_CONSTANT);
 	}
 
 	/**
