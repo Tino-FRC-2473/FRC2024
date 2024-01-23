@@ -624,14 +624,13 @@ public class DriveFSMSystem {
 	 * Drives the robot until it reaches a given position relative to the apriltag.
 	 */
 	public void driveToTag() {
-`if (xDist == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT
+		if (xDist == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT
 			|| yDist == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT
 			|| rotFinal == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
 			drive(0, 0, 0, false, false);
 			return;
 		}
 
-		}
 		// double transformedXDist = Math.hypot(lastSeenTagX, lastSeenTagX)
 		// 	* Math.sin(Math.toRadians(-(getHeading() + lastSeenTagYaw)));
 		// double transformedYDist = Math.hypot(lastSeenTagX, lastSeenTagY)
