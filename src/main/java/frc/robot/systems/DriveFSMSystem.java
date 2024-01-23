@@ -19,6 +19,7 @@ import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Timer;
 
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -47,6 +48,7 @@ public class DriveFSMSystem {
 
 	// The gyro sensor
 	private AHRS gyro = new AHRS(SPI.Port.kMXP);
+	private Timer timer = new Timer();
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double currentRotation = 0.0;
@@ -289,6 +291,7 @@ public class DriveFSMSystem {
 				}
 				return driveAlongPath(path5Points);
 			case PENDING:
+				timer.start();
 				return pause(AutoConstants.WAIT_TIME);
 			default:
 				return false;
@@ -544,8 +547,11 @@ public class DriveFSMSystem {
 	 * @return whether or not the wait time has been completed
 	 */
 	public boolean pause(double seconds) {
-		// after seconds...
-		return true;
+		if (timer.get() >= seconds) {
+			timer.stop();
+			return true;
+		}
+		return false;
 	}
 
 	/**
