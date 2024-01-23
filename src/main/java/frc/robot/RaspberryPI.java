@@ -5,7 +5,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.SwerveConstants.AutoConstants;
+import frc.robot.SwerveConstants.VisionConstants;
 
 public class RaspberryPI {
 	private double fps = 0;
@@ -58,7 +58,7 @@ public class RaspberryPI {
 			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1))];
 		} catch (NullPointerException e) {
 			System.out.println("cv no");
-			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
@@ -71,7 +71,7 @@ public class RaspberryPI {
 		try {
 			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 1];
 		} catch (NullPointerException e) {
-			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
@@ -84,7 +84,7 @@ public class RaspberryPI {
 		try {
 			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2];
 		} catch (NullPointerException e) {
-			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
@@ -97,7 +97,7 @@ public class RaspberryPI {
 		try {
 			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 1];
 		} catch (NullPointerException e) {
-			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
@@ -110,7 +110,7 @@ public class RaspberryPI {
 		try {
 			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 2];
 		} catch (NullPointerException e) {
-			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
@@ -123,7 +123,7 @@ public class RaspberryPI {
 		try {
 			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 2 + 1];
 		} catch (NullPointerException e) {
-			return AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 }

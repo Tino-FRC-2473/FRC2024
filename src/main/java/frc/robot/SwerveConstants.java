@@ -155,6 +155,10 @@ public final class SwerveConstants {
 			MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
 	}
 
+	public static final class VisionConstants {
+		public static final double UNABLE_TO_SEE_TAG_CONSTANT = 4000;
+	}
+
 	public static final class NeoMotorConstants {
 		public static final double FREE_SPEED_RPM = 5676;
 	}
