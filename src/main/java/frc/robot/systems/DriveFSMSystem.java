@@ -35,9 +35,7 @@ public class DriveFSMSystem {
 	/* ======================== Constants ======================== */
 	// FSM state definitions
 	public enum FSMState {
-		TELEOP_STATE,
-		ALIGN_TO_TAG_STATE,
-		ALIGN_TO_OBJECT_STATE
+		TELEOP_STATE
 	}
 
 	/* ======================== Private variables ======================== */
@@ -392,19 +390,6 @@ public class DriveFSMSystem {
 				}
 				break;
 
-			case ALIGN_TO_OBJECT_STATE:
-				//double dist = rpi.getConeDistance();
-				//double angle = rpi.getConeYaw();
-				//boolean canSee = (dist == -1 || angle == -1);
-				//SmartDashboard.putBoolean("Can See Object", canSee);
-				//SmartDashboard.putNumber("Distance to Object", dist);
-				//driveUntilObject(dist, angle);
-				break;
-
-			case ALIGN_TO_TAG_STATE:
-				driveToTag();
-				break;
-
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -427,24 +412,7 @@ public class DriveFSMSystem {
 				lastSeenTagX = AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 				lastSeenTagY = AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 				lastSeenTagYaw = AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT;
-				if (input.isCircleButtonPressed()) {
-					return FSMState.ALIGN_TO_TAG_STATE;
-				} else if (input.isTriangleButtonPressed()) {
-					return FSMState.ALIGN_TO_OBJECT_STATE;
-				}
 				return FSMState.TELEOP_STATE;
-
-			case ALIGN_TO_OBJECT_STATE:
-				if (input.isTriangleButtonReleased()) {
-					return FSMState.TELEOP_STATE;
-				}
-				return FSMState.ALIGN_TO_OBJECT_STATE;
-
-			case ALIGN_TO_TAG_STATE:
-				if (input.isCircleButtonReleased()) {
-					return FSMState.TELEOP_STATE;
-				}
-				return FSMState.ALIGN_TO_TAG_STATE;
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -611,51 +579,6 @@ public class DriveFSMSystem {
 			currentPointInPath++;
 		}
 		return false;
-	}
-
-	/**
-	 * Drives the robot until it reaches a given position relative to the apriltag.
-	 */
-	public void driveToTag() {
-
-		double xSpeed = clamp(-lastSeenTagX / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
-			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
-		double ySpeed = clamp((Math.abs(lastSeenTagY) - AutoConstants.DRIVE_TO_TAG_DISTANCE_MARGIN)
-			/ AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
-			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
-		double rotSpeed = clamp(-lastSeenTagYaw / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
-			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
-			AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
-
-		if (Math.abs(lastSeenTagX) < AutoConstants.DRIVE_TO_TAG_ANGLE_MARGIN
-			&& Math.abs(lastSeenTagY) < AutoConstants.DRIVE_TO_TAG_DISTANCE_MARGIN
-			&& Math.abs(lastSeenTagYaw) < AutoConstants.DRIVE_TO_TAG_ANGLE_MARGIN) {
-			System.out.println("aligned");
-			drive(0, 0, 0, true, false);
-		} else {
-			drive(ySpeed, 0, 0, true, false);
-		}
-	}
-
-	/**
-	 * Drives the robot until it reaches a given object.
-	 * @param dist constantly updating distance to the object
-	 * @param rotFinal constantly updating angular difference to the point
-	 */
-	public void driveUntilObject(double dist, double rotFinal) {
-		double power = clamp((dist - AutoConstants.DISTANCE_MARGIN_TO_DRIVE_TO_OBJECT)
-			/ AutoConstants.DRIVE_TO_OBJECT_TRANSLATIONAL_CONSTANT,
-			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
-		double rotSpeed = clamp(-rotFinal / AutoConstants.DRIVE_TO_OBJECT_ROTATIONAL_CONSTANT,
-			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
-			AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
-
-		if ((dist < AutoConstants.DISTANCE_MARGIN_TO_DRIVE_TO_OBJECT && Math.abs(rotFinal)
-			<= AutoConstants.ANGLE_MARGIN_TO_DRIVE_TO_OBJECT) || (dist == -1 || rotFinal == -1)) {
-			drive(0, 0, 0, false, false);
-		} else {
-			drive(power, 0, rotSpeed, false, false);
-		}
 	}
 
 	/**
