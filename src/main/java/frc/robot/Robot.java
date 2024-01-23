@@ -5,8 +5,8 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-
 // Systems
+import frc.robot.systems.DriveFSMSystem;
 import frc.robot.systems.KitBotShooterFSM;
 import frc.robot.systems.AutoHandlerSystem;
 import frc.robot.systems.AutoHandlerSystem.AutoPath;
@@ -17,11 +17,11 @@ import frc.robot.systems.AutoHandlerSystem.AutoPath;
  */
 public class Robot extends TimedRobot {
 	private TeleopInput input;
-
 	// Systems
+	private DriveFSMSystem driveFSMSystem;
 	private KitBotShooterFSM shooterFSM;
-
 	private AutoHandlerSystem autoHandler;
+	private AutoPathChooser autoPathChooser;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -31,16 +31,21 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		System.out.println("robotInit");
 		input = new TeleopInput();
-
 		// Instantiate all systems here
+		autoPathChooser = new AutoPathChooser();
+		driveFSMSystem = new DriveFSMSystem();
 		shooterFSM = new KitBotShooterFSM();
-		autoHandler = new AutoHandlerSystem(shooterFSM);
+		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		autoHandler.reset(AutoPath.PATH1);
+		AutoPath path = AutoPath.PATH1;
+		if (AutoPathChooser.getSelectedPath() != null) {
+			path = AutoPathChooser.getSelectedPath();
+		}
+		autoHandler.reset(path);
 	}
 
 	@Override
@@ -51,16 +56,14 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
+		driveFSMSystem.reset();
 		shooterFSM.reset();
-		//subSystem2.reset();
-		//subSystem3.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
+		driveFSMSystem.update(input);
 		shooterFSM.update(input);
-		//subSystem2.update(input);
-		//subSystem3.update(input);
 	}
 
 	@Override
@@ -70,16 +73,6 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void disabledPeriodic() {
-
-	}
-
-	@Override
-	public void testInit() {
-		System.out.println("-------- Test Init --------");
-	}
-
-	@Override
-	public void testPeriodic() {
 
 	}
 
@@ -96,3 +89,4 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotPeriodic() { }
 }
+
