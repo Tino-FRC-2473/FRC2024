@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.systems.DriveFSMSystem;
 import frc.robot.systems.KitBotShooterFSM;
 import frc.robot.systems.AutoHandlerSystem;
+import frc.robot.systems.ClimberMechFSMLeft;
+import frc.robot.systems.ClimberMechFSMRight;
 import frc.robot.systems.AutoHandlerSystem.AutoPath;
 
 /**
@@ -18,8 +20,11 @@ import frc.robot.systems.AutoHandlerSystem.AutoPath;
 public class Robot extends TimedRobot {
 	private TeleopInput input;
 	// Systems
-	private DriveFSMSystem driveFSMSystem;
 	private KitBotShooterFSM shooterFSM;
+	private ClimberMechFSMLeft climberMechLeftFSM;
+	private ClimberMechFSMRight climberMechRightFSM;
+	private DriveFSMSystem driveFSMSystem;
+
 	private AutoHandlerSystem autoHandler;
 	private AutoPathChooser autoPathChooser;
 
@@ -32,9 +37,12 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
+		shooterFSM = new KitBotShooterFSM();
+		climberMechLeftFSM = new ClimberMechFSMLeft();
+		climberMechRightFSM = new ClimberMechFSMRight();
+
 		autoPathChooser = new AutoPathChooser();
 		driveFSMSystem = new DriveFSMSystem();
-		shooterFSM = new KitBotShooterFSM();
 		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
 	}
 
@@ -56,12 +64,16 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
+		climberMechLeftFSM.reset();
+		climberMechRightFSM.reset();
 		driveFSMSystem.reset();
 		shooterFSM.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
+		climberMechLeftFSM.update(input);
+		climberMechRightFSM.update(input);
 		driveFSMSystem.update(input);
 		shooterFSM.update(input);
 	}

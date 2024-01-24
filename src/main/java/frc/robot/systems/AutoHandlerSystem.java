@@ -15,9 +15,8 @@ public class AutoHandlerSystem {
 		DRIVE_PATH_4_STATE_1,
 		DRIVE_PATH_4_STATE_2,
 		DRIVE_PATH_5,
-		SHOOTER_STATE_1,
-		SHOOTER_STATE_2,
-		SHOOTER_STATE_3,
+		SHOOTER_STATE,
+		INTAKE_STATE,
 		PENDING
 	}
 	public enum AutoPath {
@@ -88,7 +87,6 @@ public class AutoHandlerSystem {
 	 * @param path the auto path to be executed
 	 */
 	public void reset(AutoPath path) {
-
 		driveSystem.resetAutonomus();
 		shooterFSM.reset();
 
@@ -139,14 +137,11 @@ public class AutoHandlerSystem {
 			case DRIVE_PATH_5:
 				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DRIVE_PATH_5);
 				break;
-			case SHOOTER_STATE_1:
-				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_1);
+			case SHOOTER_STATE:
+				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE);
 				break;
-			case SHOOTER_STATE_2:
-				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_2);
-				break;
-			case SHOOTER_STATE_3:
-				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_3);
+			case INTAKE_STATE:
+				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.INTAKE_STATE);
 				break;
 			case PENDING:
 				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.PENDING);
