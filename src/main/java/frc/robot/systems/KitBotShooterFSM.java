@@ -1,6 +1,7 @@
 package frc.robot.systems;
 
 import edu.wpi.first.wpilibj.Timer;
+
 // WPILib Imports
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -35,13 +36,12 @@ public class KitBotShooterFSM {
 	private CANSparkMax lowMotor;
 	private CANSparkMax highMotor;
 	private SparkLimitSwitch bottomLimitSwitch;
+
 	private boolean autoOuttakingTimerStarted;
 	private double autoOuttakingTimerStart;
 	private boolean autoIntakingTimerStarted;
 	private double autoIntakingTimerStart;
 	private Timer timer;
-
-
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -64,6 +64,7 @@ public class KitBotShooterFSM {
 
 		autoOuttakingTimerStarted = false;
 		timer = new Timer();
+
 		// Reset state machine
 		reset();
 	}
@@ -130,12 +131,10 @@ public class KitBotShooterFSM {
 	 */
 	public boolean updateAutonomous(AutoFSMState autoState) {
 		switch (autoState) {
-			case STATE1:
-				return handleAutoState1();
-			case STATE2:
-				return handleAutoState2();
-			case STATE3:
-				return handleAutoState3();
+			case SHOOTER_STATE:
+				return handleAutoOuttakingState();
+			case INTAKE_STATE:
+				return handleAutoIntakingState();
 			default:
 				return true;
 		}
@@ -214,32 +213,7 @@ public class KitBotShooterFSM {
 		highMotor.set(U_MOTOR_RUN_POWER);
 	}
 
-	/**
-	 * Performs action for auto STATE1.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState1() {
-		return true;
-	}
-
-	/**
-	 * Performs action for auto STATE2.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState2() {
-		return true;
-	}
-
-	/**
-	 * Performs action for auto STATE3.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState3() {
-		return true;
-	}
-
 	private boolean handleAutoOuttakingState() {
-
 		if (!autoOuttakingTimerStarted) {
 			autoOuttakingTimerStarted = true;
 			autoOuttakingTimerStart = timer.get();
@@ -260,7 +234,6 @@ public class KitBotShooterFSM {
 	}
 
 	private boolean handleAutoIntakingState() {
-
 		if (!autoIntakingTimerStarted) {
 			autoIntakingTimerStarted = true;
 			autoIntakingTimerStart = timer.get();
@@ -280,11 +253,8 @@ public class KitBotShooterFSM {
 		return false;
 	}
 
-
 	private boolean hasNote() {
 		return bottomLimitSwitch.isPressed();
 	}
-
-
 
 }
