@@ -1,10 +1,7 @@
 import numpy as np
 import cv2
-#import matplotlib.pyplot as plt
 import os
 import math
-#import apriltag
-#from pupil_apriltags import Detector
 
 # basically fixes the intrinsic parameters and is the class that returns the 3D stuff
 # printed 3dpose --> tvec (x: left/right, y: up/down, z: front/back), rvec
@@ -59,8 +56,8 @@ class AprilTag():
         self.camera_matrix = mtx
         self.dist_coeffs = dist
 
-        np.save('calibration_data/home_camera_matrix.npy',mtx)
-        np.save('calibration_data/home_camera_dist.npy',dist)
+        np.save('calibration_data/camera1_matrix.npy',mtx)
+        np.save('calibration_data/camera1_dist.npy',dist)
         print('Calibration complete')
 
     def draw_axis_on_image(self, image, camera_matrix, dist_coeffs, rvec, tvec, size=1):
@@ -88,16 +85,14 @@ class AprilTag():
             text_color = (255, 0, 255)  # White color
             text_position = (10, 30)  # Top-left corner coordinates
             # Add text to the image
+
             rvec = rvec.reshape((3, 1))
             tvec = tvec.reshape((3,1))
             R, _ = cv2.Rodrigues(rvec)
-            Cesc = (-R.T @ tvec).reshape(3)
-            text = str(Cesc* 39.37) + '\n' + str(rvec.flatten() * 180 / 3.14)
+            tag_relative_tvec = (-R.T @ tvec).reshape(3)
+            text = str(tag_relative_tvec * 39.37) + '\n' + str(rvec.flatten() * 180 / 3.14)
             cv2.putText(image, text, text_position, font, font_scale, text_color, font_thickness)
-
-
             return image
-
         except Exception as e:
             print(f"An error occurred: {e}")
             return None
@@ -107,7 +102,6 @@ class AprilTag():
             # Ensure corners is a NumPy array
             corners = np.array(corners)
             # Define the 3D coordinates of the marker corners in the marker coordinate system
-            #marker_points_3d = np.array([[0, 0, 0], [marker_size, 0, 0], [marker_size, marker_size, 0], [0, marker_size, 0]], dtype=np.float32)
             marker_points_3d = np.array([[-marker_size / 2, marker_size / 2, 0], [marker_size / 2, marker_size / 2, 0], [marker_size / 2, -marker_size / 2, 0], [-marker_size / 2, -marker_size / 2, 0]], dtype=np.float32)
 
             # Reshape the corners to a flat array
@@ -137,40 +131,14 @@ class AprilTag():
 
             pose_data = {}
             num_tags = len(ids) if ids is not None else 0
-            #print(str(num_tags) + ' AprilTags detected')
             if num_tags != 0:
-                # Draw the detected markers on the image
-                #cv2.aruco.drawDetectedMarkers(image, corners, ids)
-
                 # Estimate the pose of each detected marker
                 for i in range(len(ids)):
                     # Estimate the pose
                     rvec, tvec= self.estimate_pose_single_marker(corners[i], ARUCO_LENGTH_METERS, self.camera_matrix, self.dist_coeffs)
-                    #print(tvec,n)
+                    
                     pose_data[ids[i][0]] = (tvec, rvec)
-                    #print(corners[i])
-                    #print(self.get_yaw(corners[i]) )
+                    
                     self.draw_axis_on_image(frame_ann, self.camera_matrix, self.dist_coeffs, rvec, tvec, 0.1)
-                    #rvec[0] = self.get_yaw(corners[i])
-                    # Draw the 3D pose axis on the image
 
-                # Display the result
-                #cv2.imshow('AprilTag Pose Estimation', image)
-            else:
-                #print("No AprilTags detected in the image.")
-                pass
             return pose_data
-
-    def get_yaw(self, corners):
-        corners = np.array(corners)
-        
-        x = np.mean(corners[0], axis=0)[0]
-        
-        
-        center_tag = x
-        center_cam = 640/2
-        B = center_tag - center_cam
-        A = center_cam
-        theta = math.atan(B * math.tan(math.radians(50 / 2)) / A)
-        #print(math.degrees(theta))
-        return math.degrees(theta)

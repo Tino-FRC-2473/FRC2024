@@ -20,11 +20,9 @@ class VisionInput:
         if not self.cap.isOpened():
             print("cannot open cam")
         ret, fr = self.cap.read()
-
         if not ret:
             print('frame malf')
         exit
-        #fr = cv2.resize(fr, (self.w, self.h), interpolation=cv2.INTER_AREA)
         return fr
 
 

@@ -25,15 +25,17 @@ while True:
     annotated_frame = frame.copy()
     m = time.time()
     tagData = tag_module.estimate_3d_pose(frame, annotated_frame, TAG_LENGTH_METERS)
-    print(time.time() - m)
+    print('Apriltag pipeline runtime: ' + str((time.time() - m)))
 
     pose_list = [4000 for _ in range(16 * 6)]
     for key, value in tagData.items():
         pose_list[(key - 1) * 6 : (key * 6)] = np.concatenate((value[0].flatten(), value[1].flatten()), axis=0).tolist()
+    
     cv2.imshow('result', annotated_frame)
     key = cv2.waitKey(1) & 0xFF
     if key == ord('q'):
         break
+    
     time.sleep(0.02)
 
 

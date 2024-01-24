@@ -98,12 +98,9 @@ public class DriveFSMSystem {
 
 	private boolean facingSpeakerTag;
 	private boolean closeToSpeakerTag;
-	private boolean parallelSourceTag;
-	private boolean closeToSourceTag;
+	private boolean alignedSourceTag;
 	private double lastSeenX;
 	private double lastSeenZ;
-	private double targetZTransform;
-	private double targetYaw;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -150,12 +147,9 @@ public class DriveFSMSystem {
 		resetOdometry(new Pose2d());
 		facingSpeakerTag = false;
 		closeToSpeakerTag = false;
-		parallelSourceTag = false;
-		closeToSourceTag = false; 
+		alignedSourceTag = false;
 		lastSeenX = 4000;
 		lastSeenZ = 4000;
-		targetZTransform = 4000;
-		targetYaw = 4000;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -333,7 +327,12 @@ public class DriveFSMSystem {
 				break;
 
 			case ALIGN_TO_SOURCE_STATE:
-				alignToSource();
+					if (rpi.getAprilTagX(3) != 4000) {
+						lastSeenX = rpi.getAprilTagX(3);
+						alignToSource(lastSeenX);
+					} else {
+						alignToSource(lastSeenX);
+					}
 				break;
 
 			case ALIGN_TO_SPEAKER_STATE:
@@ -371,26 +370,14 @@ public class DriveFSMSystem {
 				if (input.isCircleButtonPressed()) {
 					return FSMState.ALIGN_TO_SPEAKER_STATE;
 				} else if (input.isTriangleButtonPressed()) {
-					drive(0, 0, 0, false, false);
-					targetYaw = 4000;
-					targetZTransform = 4000;
-					if (rpi.getAprilTagYaw(3) != 4000) {
-						targetYaw = (rpi.getAprilTagYaw(3) * 180 / Math.PI);
-						if (targetYaw >= 0) {
-							targetYaw = targetYaw - 180;
-						} else {
-							targetYaw = targetYaw + 180;
-						}
-						targetYaw = getPose().getRotation().getDegrees() + targetYaw;
-					}
 					return FSMState.ALIGN_TO_SOURCE_STATE;
 				}
 				return FSMState.TELEOP_STATE;
 
 			case ALIGN_TO_SOURCE_STATE:
 				if (input.isTriangleButtonReleased()) {
-					closeToSourceTag = false;
-					parallelSourceTag = false;
+					alignedSourceTag = false;
+					lastSeenX = 4000;
 					return FSMState.TELEOP_STATE;
 				}
 				return FSMState.ALIGN_TO_SOURCE_STATE;
@@ -573,59 +560,26 @@ public class DriveFSMSystem {
 		return false;
 	}
 
-	/**
-	 * Drives the robot until it reaches a given position relative to the apriltag.
-	 * @param xDist constantly updating x distance to the point
-	 * @param yDist constantly updating y distance to the point
-	 * @param rotFinal constantly updating angular difference to the point
-	 */
-	public void driveToTag(double xDist, double yDist, double rotFinal) {
-		if (xDist == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT
-			|| yDist == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT
-			|| rotFinal == AutoConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+	public void alignToSource(double rotFinal) {
+		if (rotFinal == 4000) {
 			drive(0, 0, 0, false, false);
 			return;
 		}
-		double xSpeed = clamp(xDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
-			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
-		double ySpeed = clamp(yDist / AutoConstants.DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT,
-			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
-		double rotSpeed = clamp(rotFinal / AutoConstants.DRIVE_TO_TAG_ROTATIONAL_CONSTANT,
-			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
-			AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
-
-		if (Math.abs(xDist) < AutoConstants.DRIVE_TO_TAG_DISTANCE_MARGIN && Math.abs(yDist)
-			< AutoConstants.DRIVE_TO_TAG_DISTANCE_MARGIN && rotFinal
-			< AutoConstants.DRIVE_TO_TAG_ANGLE_MARGIN) {
-			drive(0, 0, 0, false, false);
-		} else {
-			drive(xSpeed, ySpeed, rotSpeed, true, true);
-		}
-	}
-
-	//Compute current (Tag -> camera pose) and use rvec[1] and tvec[2] to determine how many degrees
-	//you need to turn and how many inches you need to travel forward. Use gyro-encoder to travel these amounts
-	public void alignToSource() {
-		if (targetYaw == 4000) {
-			//no tag was seen
-			drive(0, 0, 0, false, false);
-			return;
-		}
-		SmartDashboard.putNumber("gyro angle", getPose().getRotation().getDegrees());
-		SmartDashboard.putNumber("Target yaw", targetYaw);
-		double aDiff = targetYaw - getPose().getRotation().getDegrees();
-		double rotSpeed = clamp(-aDiff / VisionConstants.SPEAKER_ROTATIONAL_ACCEL_CONSTANT,
+		double rotSpeed = clamp(-rotFinal / VisionConstants.SPEAKER_ROTATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
-		if (rotSpeed <= 0.02) {
-			rotSpeed = 0;
+		if (!alignedSourceTag) {
+			drive(0, 0, rotSpeed, false, false);
+			if (Math.abs(rotSpeed) <= 0.02) {
+				alignedSourceTag = true;
+			}
+		} else {
+			drive(VisionConstants.SPEAKER_DRIVE_FORWARD_POWER, 0, 0, false, false);
 		}
-		//drive(0, 0, rotSpeed, true, false);
 
 	}
 	public void alignToSpeaker(double dist, double rotFinal) {
 		if (dist == 4000 && rotFinal == 4000) {
-			//no tag was seen
 			drive(0, 0, 0, false, false);
 			return;
 		}
@@ -635,10 +589,6 @@ public class DriveFSMSystem {
 		double rotSpeed = clamp(-rotFinal / VisionConstants.SPEAKER_ROTATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
-		SmartDashboard.putNumber("Forward speaker power", forwardPower);
-		SmartDashboard.putNumber("Rotational speaker power", rotSpeed);
-		SmartDashboard.putNumber("CV Z value", dist);
-		SmartDashboard.putNumber("CV X value", rotFinal);
 		if (!facingSpeakerTag) {
 			drive(0, 0, rotSpeed, false, false);
 			if (Math.abs(rotSpeed) <= 0.02) {
@@ -653,28 +603,6 @@ public class DriveFSMSystem {
 			} else {
 				drive(0, 0, 0, false, false);
 			}
-		}
-	}
-	/**
-	 * Drives the robot until it reaches a given object.
-	 * @param dist constantly updating distance to the object
-	 * @param rotFinal constantly updating angular difference to the point
-	 */
-	public void driveUntilObject(double dist, double rotFinal) {
-		double power = clamp((dist - AutoConstants.DISTANCE_MARGIN_TO_DRIVE_TO_OBJECT)
-			/ AutoConstants.DRIVE_TO_OBJECT_TRANSLATIONAL_CONSTANT,
-			-AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_SPEED_METERS_PER_SECOND);
-		double rotSpeed = clamp(-rotFinal / AutoConstants.DRIVE_TO_OBJECT_ROTATIONAL_CONSTANT,
-			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
-			AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
-
-		if ((dist < AutoConstants.DISTANCE_MARGIN_TO_DRIVE_TO_OBJECT && Math.abs(rotFinal)
-			<= AutoConstants.ANGLE_MARGIN_TO_DRIVE_TO_OBJECT) || (dist == -1 || rotFinal == -1)) {
-			drive(0, 0, 0, false, false);
-		// } else if (Math.abs(rotFinal) > 5) {
-		// 	drive(0, 0, rotSpeed, false, false);
-		} else {
-			drive(power, 0, rotSpeed, false, false);
 		}
 	}
 
