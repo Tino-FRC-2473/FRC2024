@@ -81,12 +81,12 @@ public class ClimberMechFSMRight {
 	 */
 	public void update(TeleopInput input) {
 
-		if (input == null) {
-			return;
-		}
-
 		if (peakLimitSwitch.isPressed()) {
 			limitPressed = true;
+		}
+
+		if (input == null) {
+			return;
 		}
 
 		switch (currentState) {
@@ -134,9 +134,6 @@ public class ClimberMechFSMRight {
 	 * @return FSM state for the next iteration
 	 */
 	private ClimberMechFSMState nextState(TeleopInput input) {
-		if (input == null) {
-			return ClimberMechFSMState.IDLE_STOP;
-		}
 		switch (currentState) {
 			case IDLE_STOP:
 				if (input.isRetractClimberButtonPressed() && !peakLimitSwitchHit()) {

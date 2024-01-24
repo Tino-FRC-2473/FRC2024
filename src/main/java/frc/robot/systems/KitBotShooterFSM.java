@@ -63,6 +63,8 @@ public class KitBotShooterFSM {
 		highMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
 		autoOuttakingTimerStarted = false;
+		autoIntakingTimerStarted = false;
+
 		timer = new Timer();
 		// Reset state machine
 		reset();
@@ -253,6 +255,8 @@ public class KitBotShooterFSM {
 			lowMotor.set(0);
 			highMotor.set(0);
 
+			autoOuttakingTimerStarted = false;
+
 			return true;
 		}
 
@@ -273,6 +277,8 @@ public class KitBotShooterFSM {
 		} else {
 			lowMotor.set(0);
 			highMotor.set(0);
+
+			autoIntakingTimerStarted = false;
 
 			return true;
 		}
