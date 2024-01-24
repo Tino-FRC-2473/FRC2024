@@ -256,7 +256,7 @@ public class PivotFSM {
 		}
 		switch (currentState) {
 			case IDLE_STOP:
-				if (!zeroed && !lastLimitHit) {
+				if (!zeroed && !lastLimitHit && !input.isAbortButtonPressed()) {
 					return PivotFSMState.ZEROING;
 				} else if (currentEncoder > MIN_ENCODER_ROTATIONS
 					&& input.getLeftJoystickY() < -JOYSTICK_DEAD_ZONE) {
@@ -276,6 +276,8 @@ public class PivotFSM {
 				} else if (input.isShooterButtonPressed()
 					&& !inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)) {
 					return PivotFSMState.SHOOTER;
+				} else if (!zeroed && !lastLimitHit) {
+					return PivotFSMState.IDLE_STOP;
 				} else {
 					return PivotFSMState.IDLE_STOP;
 				}
@@ -292,7 +294,7 @@ public class PivotFSM {
 				if (currentEncoder > MIN_ENCODER_ROTATIONS
 					&& input.getLeftJoystickY() < -JOYSTICK_DEAD_ZONE) {
 					return PivotFSMState.MANUAL_IN;
-				} else {
+				} else if (input.getLeftJoystickY() == 0 && input.getRightJoystickX() == 0) {
 					return PivotFSMState.IDLE_STOP;
 				}
 
