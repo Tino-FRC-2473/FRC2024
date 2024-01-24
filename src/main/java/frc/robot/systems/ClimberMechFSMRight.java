@@ -112,12 +112,6 @@ public class ClimberMechFSMRight {
 	 */
 	public boolean updateAutonomous(AutoFSMState autoState) {
 		switch (autoState) {
-			case STATE1:
-				return handleAutoState1();
-			case STATE2:
-				return handleAutoState2();
-			case STATE3:
-				return handleAutoState3();
 			default:
 				return true;
 		}
@@ -168,30 +162,6 @@ public class ClimberMechFSMRight {
 	 */
 	private void handleRetractingState(TeleopInput input) {
 		motor.set(-MOTOR_RUN_POWER);
-	}
-
-	/**
-	 * Performs action for auto STATE1.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState1() {
-		return true;
-	}
-
-	/**
-	 * Performs action for auto STATE2.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState2() {
-		return true;
-	}
-
-	/**
-	 * Performs action for auto STATE3.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState3() {
-		return true;
 	}
 
 	private boolean peakLimitSwitchHit() {
