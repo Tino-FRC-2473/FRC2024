@@ -37,10 +37,10 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
-    shooterFSM = new KitBotShooterFSM();
+		shooterFSM = new KitBotShooterFSM();
 		climberMechLeftFSM = new ClimberMechFSMLeft();
 		climberMechRightFSM = new ClimberMechFSMRight();
-    
+
 		autoPathChooser = new AutoPathChooser();
 		driveFSMSystem = new DriveFSMSystem();
 		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);

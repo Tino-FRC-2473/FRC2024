@@ -16,7 +16,7 @@ public class AutoHandlerSystem {
 		DRIVE_PATH_4_STATE_2,
 		DRIVE_PATH_5,
 		SHOOTER_STATE,
-    INTAKE_STATE,
+		INTAKE_STATE,
 		PENDING
 	}
 	public enum AutoPath {
@@ -140,7 +140,7 @@ public class AutoHandlerSystem {
 			case SHOOTER_STATE:
 				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE);
 				break;
-   		case INTAKE_STATE:
+			case INTAKE_STATE:
 				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.INTAKE_STATE);
 				break;
 			case PENDING:

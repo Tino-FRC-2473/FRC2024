@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.PS4Controller;
 public class TeleopInput {
 	/* ======================== Constants ======================== */
 	private static final int LEFT_JOYSTICK_PORT = 1;
-  private static final int RETRACT_CLIMBER_BUTTON = 3;
+	private static final int RETRACT_CLIMBER_BUTTON = 3;
 	private static final int INTAKE_BUTTON = 2;
 	private static final int OUTTAKE_BUTTON = 1;
 	public static final int DRIVER_CONTROLLER_PORT = 0;
@@ -143,7 +143,7 @@ public class TeleopInput {
 	 */
 	public boolean isRetractClimberButtonPressed() {
 		return leftJoystick.getRawButton(RETRACT_CLIMBER_BUTTON);
-
+	}
 	/* ======================== Private methods ======================== */
 
 }
