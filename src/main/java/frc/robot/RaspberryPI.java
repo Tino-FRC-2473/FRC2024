@@ -57,15 +57,15 @@ public class RaspberryPI {
 		return tagSubscriber.get()[(6 * (id - 1)) + 2];
 	}
 
-	public double getAprilTagYaw(int id) {
+	public double getAprilTagRoll(int id) {
 		return tagSubscriber.get()[(6 * (id - 1)) + 3];
 	}
 
-	public double getAprilTagPitch(int id) {
+	public double getAprilTagYaw(int id) {
 		return tagSubscriber.get()[(6 * (id - 1)) + 4];
 	}
 
-	public double getAprilTagRoll(int id) {
+	public double getAprilTagPitch(int id) {
 		return tagSubscriber.get()[(6 * (id - 1)) + 5];
 	}
 }

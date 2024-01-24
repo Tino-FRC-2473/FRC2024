@@ -18,7 +18,7 @@ FOV = (50.28, 29.16)
 CAM_HEIGHT = 0.4
 CAM_ANGLE = -15
 input = VisionInput(FOV, RES, CAM_HEIGHT, CAM_ANGLE)
-TAG_LENGTH_METERS = 0.123
+TAG_LENGTH_METERS = 0.165
 
 while True:
     frame = input.getFrame()

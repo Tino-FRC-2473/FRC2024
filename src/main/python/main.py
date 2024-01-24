@@ -28,7 +28,6 @@ while True:
         xPub.set(frame.sum())
         annotated_frame = frame.copy()
         tagData = tag_module.estimate_3d_pose(frame, annotated_frame, ARUCO_LENGTH_METERS)
-        # yaw = tag_module.get_yaw(frame)
 
         if n%30 == 0: print(tagData)
 

@@ -91,7 +91,7 @@ class AprilTag():
             rvec = rvec.reshape((3, 1))
             tvec = tvec.reshape((3,1))
             R, _ = cv2.Rodrigues(rvec)
-            Cesc = (-R.T @ tvec).reshape(3) 
+            Cesc = (-R.T @ tvec).reshape(3)
             text = str(Cesc* 39.37) + '\n' + str(rvec.flatten() * 180 / 3.14)
             cv2.putText(image, text, text_position, font, font_scale, text_color, font_thickness)
 
@@ -129,7 +129,7 @@ class AprilTag():
 
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-            # aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_16h5)
+            # aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_36h11)
             # detector = cv2.aruco.ArucoDetector(aruco_dict)
             # corners, ids, rejected_img_points = detector.detectMarkers(gray)
             aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_APRILTAG_36h11)

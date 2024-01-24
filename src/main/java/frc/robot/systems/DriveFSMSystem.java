@@ -98,8 +98,12 @@ public class DriveFSMSystem {
 
 	private boolean facingSpeakerTag;
 	private boolean closeToSpeakerTag;
+	private boolean parallelSourceTag;
+	private boolean closeToSourceTag;
 	private double lastSeenX;
 	private double lastSeenZ;
+	private double targetZTransform;
+	private double targetYaw;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -146,8 +150,12 @@ public class DriveFSMSystem {
 		resetOdometry(new Pose2d());
 		facingSpeakerTag = false;
 		closeToSpeakerTag = false;
+		parallelSourceTag = false;
+		closeToSourceTag = false; 
 		lastSeenX = 4000;
 		lastSeenZ = 4000;
+		targetZTransform = 4000;
+		targetYaw = 4000;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -325,12 +333,7 @@ public class DriveFSMSystem {
 				break;
 
 			case ALIGN_TO_SOURCE_STATE:
-				//double dist = rpi.getConeDistance();
-				//double angle = rpi.getConeYaw();
-				//boolean canSee = (dist == -1 || angle == -1);
-				//SmartDashboard.putBoolean("Can See Object", canSee);
-				//SmartDashboard.putNumber("Distance to Object", dist);
-				//driveUntilObject(dist, angle);
+				alignToSource();
 				break;
 
 			case ALIGN_TO_SPEAKER_STATE:
@@ -368,12 +371,26 @@ public class DriveFSMSystem {
 				if (input.isCircleButtonPressed()) {
 					return FSMState.ALIGN_TO_SPEAKER_STATE;
 				} else if (input.isTriangleButtonPressed()) {
+					drive(0, 0, 0, false, false);
+					targetYaw = 4000;
+					targetZTransform = 4000;
+					if (rpi.getAprilTagYaw(3) != 4000) {
+						targetYaw = (rpi.getAprilTagYaw(3) * 180 / Math.PI);
+						if (targetYaw >= 0) {
+							targetYaw = targetYaw - 180;
+						} else {
+							targetYaw = targetYaw + 180;
+						}
+						targetYaw = getPose().getRotation().getDegrees() + targetYaw;
+					}
 					return FSMState.ALIGN_TO_SOURCE_STATE;
 				}
 				return FSMState.TELEOP_STATE;
 
 			case ALIGN_TO_SOURCE_STATE:
 				if (input.isTriangleButtonReleased()) {
+					closeToSourceTag = false;
+					parallelSourceTag = false;
 					return FSMState.TELEOP_STATE;
 				}
 				return FSMState.ALIGN_TO_SOURCE_STATE;
@@ -589,6 +606,21 @@ public class DriveFSMSystem {
 	//Compute current (Tag -> camera pose) and use rvec[1] and tvec[2] to determine how many degrees
 	//you need to turn and how many inches you need to travel forward. Use gyro-encoder to travel these amounts
 	public void alignToSource() {
+		if (targetYaw == 4000) {
+			//no tag was seen
+			drive(0, 0, 0, false, false);
+			return;
+		}
+		SmartDashboard.putNumber("gyro angle", getPose().getRotation().getDegrees());
+		SmartDashboard.putNumber("Target yaw", targetYaw);
+		double aDiff = targetYaw - getPose().getRotation().getDegrees();
+		double rotSpeed = clamp(-aDiff / VisionConstants.SPEAKER_ROTATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
+		if (rotSpeed <= 0.02) {
+			rotSpeed = 0;
+		}
+		//drive(0, 0, rotSpeed, true, false);
 
 	}
 	public void alignToSpeaker(double dist, double rotFinal) {
