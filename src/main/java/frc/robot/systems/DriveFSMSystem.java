@@ -337,13 +337,15 @@ public class DriveFSMSystem {
 		switch (currentState) {
 			case TELEOP_STATE:
 				drive(-MathUtil.applyDeadband((input.getControllerLeftJoystickY()
-					* Math.abs(input.getControllerLeftJoystickY())),
-					OIConstants.DRIVE_DEADBAND),
+					* Math.abs(input.getControllerLeftJoystickY()) * ((input.getLeftTrigger() / 2)
+					+ DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT) / 2), OIConstants.DRIVE_DEADBAND),
 					-MathUtil.applyDeadband((input.getControllerLeftJoystickX()
-					* Math.abs(input.getControllerLeftJoystickX())),
-					OIConstants.DRIVE_DEADBAND),
-					-MathUtil.applyDeadband(input.getControllerRightJoystickX(),
-					OIConstants.DRIVE_DEADBAND), true, true);
+					* Math.abs(input.getControllerLeftJoystickX()) * ((input.getLeftTrigger() / 2)
+					+ DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT) / 2), OIConstants.DRIVE_DEADBAND),
+					-MathUtil.applyDeadband((input.getControllerRightJoystickX()
+					* ((input.getLeftTrigger() / 2) + DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT)
+					/ DriveConstants.ANGULAR_SPEED_LIMIT_CONSTANT), OIConstants.DRIVE_DEADBAND),
+					true, true);
 				if (input.isBackButtonPressed()) {
 					gyro.reset();
 					resetOdometry(new Pose2d(new Translation2d(getPose().getX(), getPose().getY()),

@@ -103,6 +103,20 @@ public class TeleopInput {
 	public boolean isTriangleButtonReleased() {
 		return driverController.getTriangleButtonReleased();
 	}
+	/**
+	 * Get the value of the left trigger.
+	 * @return value of the left trigger.
+	 */
+	public double getLeftTrigger() {
+		return driverController.getL2Axis();
+	}
+	/**
+	 * Get the value of the right trigger.
+	 * @return value of the right trigger.
+	 */
+	public double getRightTrigger() {
+		return driverController.getR2Axis();
+	}
 
 	/* ------------------------ Left Joystick ------------------------ */
 	/**
