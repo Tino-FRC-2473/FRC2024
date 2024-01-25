@@ -167,8 +167,8 @@ public class DriveFSMSystem {
 		facingSpeakerTag = false;
 		closeToSpeakerTag = false;
 		alignedSourceTag = false;
-		lastSeenX = 4000;
-		lastSeenZ = 4000;
+		lastSeenX = VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+		lastSeenZ = VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -371,25 +371,34 @@ public class DriveFSMSystem {
 				break;
 
 			case ALIGN_TO_SOURCE_STATE:
-					if (rpi.getAprilTagX(3) != 4000) {
-						lastSeenX = rpi.getAprilTagX(3);
-						alignToSource(lastSeenX);
-					} else {
-						alignToSource(lastSeenX);
-					}
+				if (rpi.getAprilTagX(VisionConstants.SOURCE_TAG_ID1)
+					!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+					lastSeenX = rpi.getAprilTagX(VisionConstants.SOURCE_TAG_ID1);
+					alignToSource(lastSeenX);
+				} else {
+					alignToSource(lastSeenX);
+				}
 				break;
 
 			case ALIGN_TO_SPEAKER_STATE:
-				if (rpi.getAprilTagZ(4) != 4000 && rpi.getAprilTagX(4) != 4000) {
-					lastSeenX = rpi.getAprilTagX(4);
-					lastSeenZ = rpi.getAprilTagZ(4);
-					alignToSpeaker(lastSeenZ,lastSeenX);
-				} else if(rpi.getAprilTagZ(7) != 4000 && rpi.getAprilTagX(7) != 4000) {
-					lastSeenX = rpi.getAprilTagX(7);
-					lastSeenZ = rpi.getAprilTagZ(7);
-					alignToSpeaker(lastSeenZ,lastSeenX);
+				if (rpi.getAprilTagZ(VisionConstants.SPEAKER_TAG_ID1)
+					!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
+					&& rpi.getAprilTagX(VisionConstants.SPEAKER_TAG_ID1)
+					!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+
+					lastSeenX = rpi.getAprilTagX(VisionConstants.SPEAKER_TAG_ID1);
+					lastSeenZ = rpi.getAprilTagZ(VisionConstants.SPEAKER_TAG_ID1);
+					alignToSpeaker(lastSeenZ, lastSeenX);
+				} else if (rpi.getAprilTagZ(VisionConstants.SPEAKER_TAG_ID2)
+					!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
+					&& rpi.getAprilTagX(VisionConstants.SPEAKER_TAG_ID2)
+					!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+
+					lastSeenX = rpi.getAprilTagX(VisionConstants.SPEAKER_TAG_ID2);
+					lastSeenZ = rpi.getAprilTagZ(VisionConstants.SPEAKER_TAG_ID2);
+					alignToSpeaker(lastSeenZ, lastSeenX);
 				} else {
-					alignToSpeaker(lastSeenZ,lastSeenX);
+					alignToSpeaker(lastSeenZ, lastSeenX);
 				}
 				break;
 			default:
@@ -421,7 +430,7 @@ public class DriveFSMSystem {
 			case ALIGN_TO_SOURCE_STATE:
 				if (input.isTriangleButtonReleased()) {
 					alignedSourceTag = false;
-					lastSeenX = 4000;
+					lastSeenX = VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 					return FSMState.TELEOP_STATE;
 				}
 				return FSMState.ALIGN_TO_SOURCE_STATE;
@@ -430,8 +439,8 @@ public class DriveFSMSystem {
 				if (input.isCircleButtonReleased()) {
 					facingSpeakerTag = false;
 					closeToSpeakerTag = false;
-					lastSeenX = 4000;
-					lastSeenZ = 4000;
+					lastSeenX = VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+					lastSeenZ = VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 					return FSMState.TELEOP_STATE;
 				}
 				return FSMState.ALIGN_TO_SPEAKER_STATE;
@@ -603,8 +612,14 @@ public class DriveFSMSystem {
 		return false;
 	}
 
+	/**
+	 * @param rotFinal a number proportional to the angle from the camera to the tag
+	 * Turns the robot towards the source's april tag and drives
+	 * towards it and straightens the robot when driving against the wall. This positions
+	 * robot to be at the source to pickup a note.
+	 */
 	public void alignToSource(double rotFinal) {
-		if (rotFinal == 4000) {
+		if (rotFinal == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
 			drive(0, 0, 0, false, false);
 			return;
 		}
@@ -613,7 +628,7 @@ public class DriveFSMSystem {
 			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
 		if (!alignedSourceTag) {
 			drive(0, 0, rotSpeed, false, false);
-			if (Math.abs(rotSpeed) <= 0.02) {
+			if (Math.abs(rotSpeed) <= VisionConstants.ROTATIONAL_POWER_LOWER_THRESHOLD) {
 				alignedSourceTag = true;
 			}
 		} else {
@@ -621,34 +636,45 @@ public class DriveFSMSystem {
 		}
 
 	}
+
+	/**
+	 * @param rotFinal a number proportional to the angle from the camera to the tag
+	 * @param dist the distance in meters from the camera to the tag
+	 * Turns the robot towards the speaker's april tag and drives it
+	 * forward to be a set distance away from the speaker. This positions
+	 * robot to be at the ideal shooting position relative to the speaker.
+	 */
 	public void alignToSpeaker(double dist, double rotFinal) {
-		if (dist == 4000 && rotFinal == 4000) {
+		if (dist == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
+			&& rotFinal == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
 			drive(0, 0, 0, false, false);
 			return;
 		}
 		double forwardPower = clamp((dist - VisionConstants.Z_MARGIN_TO_SPEAKER)
-		/ VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,
-		-VisionConstants.MAX_SPEED_METERS_PER_SECOND, VisionConstants.MAX_SPEED_METERS_PER_SECOND);
+			/ VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
+			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
 		double rotSpeed = clamp(-rotFinal / VisionConstants.SPEAKER_ROTATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
 		if (!facingSpeakerTag) {
 			drive(0, 0, rotSpeed, false, false);
-			if (Math.abs(rotSpeed) <= 0.02) {
+			if (Math.abs(rotSpeed) <= VisionConstants.ROTATIONAL_POWER_LOWER_THRESHOLD) {
 				facingSpeakerTag = true;
 			}
 		} else {
 			if (!closeToSpeakerTag) {
-			 	drive(forwardPower, 0, 0, false, false);
-			 	if (dist < VisionConstants.Z_MARGIN_TO_SPEAKER + VisionConstants.Z_MARGIN_SPEAKER_OFFSET) {
-			 		closeToSpeakerTag = true;
-			 	}
+				drive(forwardPower, 0, 0, false, false);
+				if (dist < VisionConstants.Z_MARGIN_TO_SPEAKER
+					+ VisionConstants.Z_MARGIN_SPEAKER_OFFSET) {
+					closeToSpeakerTag = true;
+				}
 			} else {
 				drive(0, 0, 0, false, false);
 			}
 		}
 	}
-	
+
 	/**
 	 * Drives the robot until it reaches a given object.
 	 * @param seconds seconds to wait

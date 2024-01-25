@@ -168,5 +168,10 @@ public final class SwerveConstants {
 		public static final double Z_MARGIN_SPEAKER_OFFSET = 0.05;
 		public static final double SPEAKER_DRIVE_FORWARD_POWER = 0.1;
 		public static final double UNABLE_TO_SEE_TAG_CONSTANT = 4000;
+		public static final double ROTATIONAL_POWER_LOWER_THRESHOLD = 0.02;
+		public static final int SPEAKER_TAG_ID1 = 4;
+		public static final int SPEAKER_TAG_ID2 = 7;
+		public static final int SOURCE_TAG_ID1 = 3;
+
 	}
 }
