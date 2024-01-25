@@ -3,6 +3,10 @@
 ## Code Structure
 This project will use the FSMSystem framework, representing each subsystem as a finite state machine.
 
+[![Javadoc](https://github.com/Tino-FRC-2473/FRC2024/actions/workflows/javadoc.yml/badge.svg)](https://github.com/Tino-FRC-2473/FRC2024/actions/workflows/javadoc.yml)
+
+Javadoc for this repo is available at [https://tino-frc-2473.github.io/FRC2024/](https://tino-frc-2473.github.io/FRC2024/)
+
 ## Code Conventions
 We will base our code style off the [Sun Java style guide](https://www.oracle.com/technetwork/java/codeconventions-150003.pdf).
  * Indentation: tabs

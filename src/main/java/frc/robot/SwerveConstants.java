@@ -26,8 +26,8 @@ public final class SwerveConstants {
 	public static final class DriveConstants {
 		// Driving Parameters - Note that these are not the maximum capable speeds of
 		// the robot, rather the allowed maximum speeds
-		public static final double MAX_SPEED_METERS_PER_SECOND = 4.8; //4.8
-		public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // radians per second //2
+		public static final double MAX_SPEED_METERS_PER_SECOND = 4.8;
+		public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // radians per second
 
 		public static final double DIRECTION_SLEW_RATE = 1.2; // radians per second
 		public static final double MAGNITUDE_SLEW_RATE = 1.8; // percent per second (1 = 100%)
@@ -51,7 +51,6 @@ public final class SwerveConstants {
 		public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 0;
 		public static final double REAR_LEFT_CHASSIS_ANGULAR_OFFSET = Math.PI;
 		public static final double REAR_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI / 2;
-
 
 		public static final boolean GYRO_REVERSED = false;
 		public static final double TIME_CONSTANT = 1e-6;
@@ -98,14 +97,14 @@ public final class SwerveConstants {
 		public static final double TURNING_ENCODER_POSITION_PID_MAX_INPUT
 				= TURNING_ENCODER_POSITION_FACTOR; // radians
 
-		public static final double DRIVING_P = 0.04; //0.04
+		public static final double DRIVING_P = 0.04;
 		public static final double DRIVING_I = 0;
 		public static final double DRIVING_D = 0;
 		public static final double DRIVING_FF = 1 / DRIVE_WHEEL_FREE_SPEED_RPS;
 		public static final double DRIVING_MIN_OUTPUT = -1;
 		public static final double DRIVING_MAX_OUTPUT = 1;
 
-		public static final double TURNING_P = 1; // 1
+		public static final double TURNING_P = 1;
 		public static final double TURNING_I = 0;
 		public static final double TURNING_D = 0;
 		public static final double TURNING_FF = 0;
@@ -124,110 +123,40 @@ public final class SwerveConstants {
 	}
 
 	public static final class AutoConstants {
+		//auto paths constants
 		public static final double MAX_SPEED_METERS_PER_SECOND = 0.3; // 0.5 decided
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 12;
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI / 2;
-
-		public static final double PX_CONTROLLER = 1;
-		public static final double PY_CONTROLLER = 1;
-		public static final double P_THETA_CONTROLLER = 1;
-
-		// tag detection/alignment
-		public static final double DRIVE_TO_TAG_TRANSLATIONAL_CONSTANT = 600; //meters
-		public static final double DRIVE_TO_TAG_ROTATIONAL_CONSTANT = 100;
-		public static final double DRIVE_TO_TAG_DISTANCE_MARGIN = 3;
-		public static final double DRIVE_TO_TAG_ANGLE_MARGIN = 5;
-		public static final double UNABLE_TO_SEE_TAG_CONSTANT = 4000;
-		//object detection/alignment
-		public static final double DRIVE_TO_OBJECT_TRANSLATIONAL_CONSTANT = 0.5; //meters (0.5)
-		public static final double DRIVE_TO_OBJECT_ROTATIONAL_CONSTANT = 100;
-		public static final double DISTANCE_MARGIN_TO_DRIVE_TO_OBJECT = 0.58; // meters
-		public static final double ANGLE_MARGIN_TO_DRIVE_TO_OBJECT = 5; // degrees
-		//auto paths constants
 		public static final double AUTO_DRIVE_METERS_MARGIN_OF_ERROR = 0.03;
 		public static final double AUTO_DRIVE_DEGREES_MARGIN_OF_ERROR = 3;
 		public static final double AUTO_DRIVE_ANGULAR_SPEED_ACCEL_CONSTANT = 120;
-		public static final double AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT = 3; //?
+		public static final double AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT = 3;
+		public static final double CONSTANT_SPEED_THRESHOLD = 0.2; // meters
+		public static final double WAIT_TIME = 5; // seconds
 
-		/*
-		Auto Coordinate Constants
-		Refer to the following document for point references
-		Link: http://tinyurl.com/2023-auto-planning
-		GD Dir: (FRC > 23-24 > 24 Season > Autonomous > Autonomous Path Planning)
-		*/
-
-		// -----------------Blue Alliance--------------------
-
-		// Path 1
-		public static final double BLUE_PATH1_POINT2_X = -1;
-		public static final double BLUE_PATH1_POINT2_Y = 3;
-		public static final double BLUE_PATH1_POINT3_X = -3.5;
-		public static final double BLUE_PATH1_POINT3_Y = 5;
-		public static final double BLUE_PATH1_POINT4_X = -6;
-		public static final double BLUE_PATH1_POINT4_Y = 5;
-
-		// Path 2
-		public static final double BLUE_PATH2_POINT2_X = -3.5;
-		public static final double BLUE_PATH2_POINT2_Y = 4;
-		public static final double BLUE_PATH2_POINT3_X = -6;
-		public static final double BLUE_PATH2_POINT3_Y = 4;
-
-		// Path 3
-		public static final double BLUE_PATH3_POINT2_X = -4.5;
-		public static final double BLUE_PATH3_POINT2_Y = 0;
-		public static final double BLUE_PATH3_POINT3_X = -6;
-		public static final double BLUE_PATH3_POINT3_Y = 1;
-		public static final double BLUE_PATH3_POINT4_X = -6;
-		public static final double BLUE_PATH3_POINT4_Y = 3.5;
-
-		// Path 4
-		public static final double BLUE_PATH4_POINT2_X = 0;
-		public static final double BLUE_PATH4_POINT2_Y = -2;
-		public static final double BLUE_PATH4_POINT3_X = -1;
-		public static final double BLUE_PATH4_POINT3_Y = -1;
-		public static final double BLUE_PATH4_POINT4_X = -3.5;
-		public static final double BLUE_PATH4_POINT4_Y = 3;
-		public static final double BLUE_PATH4_POINT5_X = -6;
-		public static final double BLUE_PATH4_POINT5_Y = 3;
-
-		// ------------------ Red Alliance ------------------
-
-		// Path 1
-		public static final double RED_PATH1_POINT2_X = -1;
-		public static final double RED_PATH1_POINT2_Y = -3;
-		public static final double RED_PATH1_POINT3_X = -3.5;
-		public static final double RED_PATH1_POINT3_Y = -5;
-		public static final double RED_PATH1_POINT4_X = -6;
-		public static final double RED_PATH1_POINT4_Y = -5;
-
-		// Path 2
-		public static final double RED_PATH2_POINT2_X = -3.5;
-		public static final double RED_PATH2_POINT2_Y = -4;
-		public static final double RED_PATH2_POINT3_X = -6;
-		public static final double RED_PATH2_POINT3_Y = -4;
-
-		// Path 3
-		public static final double RED_PATH3_POINT2_X = -4.5;
-		public static final double RED_PATH3_POINT2_Y = 0;
-		public static final double RED_PATH3_POINT3_X = -6;
-		public static final double RED_PATH3_POINT3_Y = -1;
-		public static final double RED_PATH3_POINT4_X = -6;
-		public static final double RED_PATH3_POINT4_Y = -3.5;
-
-		// Path 4
-		public static final double RED_PATH4_POINT2_X = 0;
-		public static final double RED_PATH4_POINT2_Y = 2;
-		public static final double RED_PATH4_POINT3_X = -1;
-		public static final double RED_PATH4_POINT3_Y = 1;
-		public static final double RED_PATH4_POINT4_X = -3.5;
-		public static final double RED_PATH4_POINT4_Y = -3;
-		public static final double RED_PATH4_POINT5_X = -6;
-		public static final double RED_PATH4_POINT5_Y = -3;
+		// constants for auto path points
+		public static final double N_1_5 = 1.5;
+		public static final double N_2 = 2;
+		public static final double N_2_5 = 2.5;
+		public static final double N_3 = 3;
+		public static final double N_3_5 = 3.5;
+		public static final double N_4 = 4;
+		public static final double N_4_5 = 4.5;
+		public static final double N_5 = 5;
+		public static final double N_5_5 = 5.5;
+		public static final double N_6 = 6;
+		public static final double DEG_45 = 45;
+		public static final double DEG_90 = 90;
+		public static final double DEG_180 = 180;
 
 		// Constraint for the motion profiled robot angle controller
 		public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS
 			= new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
+	}
+
+	public static final class VisionConstants {
+		public static final double UNABLE_TO_SEE_TAG_CONSTANT = 4000;
 	}
 
 	public static final class NeoMotorConstants {
