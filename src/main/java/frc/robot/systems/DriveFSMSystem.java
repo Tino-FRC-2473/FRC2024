@@ -267,14 +267,12 @@ public class DriveFSMSystem {
 			case DRIVE_PATH_4_STATE_2:
 				ArrayList<Pose2d> path4Points2 = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					path4Points2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
 					path4Points2.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_3,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
 					path4Points2.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_3,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
 				} else {
-					path4Points2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
-					path4Points2.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_5,
+					path4Points2.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_3,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
 					path4Points2.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_3,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
@@ -472,8 +470,8 @@ public class DriveFSMSystem {
 	 * @return if the robot has driven to the current position
 	 */
 	public boolean driveToPose(Pose2d pose) {
-		double x = pose.getX();
-		double y = pose.getY();
+		double x = pose.getX() / 2; //remove /2 after testing
+		double y = pose.getY() / 2;
 		double angle = pose.getRotation().getDegrees();
 
 		double xDiff = x - getPose().getX();

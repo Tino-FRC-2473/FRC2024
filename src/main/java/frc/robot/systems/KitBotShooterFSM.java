@@ -118,12 +118,12 @@ public class KitBotShooterFSM {
 	 */
 	public boolean updateAutonomous(AutoFSMState autoState) {
 		switch (autoState) {
-			case SHOOTER_STATE_1:
-				return handleAutoState1();
-			case SHOOTER_STATE_2:
-				return handleAutoState2();
-			case SHOOTER_STATE_3:
-				return handleAutoState3();
+			// case SHOOTER_STATE_1:
+			// 	return handleAutoState1();
+			// case SHOOTER_STATE_2:
+			// 	return handleAutoState2();
+			// case SHOOTER_STATE_3:
+			// 	return handleAutoState3();
 			default:
 				return true;
 		}
