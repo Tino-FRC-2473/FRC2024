@@ -18,8 +18,7 @@ public class RaspberryPI {
 	private double previousValueReceived = 0;
 	private double previousTimeReceived = 0;
 	private Timer timer = new Timer();
-
-	public static final int APRIL_TAG_CONSTANT = 6;
+	public static final int VALUES_PER_TAG = 6;
 
 	/**Updates the FPS each iteration of the robot.*/
 	public RaspberryPI() {
@@ -47,81 +46,73 @@ public class RaspberryPI {
 		SmartDashboard.putNumber("FPS", fps);
 	}
 
-	//If the number 4000 is returned from any of the methods below, that output is
-	//invalid and no tag of the inputted Id has been detected
 	/**
-	 * Gives information about april tag.
-	 * @param id takes the id of tag
-	 * @return the x distance to the tag in inches
+	 * @param id id of the april tag we are fetching data on
+	 * @return X value from the camera to tag in meters
 	 */
 	public double getAprilTagX(int id) {
 		try {
-			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1))];
+			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1))];
 		} catch (NullPointerException e) {
 			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
 	/**
-	 * Gives information about april tag.
-	 * @param id takes the id of tag
-	 * @return the y distance to the tag in inches
+	 * @param id id of the april tag we are fetching data on
+	 * @return Y value from the camera to tag in meters
 	 */
 	public double getAprilTagY(int id) {
 		try {
-			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 1];
+			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 1];
 		} catch (NullPointerException e) {
 			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
 	/**
-	 * Gives information about april tag.
-	 * @param id takes the id of tag
-	 * @return the z distance to the tag in inches
+	 * @param id id of the april tag we are fetching data on
+	 * @return Z value from the camera to tag in meters
 	 */
 	public double getAprilTagZ(int id) {
 		try {
-			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2];
+			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 2];
 		} catch (NullPointerException e) {
 			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
 	/**
-	 * Gives information about april tag.
-	 * @param id takes the id of tag
-	 * @return the yaw to the tag
-	 */
-	public double getAprilTagYaw(int id) {
-		try {
-			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 1];
-		} catch (NullPointerException e) {
-			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
-		}
-	}
-
-	/**
-	 * Gives information about april tag.
-	 * @param id takes the id of tag
-	 * @return the pitch to the tag
-	 */
-	public double getAprilTagPitch(int id) {
-		try {
-			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 2];
-		} catch (NullPointerException e) {
-			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
-		}
-	}
-
-	/**
-	 * Gives information about april tag.
-	 * @param id takes the id of tag
-	 * @return the roll to the tag
+	 * @param id id of the april tag we are fetching data on
+	 * @return roll angle from the tag to camera in radians
 	 */
 	public double getAprilTagRoll(int id) {
 		try {
-			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 2 + 1];
+			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 2 + 1];
+		} catch (NullPointerException e) {
+			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+		}
+	}
+
+	/**
+	 * @param id id of the april tag we are fetching data on
+	 * @return yaw angle from the tag to camera in radians
+	 */
+	public double getAprilTagYaw(int id) {
+		try {
+			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 2 + 2];
+		} catch (NullPointerException e) {
+			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+		}
+	}
+
+	/**
+	 * @param id id of the april tag we are fetching data on
+	 * @return pitch angle from the tag to camera in radians
+	 */
+	public double getAprilTagPitch(int id) {
+		try {
+			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 2 + 2 + 1];
 		} catch (NullPointerException e) {
 			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}

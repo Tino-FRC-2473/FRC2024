@@ -26,6 +26,7 @@ import frc.robot.TeleopInput;
 import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 import frc.robot.utils.SwerveUtils;
 import frc.robot.HardwareMap;
+import frc.robot.RaspberryPI;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.SwerveConstants.AutoConstants;
@@ -39,7 +40,6 @@ public class DriveFSMSystem {
 		TELEOP_STATE,
 		ALIGN_TO_SPEAKER_STATE,
 		ALIGN_TO_SOURCE_STATE
-		TELEOP_STATE
 	}
 
 	/* ======================== Private variables ======================== */
@@ -53,6 +53,9 @@ public class DriveFSMSystem {
 	// The gyro sensor
 	private AHRS gyro = new AHRS(SPI.Port.kMXP);
 	private Timer timer = new Timer();
+
+	// The raspberry pi
+	private RaspberryPI rpi = new RaspberryPI();
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double currentRotation = 0.0;
@@ -600,6 +603,52 @@ public class DriveFSMSystem {
 		return false;
 	}
 
+	public void alignToSource(double rotFinal) {
+		if (rotFinal == 4000) {
+			drive(0, 0, 0, false, false);
+			return;
+		}
+		double rotSpeed = clamp(-rotFinal / VisionConstants.SPEAKER_ROTATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
+		if (!alignedSourceTag) {
+			drive(0, 0, rotSpeed, false, false);
+			if (Math.abs(rotSpeed) <= 0.02) {
+				alignedSourceTag = true;
+			}
+		} else {
+			drive(VisionConstants.SPEAKER_DRIVE_FORWARD_POWER, 0, 0, false, false);
+		}
+
+	}
+	public void alignToSpeaker(double dist, double rotFinal) {
+		if (dist == 4000 && rotFinal == 4000) {
+			drive(0, 0, 0, false, false);
+			return;
+		}
+		double forwardPower = clamp((dist - VisionConstants.Z_MARGIN_TO_SPEAKER)
+		/ VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,
+		-VisionConstants.MAX_SPEED_METERS_PER_SECOND, VisionConstants.MAX_SPEED_METERS_PER_SECOND);
+		double rotSpeed = clamp(-rotFinal / VisionConstants.SPEAKER_ROTATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
+		if (!facingSpeakerTag) {
+			drive(0, 0, rotSpeed, false, false);
+			if (Math.abs(rotSpeed) <= 0.02) {
+				facingSpeakerTag = true;
+			}
+		} else {
+			if (!closeToSpeakerTag) {
+			 	drive(forwardPower, 0, 0, false, false);
+			 	if (dist < VisionConstants.Z_MARGIN_TO_SPEAKER + VisionConstants.Z_MARGIN_SPEAKER_OFFSET) {
+			 		closeToSpeakerTag = true;
+			 	}
+			} else {
+				drive(0, 0, 0, false, false);
+			}
+		}
+	}
+	
 	/**
 	 * Drives the robot until it reaches a given object.
 	 * @param seconds seconds to wait
