@@ -201,95 +201,126 @@ public class DriveFSMSystem {
 		GD Dir: (FRC > 23-24 > 24 Season > Autonomous > Autonomous Path Planning)
 		*/
 		switch (autoState) {
-			case DRIVE_PATH_1:
-				ArrayList<Pose2d> path1Points = new ArrayList<Pose2d>();
+			case SVR_DRIVE_PATH_1:
+				ArrayList<Pose2d> svrPath1Points = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					path1Points.add(new Pose2d(-1, AutoConstants.N_3,
+					svrPath1Points.add(new Pose2d(-1, AutoConstants.N_3,
 						new Rotation2d(Math.toRadians(0))));
-					path1Points.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_5,
+					svrPath1Points.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_5,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					path1Points.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
+					svrPath1Points.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
 				} else {
-					path1Points.add(new Pose2d(-1, -AutoConstants.N_3,
+					svrPath1Points.add(new Pose2d(-1, -AutoConstants.N_3,
 						new Rotation2d(Math.toRadians(0))));
-					path1Points.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_5,
+					svrPath1Points.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_5,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					path1Points.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_5,
+					svrPath1Points.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_5,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				}
-				return driveAlongPath(path1Points);
-			case DRIVE_PATH_2:
-				ArrayList<Pose2d> path2Points = new ArrayList<Pose2d>();
+				return driveAlongPath(svrPath1Points);
+			case SVR_DRIVE_PATH_2:
+				ArrayList<Pose2d> svrPath2Points = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					path2Points.add(new Pose2d(0, 0,
+					svrPath2Points.add(new Pose2d(0, 0,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-					path2Points.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_4,
+					svrPath2Points.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_4,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					path2Points.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_4,
+					svrPath2Points.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_4,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
 				} else {
-					path2Points.add(new Pose2d(0, 0,
+					svrPath2Points.add(new Pose2d(0, 0,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-					path2Points.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_4,
+					svrPath2Points.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_4,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					path2Points.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_4,
+					svrPath2Points.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_4,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				}
-				return driveAlongPath(path2Points);
-			case DRIVE_PATH_3:
-				ArrayList<Pose2d> path3Points = new ArrayList<Pose2d>();
+				return driveAlongPath(svrPath2Points);
+			case SVR_DRIVE_PATH_3:
+				ArrayList<Pose2d> svrPath3Points = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					path3Points.add(new Pose2d(0, 0,
+					svrPath3Points.add(new Pose2d(0, 0,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-					path3Points.add(new Pose2d(-AutoConstants.N_5, 0,
+					svrPath3Points.add(new Pose2d(-AutoConstants.N_5, 0,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					path3Points.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
+					svrPath3Points.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				} else {
-					path3Points.add(new Pose2d(0, 0,
+					svrPath3Points.add(new Pose2d(0, 0,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-					path3Points.add(new Pose2d(-AutoConstants.N_5, 0,
+					svrPath3Points.add(new Pose2d(-AutoConstants.N_5, 0,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					path3Points.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_5,
+					svrPath3Points.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_5,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
 				}
-				return driveAlongPath(path3Points);
-			case DRIVE_PATH_4_STATE_1:
-				ArrayList<Pose2d> path4Points1 = new ArrayList<Pose2d>();
+				return driveAlongPath(svrPath3Points);
+			case SVR_DRIVE_PATH_4_STATE_1:
+				ArrayList<Pose2d> svrPath4Points1 = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					path4Points1.add(new Pose2d(0, -AutoConstants.N_2,
+					svrPath4Points1.add(new Pose2d(0, -AutoConstants.N_2,
 						new Rotation2d(Math.toRadians(0))));
 				} else {
-					path4Points1.add(new Pose2d(0, 2, new Rotation2d(Math.toRadians(0))));
+					svrPath4Points1.add(new Pose2d(0, 2, new Rotation2d(Math.toRadians(0))));
 				}
-				return driveAlongPath(path4Points1);
-			case DRIVE_PATH_4_STATE_2:
-				ArrayList<Pose2d> path4Points2 = new ArrayList<Pose2d>();
+				return driveAlongPath(svrPath4Points1);
+			case SVR_DRIVE_PATH_4_STATE_2:
+				ArrayList<Pose2d> svrPath4Points2 = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					path4Points2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
-					path4Points2.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_3,
+					svrPath4Points2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
+					svrPath4Points2.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_3,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					path4Points2.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_3,
+					svrPath4Points2.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_3,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
 				} else {
-					path4Points2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
-					path4Points2.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_5,
+					svrPath4Points2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
+					svrPath4Points2.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_5,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					path4Points2.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_3,
+					svrPath4Points2.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_3,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				}
-				return driveAlongPath(path4Points2);
-			case DRIVE_PATH_5:
-				ArrayList<Pose2d> path5Points = new ArrayList<Pose2d>();
+				return driveAlongPath(svrPath4Points2);
+			case SVR_DRIVE_PATH_5:
+				ArrayList<Pose2d> svrPath5Points = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					path5Points.add(new Pose2d(-AutoConstants.N_6, 0,
+					svrPath5Points.add(new Pose2d(-AutoConstants.N_6, 0,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				} else {
-					path5Points.add(new Pose2d(-AutoConstants.N_6, 0,
+					svrPath5Points.add(new Pose2d(-AutoConstants.N_6, 0,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				}
-				return driveAlongPath(path5Points);
+				return driveAlongPath(svrPath5Points);
+			case MBR_DRIVE_PATH_1_STATE_1:
+				ArrayList<Pose2d> mbrPath1Points1 = new ArrayList<Pose2d>();
+				if (blueAlliance) {
+					mbrPath1Points1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
+					mbrPath1Points1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+				} else {
+					mbrPath1Points1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
+					mbrPath1Points1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+				}
+				return driveAlongPath(mbrPath1Points1);
+			case MBR_DRIVE_PATH_1_STATE_2:
+				ArrayList<Pose2d> mbrPath1Points2 = new ArrayList<Pose2d>();
+				if (blueAlliance) {
+					mbrPath1Points2.add(new Pose2d(-1, AutoConstants.N_1_5,
+						new Rotation2d(Math.toRadians(0))));
+				} else {
+					mbrPath1Points2.add(new Pose2d(-1, -AutoConstants.N_1_5,
+						new Rotation2d(Math.toRadians(0))));
+				}
+				return driveAlongPath(mbrPath1Points2);
+			case MBR_DRIVE_PATH_2_STATE_1:
+				ArrayList<Pose2d> mbrPath2Points1 = new ArrayList<Pose2d>();
+				if (blueAlliance) {
+					mbrPath2Points1.add(new Pose2d(0, 0,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
+					mbrPath2Points1.add(new Pose2d(-1, -0.5, new Rotation2d(Math.toRadians(0))));
+				} else {
+					mbrPath2Points1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
+					mbrPath2Points1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+				}
+				return driveAlongPath(mbrPath2Points1);
 			case PENDING:
 				timer.start();
 				return pause(AutoConstants.WAIT_TIME);
