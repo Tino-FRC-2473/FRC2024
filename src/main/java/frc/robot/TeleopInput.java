@@ -12,15 +12,15 @@ import edu.wpi.first.wpilibj.PS5Controller;
  */
 public class TeleopInput {
 	/* ======================== Constants ======================== */
-	private static final int LEFT_JOYSTICK_PORT = 0;
+	private static final int LEFT_JOYSTICK_PORT = 1;
 	private static final int PS5_CONTROLLER_PORT = 1;
 	private static final int INTAKE_BUTTON = 2;
 	private static final int OUTTAKE_BUTTON = 1;
 	private static final int SHOOT_BUTTON = 3;
-	private static final int GROUND_BUTTON = 4;
-	private static final int AMP_BUTTON = 5;
-	private static final int SOURCE_BUTTON = 6;
-	private static final int SHOOTER_BUTTON = 7;
+	private static final int GROUND_ARM_BUTTON = 4;
+	private static final int AMP_ARM_BUTTON = 5;
+	private static final int SOURCE_ARM_BUTTON = 6;
+	private static final int SHOOTER_ARM_BUTTON = 7;
 	private static final int ABORT_BUTTON = 8;
 
 	/* ======================== Private variables ======================== */
@@ -86,8 +86,8 @@ public class TeleopInput {
 	 * Get the value of the Outtake button.
 	 * @return True if button is pressed
 	 */
-	public boolean isGroundButtonPressed() {
-		return leftJoystick.getRawButton(GROUND_BUTTON);
+	public boolean isGroundArmButtonPressed() {
+		return leftJoystick.getRawButton(GROUND_ARM_BUTTON);
 	}
 
 
@@ -95,8 +95,8 @@ public class TeleopInput {
 	 * Get the value of the Outtake button.
 	 * @return True if button is pressed
 	 */
-	public boolean isSourceButtonPressed() {
-		return leftJoystick.getRawButton(SOURCE_BUTTON);
+	public boolean isSourceArmButtonPressed() {
+		return leftJoystick.getRawButton(SOURCE_ARM_BUTTON);
 	}
 
 	/**
@@ -111,16 +111,16 @@ public class TeleopInput {
 	 * Get the value of the Outtake button.
 	 * @return True if button is pressed
 	 */
-	public boolean isAmpButtonPressed() {
-		return leftJoystick.getRawButton(AMP_BUTTON);
+	public boolean isAmpArmButtonPressed() {
+		return leftJoystick.getRawButton(AMP_ARM_BUTTON);
 	}
 
 	/**
 	 * Get the value of the Outtake button.
 	 * @return True if button is pressed
 	 */
-	public boolean isShooterButtonPressed() {
-		return leftJoystick.getRawButton(SHOOTER_BUTTON);
+	public boolean isShooterArmButtonPressed() {
+		return leftJoystick.getRawButton(SHOOTER_ARM_BUTTON);
 	}
 
 	/* ------------------------ Right Joystick ------------------------ */
