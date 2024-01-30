@@ -15,11 +15,6 @@ public class AutoHandlerSystem {
 	}
 	public enum AutoPath {
 		PATH1,
-		PATH2,
-		PATH3,
-		PATH4,
-		PATH5,
-		PATH_6
 	}
 
 	/* ======================== Private variables ======================== */
@@ -31,10 +26,9 @@ public class AutoHandlerSystem {
 
 	//FSM Systems that the autoHandlerFSM uses
 	private DriveFSMSystem driveSystem;
-	private KitBotShooterFSM shooterFSM;
 
 	//Predefined auto paths
-	private static final AutoFSMState[] SVR_PATH1 = new AutoFSMState[]{
+	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
 		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.LEAVE};
 
 
@@ -43,7 +37,6 @@ public class AutoHandlerSystem {
 	 * Create FSMSystem and initialize to starting state.
 	 * Initializes any subsystems such as driveFSM, armFSM, ect.
 	 * @param fsm1 the first subsystem that the auto handler will call functions on
-	 * @param fsm2 the second subsystem that the auto handler will call functions on
 	 */
 	public AutoHandlerSystem(DriveFSMSystem fsm1) {
 		driveSystem = fsm1;
@@ -71,19 +64,10 @@ public class AutoHandlerSystem {
 	public void reset(AutoPath path) {
 
 		driveSystem.resetAutonomus();
-		shooterFSM.reset();
 
 		currentStateIndex = 0;
-		if (path == AutoPath.SVR_PATH1) {
-			currentStateList = SVR_PATH1;
-		} else if (path == AutoPath.SVR_PATH2) {
-			currentStateList = SVR_PATH2;
-		} else if (path == AutoPath.SVR_PATH3) {
-			currentStateList = SVR_PATH3;
-		} else if (path == AutoPath.SVR_PATH4) {
-			currentStateList = SVR_PATH4;
-		} else if (path == AutoPath.SVR_PATH5) {
-			currentStateList = SVR_PATH5;
+		if (path == AutoPath.PATH1) {
+			currentStateList = PATH1;
 		}
 	}
 
@@ -98,41 +82,13 @@ public class AutoHandlerSystem {
 		boolean isCurrentStateFinished;
 		SmartDashboard.putString("In Auto State: ", "" + getCurrentState());
 		switch (getCurrentState()) {
-			case SVR_DRIVE_PATH_1:
+			case TURN_TO_SPEAKER:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.SVR_DRIVE_PATH_1);
+					AutoFSMState.TURN_TO_SPEAKER);
 				break;
-			case SVR_DRIVE_PATH_2:
+			case LEAVE:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.SVR_DRIVE_PATH_2);
-				break;
-			case SVR_DRIVE_PATH_3:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.SVR_DRIVE_PATH_3);
-				break;
-			case SVR_DRIVE_PATH_4_STATE_1:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.SVR_DRIVE_PATH_4_STATE_1);
-				break;
-			case SVR_DRIVE_PATH_4_STATE_2:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.SVR_DRIVE_PATH_4_STATE_2);
-				break;
-			case SVR_DRIVE_PATH_5:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.SVR_DRIVE_PATH_5);
-				break;
-			case SHOOTER_STATE_1:
-				isCurrentStateFinished = shooterFSM.updateAutonomous(
-					AutoFSMState.SHOOTER_STATE_1);
-				break;
-			case SHOOTER_STATE_2:
-				isCurrentStateFinished = shooterFSM.updateAutonomous(
-					AutoFSMState.SHOOTER_STATE_2);
-				break;
-			case SHOOTER_STATE_3:
-				isCurrentStateFinished = shooterFSM.updateAutonomous(
-					AutoFSMState.SHOOTER_STATE_3);
+					AutoFSMState.LEAVE);
 				break;
 			case PENDING:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
