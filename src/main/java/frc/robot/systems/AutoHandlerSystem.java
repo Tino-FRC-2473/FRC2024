@@ -15,22 +15,8 @@ public class AutoHandlerSystem {
 		SVR_DRIVE_PATH_4_STATE_1,
 		SVR_DRIVE_PATH_4_STATE_2,
 		SVR_DRIVE_PATH_5,
-		MBR_DRIVE_PATH_1_STATE_1,
-		MBR_DRIVE_PATH_1_STATE_2,
-		MBR_DRIVE_PATH_2_STATE_1,
-		MBR_DRIVE_PATH_2_STATE_2,
-		MBR_DRIVE_PATH_3_STATE_1,
-		MBR_DRIVE_PATH_3_STATE_2,
-		MBR_DRIVE_PATH_4_STATE_1,
-		MBR_DRIVE_PATH_4_STATE_2,
-		MBR_DRIVE_PATH_4_STATE_3,
-		MBR_DRIVE_PATH_5,
-		MBR_DRIVE_PATH_6,
-		MBR_DRIVE_PATH_7,
-		MBR_DRIVE_PATH_8_STATE_1,
-		MBR_DRIVE_PATH_8_STATE_2,
-		MBR_DRIVE_PATH_9_STATE_1,
-		MBR_DRIVE_PATH_9_STATE_2,
+		TURN_LEFT_TO_SPEAKER,
+		TURN_RIGHT_TO_SPEAKER,
 		SHOOTER_STATE_1,
 		SHOOTER_STATE_2,
 		SHOOTER_STATE_3,
@@ -41,16 +27,7 @@ public class AutoHandlerSystem {
 		SVR_PATH2,
 		SVR_PATH3,
 		SVR_PATH4,
-		SVR_PATH5,
-		MBR_PATH1,
-		MBR_PATH2,
-		MBR_PATH3,
-		MBR_PATH4,
-		MBR_PATH5,
-		MBR_PATH6,
-		MBR_PATH7,
-		MBR_PATH8,
-		MBR_PATH9
+		SVR_PATH5
 	}
 
 	/* ======================== Private variables ======================== */
@@ -81,33 +58,6 @@ public class AutoHandlerSystem {
 	private static final AutoFSMState[] SVR_PATH5 = new AutoFSMState[]{
 		AutoFSMState.SVR_DRIVE_PATH_5};
 
-	private static final AutoFSMState[] MBR_PATH1 = new AutoFSMState[]{
-		AutoFSMState.MBR_DRIVE_PATH_1_STATE_1, AutoFSMState.MBR_DRIVE_PATH_1_STATE_2};
-
-	private static final AutoFSMState[] MBR_PATH2 = new AutoFSMState[]{
-		AutoFSMState.MBR_DRIVE_PATH_2_STATE_1, AutoFSMState.MBR_DRIVE_PATH_2_STATE_2};
-
-	private static final AutoFSMState[] MBR_PATH3 = new AutoFSMState[]{
-		AutoFSMState.MBR_DRIVE_PATH_3_STATE_1, AutoFSMState.MBR_DRIVE_PATH_3_STATE_2};
-
-	private static final AutoFSMState[] MBR_PATH4 = new AutoFSMState[]{
-		AutoFSMState.MBR_DRIVE_PATH_4_STATE_1, AutoFSMState.MBR_DRIVE_PATH_4_STATE_2,
-		AutoFSMState.MBR_DRIVE_PATH_4_STATE_3};
-
-	private static final AutoFSMState[] MBR_PATH5 = new AutoFSMState[]{
-		AutoFSMState.MBR_DRIVE_PATH_5};
-
-	private static final AutoFSMState[] MBR_PATH6 = new AutoFSMState[]{
-		AutoFSMState.MBR_DRIVE_PATH_6};
-
-	private static final AutoFSMState[] MBR_PATH7 = new AutoFSMState[]{
-		AutoFSMState.MBR_DRIVE_PATH_7};
-
-	private static final AutoFSMState[] MBR_PATH8 = new AutoFSMState[]{
-		AutoFSMState.MBR_DRIVE_PATH_8_STATE_1, AutoFSMState.MBR_DRIVE_PATH_8_STATE_2};
-
-	private static final AutoFSMState[] MBR_PATH9 = new AutoFSMState[]{
-		AutoFSMState.MBR_DRIVE_PATH_9_STATE_1, AutoFSMState.MBR_DRIVE_PATH_9_STATE_2};
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state.
@@ -154,24 +104,6 @@ public class AutoHandlerSystem {
 			currentStateList = SVR_PATH4;
 		} else if (path == AutoPath.SVR_PATH5) {
 			currentStateList = SVR_PATH5;
-		} else if (path == AutoPath.MBR_PATH1) {
-			currentStateList = MBR_PATH1;
-		} else if (path == AutoPath.MBR_PATH2) {
-			currentStateList = MBR_PATH2;
-		} else if (path == AutoPath.MBR_PATH3) {
-			currentStateList = MBR_PATH3;
-		} else if (path == AutoPath.MBR_PATH4) {
-			currentStateList = MBR_PATH4;
-		} else if (path == AutoPath.MBR_PATH5) {
-			currentStateList = MBR_PATH5;
-		} else if (path == AutoPath.MBR_PATH6) {
-			currentStateList = MBR_PATH6;
-		} else if (path == AutoPath.MBR_PATH7) {
-			currentStateList = MBR_PATH7;
-		} else if (path == AutoPath.MBR_PATH8) {
-			currentStateList = MBR_PATH8;
-		} else if (path == AutoPath.MBR_PATH9) {
-			currentStateList = MBR_PATH9;
 		}
 	}
 
@@ -210,51 +142,6 @@ public class AutoHandlerSystem {
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.SVR_DRIVE_PATH_5);
 				break;
-			case MBR_DRIVE_PATH_1_STATE_1:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.MBR_DRIVE_PATH_1_STATE_1);
-			case MBR_DRIVE_PATH_1_STATE_2:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.MBR_DRIVE_PATH_1_STATE_2);
-			case MBR_DRIVE_PATH_2_STATE_1:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.MBR_DRIVE_PATH_2_STATE_1);
-			case MBR_DRIVE_PATH_2_STATE_2:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.MBR_DRIVE_PATH_2_STATE_2);
-			case MBR_DRIVE_PATH_3_STATE_1:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.MBR_DRIVE_PATH_3_STATE_1);
-			case MBR_DRIVE_PATH_3_STATE_2:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.MBR_DRIVE_PATH_3_STATE_2);
-			case MBR_DRIVE_PATH_4_STATE_1:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.MBR_DRIVE_PATH_4_STATE_1);
-			case MBR_DRIVE_PATH_4_STATE_2:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.MBR_DRIVE_PATH_4_STATE_2);
-			case MBR_DRIVE_PATH_5:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.MBR_DRIVE_PATH_5);
-			case MBR_DRIVE_PATH_6:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.MBR_DRIVE_PATH_6);
-			case MBR_DRIVE_PATH_7:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.MBR_DRIVE_PATH_7);
-			case MBR_DRIVE_PATH_8_STATE_1:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.MBR_DRIVE_PATH_8_STATE_1);
-			case MBR_DRIVE_PATH_8_STATE_2:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.MBR_DRIVE_PATH_8_STATE_2);
-			case MBR_DRIVE_PATH_9_STATE_1:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.MBR_DRIVE_PATH_9_STATE_1);
-			case MBR_DRIVE_PATH_9_STATE_2:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.MBR_DRIVE_PATH_9_STATE_2);
 			case SHOOTER_STATE_1:
 				isCurrentStateFinished = shooterFSM.updateAutonomous(
 					AutoFSMState.SHOOTER_STATE_1);
