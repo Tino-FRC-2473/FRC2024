@@ -371,9 +371,9 @@ public class DriveFSMSystem {
 				break;
 
 			case ALIGN_TO_SOURCE_STATE:
-				if (rpi.getAprilTagX(VisionConstants.SOURCE_TAG_ID1)
+				if (rpi.getAprilTagXInv(VisionConstants.SOURCE_TAG_ID1)
 					!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
-					lastSeenX = rpi.getAprilTagX(VisionConstants.SOURCE_TAG_ID1);
+					lastSeenX = rpi.getAprilTagXInv(VisionConstants.SOURCE_TAG_ID1);
 					alignToSource(lastSeenX);
 				} else {
 					alignToSource(lastSeenX);
@@ -381,21 +381,21 @@ public class DriveFSMSystem {
 				break;
 
 			case ALIGN_TO_SPEAKER_STATE:
-				if (rpi.getAprilTagZ(VisionConstants.SPEAKER_TAG_ID1)
+				if (rpi.getAprilTagZInv(VisionConstants.SPEAKER_TAG_ID1)
 					!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
-					&& rpi.getAprilTagX(VisionConstants.SPEAKER_TAG_ID1)
+					&& rpi.getAprilTagXInv(VisionConstants.SPEAKER_TAG_ID1)
 					!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
 
-					lastSeenX = rpi.getAprilTagX(VisionConstants.SPEAKER_TAG_ID1);
-					lastSeenZ = rpi.getAprilTagZ(VisionConstants.SPEAKER_TAG_ID1);
+					lastSeenX = rpi.getAprilTagXInv(VisionConstants.SPEAKER_TAG_ID1);
+					lastSeenZ = rpi.getAprilTagZInv(VisionConstants.SPEAKER_TAG_ID1);
 					alignToSpeaker(lastSeenZ, lastSeenX);
-				} else if (rpi.getAprilTagZ(VisionConstants.SPEAKER_TAG_ID2)
+				} else if (rpi.getAprilTagZInv(VisionConstants.SPEAKER_TAG_ID2)
 					!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
-					&& rpi.getAprilTagX(VisionConstants.SPEAKER_TAG_ID2)
+					&& rpi.getAprilTagXInv(VisionConstants.SPEAKER_TAG_ID2)
 					!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
 
-					lastSeenX = rpi.getAprilTagX(VisionConstants.SPEAKER_TAG_ID2);
-					lastSeenZ = rpi.getAprilTagZ(VisionConstants.SPEAKER_TAG_ID2);
+					lastSeenX = rpi.getAprilTagXInv(VisionConstants.SPEAKER_TAG_ID2);
+					lastSeenZ = rpi.getAprilTagZInv(VisionConstants.SPEAKER_TAG_ID2);
 					alignToSpeaker(lastSeenZ, lastSeenX);
 				} else {
 					alignToSpeaker(lastSeenZ, lastSeenX);

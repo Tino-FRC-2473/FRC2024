@@ -48,7 +48,8 @@ public class RaspberryPI {
 
 	/**
 	 * @param id id of the april tag we are fetching data on
-	 * @return X value from the camera to tag in meters
+	 * @return X value from the tag to camera in meters
+	 * This value is used in tag-relative swerve movements
 	 */
 	public double getAprilTagX(int id) {
 		try {
@@ -60,7 +61,8 @@ public class RaspberryPI {
 
 	/**
 	 * @param id id of the april tag we are fetching data on
-	 * @return Y value from the camera to tag in meters
+	 * @return Y value from the tag to camera in meters
+	 * This value is used in tag-relative swerve movements
 	 */
 	public double getAprilTagY(int id) {
 		try {
@@ -72,7 +74,8 @@ public class RaspberryPI {
 
 	/**
 	 * @param id id of the april tag we are fetching data on
-	 * @return Z value from the camera to tag in meters
+	 * @return Z value from the tag to camera in meters
+	 * This value is used in tag-relative swerve movements
 	 */
 	public double getAprilTagZ(int id) {
 		try {
@@ -84,9 +87,10 @@ public class RaspberryPI {
 
 	/**
 	 * @param id id of the april tag we are fetching data on
-	 * @return roll angle from the tag to camera in radians
+	 * @return X value from the camera to tag in meters
+	 * This value is proportional to yaw and is used in robot-relative swerve movements
 	 */
-	public double getAprilTagRoll(int id) {
+	public double getAprilTagXInv(int id) {
 		try {
 			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 2 + 1];
 		} catch (NullPointerException e) {
@@ -96,9 +100,10 @@ public class RaspberryPI {
 
 	/**
 	 * @param id id of the april tag we are fetching data on
-	 * @return yaw angle from the tag to camera in radians
+	 * @return Y value from the camera to tag in meters
+	 * This value is proportional to pitch and is used in robot-relative swerve movements
 	 */
-	public double getAprilTagYaw(int id) {
+	public double getAprilTagYInv(int id) {
 		try {
 			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 2 + 2];
 		} catch (NullPointerException e) {
@@ -108,9 +113,10 @@ public class RaspberryPI {
 
 	/**
 	 * @param id id of the april tag we are fetching data on
-	 * @return pitch angle from the tag to camera in radians
+	 * @return Z value from the camera to tag in meters
+	 * This value is used in robot-relative swerve movements
 	 */
-	public double getAprilTagPitch(int id) {
+	public double getAprilTagZInv(int id) {
 		try {
 			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 2 + 2 + 1];
 		} catch (NullPointerException e) {
