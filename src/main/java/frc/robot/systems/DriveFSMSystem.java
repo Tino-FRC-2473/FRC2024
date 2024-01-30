@@ -42,6 +42,7 @@ public class DriveFSMSystem {
 	private FSMState currentState;
 	private int currentPointInPath;
 	private boolean blueAlliance;
+	private int initialPos;
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -290,91 +291,18 @@ public class DriveFSMSystem {
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				}
 				return driveAlongPath(svrPath5Points);
-			case MBR_DRIVE_PATH_1_STATE_1:
-				ArrayList<Pose2d> mbrPath1Points1 = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					mbrPath1Points1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
-					mbrPath1Points1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-				} else {
-					mbrPath1Points1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
-					mbrPath1Points1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-				}
-				return driveAlongPath(mbrPath1Points1);
-			case MBR_DRIVE_PATH_1_STATE_2:
-				ArrayList<Pose2d> mbrPath1Points2 = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					mbrPath1Points2.add(new Pose2d(-1, AutoConstants.N_1_5,
-						new Rotation2d(Math.toRadians(0))));
-				} else {
-					mbrPath1Points2.add(new Pose2d(-1, -AutoConstants.N_1_5,
-						new Rotation2d(Math.toRadians(0))));
-				}
-				return driveAlongPath(mbrPath1Points2);
-			case MBR_DRIVE_PATH_2_STATE_1:
-				ArrayList<Pose2d> mbrPath2Points1 = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					mbrPath2Points1.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-					mbrPath2Points1.add(new Pose2d(-1, -AutoConstants.N_0_5,
-						new Rotation2d(Math.toRadians(0))));
-					mbrPath2Points1.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-				} else {
-					mbrPath2Points1.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-					mbrPath2Points1.add(new Pose2d(-1, AutoConstants.N_0_5,
-						new Rotation2d(Math.toRadians(0))));
-					mbrPath2Points1.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-				}
-				return driveAlongPath(mbrPath2Points1);
-			case MBR_DRIVE_PATH_2_STATE_2:
-				ArrayList<Pose2d> mbrPath2Points2 = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					mbrPath2Points2.add(new Pose2d(-1, 1,
-						new Rotation2d(Math.toRadians(0))));
-				} else {
-					mbrPath2Points2.add(new Pose2d(-1, -1,
-						new Rotation2d(Math.toRadians(0))));
-				}
-				return driveAlongPath(mbrPath2Points2);
-			case MBR_DRIVE_PATH_3_STATE_1:
-				ArrayList<Pose2d> mbrPath3Points1 = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					mbrPath3Points1.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-					mbrPath3Points1.add(new Pose2d(-1, AutoConstants.N_0_5,
-						new Rotation2d(Math.toRadians(0))));
-					mbrPath3Points1.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-				} else {
-					mbrPath3Points1.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-					mbrPath3Points1.add(new Pose2d(-1, -AutoConstants.N_0_5,
-						new Rotation2d(Math.toRadians(0))));
-					mbrPath3Points1.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-				}
-				return driveAlongPath(mbrPath3Points1);
-			case MBR_DRIVE_PATH_3_STATE_2:
-				ArrayList<Pose2d> mbrPath3Points2 = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					mbrPath3Points2.add(new Pose2d(-1, 1,
-						new Rotation2d(Math.toRadians(0))));
-				} else {
-					mbrPath3Points2.add(new Pose2d(-1, -1,
-						new Rotation2d(Math.toRadians(0))));
-				}
-				return driveAlongPath(mbrPath3Points2);
-			case MBR_DRIVE_PATH_4_STATE_1:
-				ArrayList<Pose2d> mbrPath4Points1 = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					mbrPath4Points1.add(new Pose2d(-1, 1,
-					new Rotation2d(Math.toRadians(0))));
-				} else {
-
-				}
-				return driveAlongPath(mbrPath4Points1)
+			case TURN_LEFT_TO_SPEAKER:
+				ArrayList<Pose2d> mbrLeftTurn = new ArrayList<Pose2d>();
+				mbrLeftTurn.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(
+					AutoConstants.DEG_45))));
+				return driveAlongPath(mbrLeftTurn);
+			case TURN_RIGHT_TO_SPEAKER:
+				ArrayList<Pose2d> mbrRightTurn = new ArrayList<Pose2d>();
+				mbrRightTurn.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(
+					-AutoConstants.DEG_45))));
+				return driveAlongPath(mbrRightTurn);
+			case LEAVE_FOR_FIRST_PICKUP:
+				ArrayList<Pose2d> 
 			case PENDING:
 				timer.start();
 				return pause(AutoConstants.WAIT_TIME);
