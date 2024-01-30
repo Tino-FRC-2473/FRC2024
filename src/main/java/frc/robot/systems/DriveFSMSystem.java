@@ -245,17 +245,32 @@ public class DriveFSMSystem {
 				}
 				return driveAlongPath(leaveSpeaker);
 
-			case TURN_RIGHT_TO_SPEAKER:
-				ArrayList<Pose2d> turnRight = new ArrayList<Pose2d>();
-				turnRight.add(new Pose2d(0, 0,
-							new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-				return driveAlongPath(turnRight);
-
-			case TURN_LEFT_TO_SPEAKER:
-				ArrayList<Pose2d> turnLeft = new ArrayList<Pose2d>();
-				turnLeft.add(new Pose2d(0, 0,
-							new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-				return driveAlongPath(turnLeft);
+			case TURN_TO_SPEAKER:
+				if (blueAlliance) {
+					if (startingPos == 2) {
+						ArrayList<Pose2d> turn = new ArrayList<Pose2d>();
+						turn.add(new Pose2d(0, 0,
+									new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
+						return driveAlongPath(turn);
+					} else if (startingPos == 2) {
+						ArrayList<Pose2d> turn = new ArrayList<Pose2d>();
+						turn.add(new Pose2d(0, 0,
+									new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
+						return driveAlongPath(turn);
+					}
+				} else {
+					if (startingPos == 2) {
+						ArrayList<Pose2d> turn = new ArrayList<Pose2d>();
+						turn.add(new Pose2d(0, 0,
+									new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
+						return driveAlongPath(turn);
+					} else if (startingPos == 2) {
+						ArrayList<Pose2d> turn = new ArrayList<Pose2d>();
+						turn.add(new Pose2d(0, 0,
+									new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
+						return driveAlongPath(turn);
+					}
+				}
 
 			case LEAVE:
 				ArrayList<Pose2d> leave = new ArrayList<Pose2d>();

@@ -9,8 +9,7 @@ public class AutoHandlerSystem {
 	/* ======================== Constants ======================== */
 	// Auto FSM state definitions
 	public enum AutoFSMState {
-		TURN_LEFT_TO_SPEAKER,
-		TURN_RIGHT_TO_SPEAKER,
+		TURN_TO_SPEAKER,
 		LEAVE,
 		PENDING
 	}
@@ -36,20 +35,8 @@ public class AutoHandlerSystem {
 
 	//Predefined auto paths
 	private static final AutoFSMState[] SVR_PATH1 = new AutoFSMState[]{
-		AutoFSMState.SVR_DRIVE_PATH_1};
+		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.LEAVE};
 
-	private static final AutoFSMState[] SVR_PATH2 = new AutoFSMState[]{
-		AutoFSMState.SVR_DRIVE_PATH_2};
-
-	private static final AutoFSMState[] SVR_PATH3 = new AutoFSMState[]{
-		AutoFSMState.SVR_DRIVE_PATH_3};
-
-	private static final AutoFSMState[] SVR_PATH4 = new AutoFSMState[]{
-		AutoFSMState.PENDING, AutoFSMState.SVR_DRIVE_PATH_4_STATE_1,
-		AutoFSMState.SVR_DRIVE_PATH_4_STATE_2};
-
-	private static final AutoFSMState[] SVR_PATH5 = new AutoFSMState[]{
-		AutoFSMState.SVR_DRIVE_PATH_5};
 
 	/* ======================== Constructor ======================== */
 	/**
