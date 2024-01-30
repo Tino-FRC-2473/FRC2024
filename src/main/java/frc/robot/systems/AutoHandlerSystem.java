@@ -58,9 +58,9 @@ public class AutoHandlerSystem {
 	 * @param fsm1 the first subsystem that the auto handler will call functions on
 	 * @param fsm2 the second subsystem that the auto handler will call functions on
 	 */
-	public AutoHandlerSystem(DriveFSMSystem fsm1, KitBotShooterFSM fsm2) {
+	public AutoHandlerSystem(DriveFSMSystem fsm1) {
 		driveSystem = fsm1;
-		shooterFSM = fsm2;
+		//shooterFSM = fsm2;
 	}
 
 	/* ======================== Public methods ======================== */
