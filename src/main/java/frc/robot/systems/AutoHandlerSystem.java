@@ -10,11 +10,17 @@ public class AutoHandlerSystem {
 	// Auto FSM state definitions
 	public enum AutoFSMState {
 		TURN_TO_SPEAKER,
+		LEAVE_SPEAKER,
 		LEAVE,
 		PENDING
 	}
 	public enum AutoPath {
 		PATH1,
+		PATH2,
+		PATH3,
+		PATH4,
+		PATH5,
+		PATH6
 	}
 
 	/* ======================== Private variables ======================== */
@@ -28,8 +34,11 @@ public class AutoHandlerSystem {
 	private DriveFSMSystem driveSystem;
 
 	//Predefined auto paths
-	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
-		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.LEAVE};
+
+	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{
+		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.LEAVE_SPEAKER};
+	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{
+		AutoFSMState.LEAVE};
 
 
 	/* ======================== Constructor ======================== */
@@ -40,7 +49,6 @@ public class AutoHandlerSystem {
 	 */
 	public AutoHandlerSystem(DriveFSMSystem fsm1) {
 		driveSystem = fsm1;
-		//shooterFSM = fsm2;
 	}
 
 	/* ======================== Public methods ======================== */
@@ -66,8 +74,10 @@ public class AutoHandlerSystem {
 		driveSystem.resetAutonomus();
 
 		currentStateIndex = 0;
-		if (path == AutoPath.PATH1) {
-			currentStateList = PATH1;
+		if (path == AutoPath.PATH3) {
+			currentStateList = PATH3;
+		} else if (path == AutoPath.PATH5) {
+			currentStateList = PATH5;
 		}
 	}
 
@@ -85,6 +95,10 @@ public class AutoHandlerSystem {
 			case TURN_TO_SPEAKER:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.TURN_TO_SPEAKER);
+				break;
+			case LEAVE_SPEAKER:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.LEAVE_SPEAKER);
 				break;
 			case LEAVE:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
