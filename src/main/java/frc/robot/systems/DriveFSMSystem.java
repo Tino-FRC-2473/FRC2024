@@ -170,8 +170,15 @@ public class DriveFSMSystem {
 		currentPointInPath = 0;
 		gyro.reset();
 		resetOdometry(new Pose2d());
-		if (AutoPathChooser.getAutoPathChooser() != null) {
+		if (AutoPathChooser.getAllianceChooser() != null) {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
+		} else {
+			blueAlliance = true;
+		}
+		if (AutoPathChooser.getStartPosChooser() != null) {
+			startingPos = AutoPathChooser.getStartingPos();
+		} else {
+			startingPos = 1;
 		}
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -241,36 +248,87 @@ public class DriveFSMSystem {
 							new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_5,
 							new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
+					} else {
+						leaveSpeaker.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				}
 				return driveAlongPath(leaveSpeaker);
 
 			case TURN_TO_SPEAKER:
+				ArrayList<Pose2d> turn = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					if (startingPos == 2) {
-						ArrayList<Pose2d> turn = new ArrayList<Pose2d>();
-						turn.add(new Pose2d(0, 0,
-									new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-						return driveAlongPath(turn);
+					if (startingPos == 1) {
+						turn.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					} else if (startingPos == 2) {
-						ArrayList<Pose2d> turn = new ArrayList<Pose2d>();
 						turn.add(new Pose2d(0, 0,
 									new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-						return driveAlongPath(turn);
+					} else if (startingPos == 3) {
+						turn.add(new Pose2d(0, 0,
+									new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
 					}
 				} else {
 					if (startingPos == 2) {
-						ArrayList<Pose2d> turn = new ArrayList<Pose2d>();
-						turn.add(new Pose2d(0, 0,
-									new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-						return driveAlongPath(turn);
-					} else if (startingPos == 2) {
-						ArrayList<Pose2d> turn = new ArrayList<Pose2d>();
 						turn.add(new Pose2d(0, 0,
 									new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-						return driveAlongPath(turn);
+					} else if (startingPos == 3) {
+						turn.add(new Pose2d(0, 0,
+									new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
+					} else {
+						turn.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				}
+				return driveAlongPath(turn);
+
+			case PICK_UP_1:
+				ArrayList<Pose2d> pickUp1 = new ArrayList<Pose2d>();
+				if (blueAlliance) {
+					if (startingPos == 1) {
+						pickUp1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						pickUp1.add(new Pose2d(-1, -AutoConstants.N_0_5, new Rotation2d(
+							Math.toRadians(0))));
+					} else if (startingPos == 3) {
+						pickUp1.add(new Pose2d(-1, AutoConstants.N_0_5, new Rotation2d(
+							Math.toRadians(0))));
+					}
+				} else {
+					if (startingPos == 1) {
+						pickUp1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						pickUp1.add(new Pose2d(-1, AutoConstants.N_0_5, new Rotation2d(
+							Math.toRadians(0))));
+					} else if (startingPos == 3) {
+						pickUp1.add(new Pose2d(-1, -AutoConstants.N_0_5, new Rotation2d(
+							Math.toRadians(0))));
+					}
+				}
+				return driveAlongPath(pickUp1);
+
+			case DRIVE_TO_SPEAKER_1:
+				ArrayList<Pose2d> toSpeaker1 = new ArrayList<Pose2d>();
+				if (blueAlliance) {
+					if (startingPos == 1) {
+						toSpeaker1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						toSpeaker1.add(new Pose2d(0, 0,
+							new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
+					} else if (startingPos == 3) {
+						toSpeaker1.add(new Pose2d(0, 0,
+							new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
+					}
+				} else {
+					if (startingPos == 1) {
+						toSpeaker1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						toSpeaker1.add(new Pose2d(0, 0,
+							new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
+					} else if (startingPos == 3) {
+						toSpeaker1.add(new Pose2d(0, 0,
+							new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
+					}
+				}
+				return driveAlongPath(toSpeaker1);
+
 
 			case LEAVE:
 				ArrayList<Pose2d> leave = new ArrayList<Pose2d>();

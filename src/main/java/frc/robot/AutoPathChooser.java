@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 public class AutoPathChooser {
 	private static SendableChooser<AutoPath> autoPathChooser;
 	private static SendableChooser<Boolean> allianceChooser;
+	private static SendableChooser<Integer> startingPosChooser;
+
 
 	/**
 	 * Constructor for creating the AutoPathChooser class. It is used in order to select the
@@ -26,6 +28,12 @@ public class AutoPathChooser {
 		allianceChooser.setDefaultOption("Blue", true);
 		allianceChooser.addOption("Red", false);
 		SmartDashboard.putData("Alliance", allianceChooser);
+
+		startingPosChooser = new SendableChooser<>();
+		startingPosChooser.setDefaultOption("Center", 1);
+		startingPosChooser.addOption("Left", 2);
+		startingPosChooser.addOption("Right", 3);
+		SmartDashboard.putData("Starting Position", startingPosChooser);
 	}
 
 	/**
@@ -46,6 +54,14 @@ public class AutoPathChooser {
 	}
 
 	/**
+	 * Returns the sendable chooser object containing information on the selected starting position.
+	 * @return the sendable chooser for the alliance. SendableChooser contains Boolean.
+	 */
+	public static SendableChooser<Integer> getStartPosChooser() {
+		return startingPosChooser;
+	}
+
+	/**
 	 * Returs the selected auto path.
 	 * @return FSMState object which has the selected auto path.
 	 */
@@ -59,5 +75,13 @@ public class AutoPathChooser {
 	 */
 	public static boolean getSelectedAlliance() {
 		return allianceChooser.getSelected();
+	}
+
+	/**
+	 * Returns the selected starting position.
+	 * @return boolean for the selected node. true for blue, false for red.
+	 */
+	public static int getStartingPos() {
+		return startingPosChooser.getSelected();
 	}
 }

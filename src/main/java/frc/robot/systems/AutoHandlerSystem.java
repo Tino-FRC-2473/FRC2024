@@ -11,9 +11,18 @@ public class AutoHandlerSystem {
 	public enum AutoFSMState {
 		TURN_TO_SPEAKER,
 		LEAVE_SPEAKER,
+		PICK_UP_1,
+		DRIVE_TO_SPEAKER_1,
+		PICK_UP_2,
+		DRIVE_TO_SPEAKER_2,
+		PICK_UP_3,
+		DRIVE_TO_SPEAKER_3,
+		PICK_UP_4,
+		DRIVE_TO_SPEAKER_4,
 		LEAVE,
 		PENDING
 	}
+
 	public enum AutoPath {
 		PATH1,
 		PATH2,
@@ -34,7 +43,10 @@ public class AutoHandlerSystem {
 	private DriveFSMSystem driveSystem;
 
 	//Predefined auto paths
-
+	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
+		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.PICK_UP_1, AutoFSMState.DRIVE_TO_SPEAKER_1,
+		AutoFSMState.PICK_UP_2, AutoFSMState.DRIVE_TO_SPEAKER_2, AutoFSMState.PICK_UP_3,
+		AutoFSMState.DRIVE_TO_SPEAKER_3, AutoFSMState.PICK_UP_4, AutoFSMState.DRIVE_TO_SPEAKER_4};
 	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{
 		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.LEAVE_SPEAKER};
 	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{
