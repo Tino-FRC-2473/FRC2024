@@ -9,25 +9,18 @@ public class AutoHandlerSystem {
 	/* ======================== Constants ======================== */
 	// Auto FSM state definitions
 	public enum AutoFSMState {
-		SVR_DRIVE_PATH_1,
-		SVR_DRIVE_PATH_2,
-		SVR_DRIVE_PATH_3,
-		SVR_DRIVE_PATH_4_STATE_1,
-		SVR_DRIVE_PATH_4_STATE_2,
-		SVR_DRIVE_PATH_5,
 		TURN_LEFT_TO_SPEAKER,
 		TURN_RIGHT_TO_SPEAKER,
-		SHOOTER_STATE_1,
-		SHOOTER_STATE_2,
-		SHOOTER_STATE_3,
+		LEAVE,
 		PENDING
 	}
 	public enum AutoPath {
-		SVR_PATH1,
-		SVR_PATH2,
-		SVR_PATH3,
-		SVR_PATH4,
-		SVR_PATH5
+		PATH1,
+		PATH2,
+		PATH3,
+		PATH4,
+		PATH5,
+		PATH_6
 	}
 
 	/* ======================== Private variables ======================== */

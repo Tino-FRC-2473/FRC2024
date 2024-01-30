@@ -42,6 +42,7 @@ public class DriveFSMSystem {
 	private FSMState currentState;
 	private int currentPointInPath;
 	private boolean blueAlliance;
+	private int startingPos;
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -201,129 +202,76 @@ public class DriveFSMSystem {
 		GD Dir: (FRC > 23-24 > 24 Season > Autonomous > Autonomous Path Planning)
 		*/
 		switch (autoState) {
-			case SVR_DRIVE_PATH_1:
-				ArrayList<Pose2d> svrPath1Points = new ArrayList<Pose2d>();
+			case LEAVE_SPEAKER:
+				ArrayList<Pose2d> leaveSpeaker = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					svrPath1Points.add(new Pose2d(-1, AutoConstants.N_3,
-						new Rotation2d(Math.toRadians(0))));
-					svrPath1Points.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_5,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					svrPath1Points.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
+					if (startingPos == 1) { // center
+						leaveSpeaker.add(new Pose2d(-1, AutoConstants.N_3,
+							new Rotation2d(Math.toRadians(0))));
+						leaveSpeaker.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_5,
+							new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+						leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
+							new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
+					} else if (startingPos == 2) { // left speaker
+						leaveSpeaker.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_4,
+							new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+						leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_4,
+							new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
+					} else if (startingPos == 3) {
+						leaveSpeaker.add(new Pose2d(-AutoConstants.N_5, 0,
+							new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
+						leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
+							new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
+					}
 				} else {
-					svrPath1Points.add(new Pose2d(-1, -AutoConstants.N_3,
-						new Rotation2d(Math.toRadians(0))));
-					svrPath1Points.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_5,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					svrPath1Points.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_5,
+					if (startingPos == 1) {
+						leaveSpeaker.add(new Pose2d(-1, -AutoConstants.N_3,
+							new Rotation2d(Math.toRadians(0))));
+						leaveSpeaker.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_5,
+							new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
+						leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_5,
+							new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
+					} else if (startingPos == 2) { // left speaker
+						leaveSpeaker.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_4,
+							new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
+						leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_4,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
+					} else if (startingPos == 3) { // right speaker
+						leaveSpeaker.add(new Pose2d(-AutoConstants.N_5, 0,
+							new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+						leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_5,
+							new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
+					}
 				}
-				return driveAlongPath(svrPath1Points);
-			case SVR_DRIVE_PATH_2:
-				ArrayList<Pose2d> svrPath2Points = new ArrayList<Pose2d>();
+				return driveAlongPath(leaveSpeaker);
+
+			case TURN_RIGHT_TO_SPEAKER:
+				ArrayList<Pose2d> turnRight = new ArrayList<Pose2d>();
+				turnRight.add(new Pose2d(0, 0,
+							new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
+				return driveAlongPath(turnRight);
+
+			case TURN_LEFT_TO_SPEAKER:
+				ArrayList<Pose2d> turnLeft = new ArrayList<Pose2d>();
+				turnLeft.add(new Pose2d(0, 0,
+							new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
+				return driveAlongPath(turnLeft);
+
+			case LEAVE:
+				ArrayList<Pose2d> leave = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					svrPath2Points.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-					svrPath2Points.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_4,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					svrPath2Points.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_4,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
-				} else {
-					svrPath2Points.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-					svrPath2Points.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_4,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					svrPath2Points.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_4,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
-				}
-				return driveAlongPath(svrPath2Points);
-			case SVR_DRIVE_PATH_3:
-				ArrayList<Pose2d> svrPath3Points = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					svrPath3Points.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-					svrPath3Points.add(new Pose2d(-AutoConstants.N_5, 0,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					svrPath3Points.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
-				} else {
-					svrPath3Points.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-					svrPath3Points.add(new Pose2d(-AutoConstants.N_5, 0,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					svrPath3Points.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_5,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
-				}
-				return driveAlongPath(svrPath3Points);
-			case SVR_DRIVE_PATH_4_STATE_1:
-				ArrayList<Pose2d> svrPath4Points1 = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					svrPath4Points1.add(new Pose2d(0, -AutoConstants.N_2,
-						new Rotation2d(Math.toRadians(0))));
-				} else {
-					svrPath4Points1.add(new Pose2d(0, 2, new Rotation2d(Math.toRadians(0))));
-				}
-				return driveAlongPath(svrPath4Points1);
-			case SVR_DRIVE_PATH_4_STATE_2:
-				ArrayList<Pose2d> svrPath4Points2 = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					svrPath4Points2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
-					svrPath4Points2.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_3,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					svrPath4Points2.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_3,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
-				} else {
-					svrPath4Points2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
-					svrPath4Points2.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_5,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					svrPath4Points2.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_3,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
-				}
-				return driveAlongPath(svrPath4Points2);
-			case SVR_DRIVE_PATH_5:
-				ArrayList<Pose2d> svrPath5Points = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					svrPath5Points.add(new Pose2d(-AutoConstants.N_6, 0,
+					leave.add(new Pose2d(-AutoConstants.N_6, 0,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				} else {
-					svrPath5Points.add(new Pose2d(-AutoConstants.N_6, 0,
+					leave.add(new Pose2d(-AutoConstants.N_6, 0,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				}
-				return driveAlongPath(svrPath5Points);
-			case MBR_DRIVE_PATH_1_STATE_1:
-				ArrayList<Pose2d> mbrPath1Points1 = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					mbrPath1Points1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
-					mbrPath1Points1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-				} else {
-					mbrPath1Points1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
-					mbrPath1Points1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-				}
-				return driveAlongPath(mbrPath1Points1);
-			case MBR_DRIVE_PATH_1_STATE_2:
-				ArrayList<Pose2d> mbrPath1Points2 = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					mbrPath1Points2.add(new Pose2d(-1, AutoConstants.N_1_5,
-						new Rotation2d(Math.toRadians(0))));
-				} else {
-					mbrPath1Points2.add(new Pose2d(-1, -AutoConstants.N_1_5,
-						new Rotation2d(Math.toRadians(0))));
-				}
-				return driveAlongPath(mbrPath1Points2);
-			case MBR_DRIVE_PATH_2_STATE_1:
-				ArrayList<Pose2d> mbrPath2Points1 = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					mbrPath2Points1.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-					mbrPath2Points1.add(new Pose2d(-1, -0.5, new Rotation2d(Math.toRadians(0))));
-				} else {
-					mbrPath2Points1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
-					mbrPath2Points1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-				}
-				return driveAlongPath(mbrPath2Points1);
+				return driveAlongPath(leave);
+
 			case PENDING:
 				timer.start();
 				return pause(AutoConstants.WAIT_TIME);
+
 			default:
 				return false;
 		}
@@ -370,13 +318,15 @@ public class DriveFSMSystem {
 		switch (currentState) {
 			case TELEOP_STATE:
 				drive(-MathUtil.applyDeadband((input.getControllerLeftJoystickY()
-					* Math.abs(input.getControllerLeftJoystickY())),
-					OIConstants.DRIVE_DEADBAND),
+					* Math.abs(input.getControllerLeftJoystickY()) * ((input.getLeftTrigger() / 2)
+					+ DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT) / 2), OIConstants.DRIVE_DEADBAND),
 					-MathUtil.applyDeadband((input.getControllerLeftJoystickX()
-					* Math.abs(input.getControllerLeftJoystickX())),
-					OIConstants.DRIVE_DEADBAND),
-					-MathUtil.applyDeadband(input.getControllerRightJoystickX(),
-					OIConstants.DRIVE_DEADBAND), true, true);
+					* Math.abs(input.getControllerLeftJoystickX()) * ((input.getLeftTrigger() / 2)
+					+ DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT) / 2), OIConstants.DRIVE_DEADBAND),
+					-MathUtil.applyDeadband((input.getControllerRightJoystickX()
+					* ((input.getLeftTrigger() / 2) + DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT)
+					/ DriveConstants.ANGULAR_SPEED_LIMIT_CONSTANT), OIConstants.DRIVE_DEADBAND),
+					true, true);
 				if (input.isBackButtonPressed()) {
 					gyro.reset();
 					resetOdometry(new Pose2d(new Translation2d(getPose().getX(), getPose().getY()),
@@ -503,8 +453,8 @@ public class DriveFSMSystem {
 	 * @return if the robot has driven to the current position
 	 */
 	public boolean driveToPose(Pose2d pose) {
-		double x = pose.getX();
-		double y = pose.getY();
+		double x = pose.getX() / 2; //remove /2 after testing
+		double y = pose.getY() / 2;
 		double angle = pose.getRotation().getDegrees();
 
 		double xDiff = x - getPose().getX();
