@@ -675,6 +675,41 @@ public class DriveFSMSystem {
 		}
 	}
 
+	public boolean driveToTag(int id) {
+
+		double xDiff = rpi.getAprilTagX(id);
+		double yDiff = rpi.getAprilTagZ(id) - 0.5;
+		double aDiff = rpi.getAprilTagXInv(id);
+
+		SmartDashboard.putNumber("x diff", xDiff);
+		SmartDashboard.putNumber("y diff", yDiff);
+		SmartDashboard.putNumber("a diff", aDiff);
+
+		double xSpeed = clamp(xDiff
+			/ 5,
+			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
+			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
+		double ySpeed = clamp(yDiff
+			/ 5,
+			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
+			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
+		double aSpeed = clamp(aDiff / 6,
+			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
+
+		xSpeed = Math.abs(xDiff) > 0.05
+			? xSpeed : 0;
+		ySpeed = Math.abs(yDiff) > 0.05
+			? ySpeed : 0;
+		aSpeed = Math.abs(aDiff) > 0.02
+			? aSpeed : 0;
+
+		drive(xSpeed, ySpeed, aSpeed, true, false);
+		if (xSpeed == 0 && ySpeed == 0 && aSpeed == 0) {
+			return true;
+		}
+		return false;
+	}
 	/**
 	 * Drives the robot until it reaches a given object.
 	 * @param seconds seconds to wait
