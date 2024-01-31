@@ -189,7 +189,7 @@ public class DriveFSMSystem {
 	 * @param autoState autoState that the subsystem executes.
 	 * @return if the action carried out in this state has finished executing
 	 */
-	public boolean updateAutonomous(AutoFSMState autoState) {
+	public boolean updateAutonomous(AutoFSMState autoState){
 		odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()),
 			new SwerveModulePosition[] {
 				frontLeft.getPosition(),
@@ -212,38 +212,38 @@ public class DriveFSMSystem {
 			case LEAVE_SPEAKER:
 				ArrayList<Pose2d> leaveSpeaker = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					if (startingPos == 1) { // center
+					if (startingPos == 0) { // center
 						leaveSpeaker.add(new Pose2d(-1, AutoConstants.N_3,
 							new Rotation2d(Math.toRadians(0))));
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_5,
 							new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
 							new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
-					} else if (startingPos == 2) { // left speaker
+					} else if (startingPos == 1) { // left speaker
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_4,
 							new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_4,
 							new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
-					} else if (startingPos == 3) {
+					} else if (startingPos == 2) {
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_5, 0,
 							new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
 							new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 					}
 				} else {
-					if (startingPos == 1) {
+					if (startingPos == 0) {
 						leaveSpeaker.add(new Pose2d(-1, -AutoConstants.N_3,
 							new Rotation2d(Math.toRadians(0))));
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_5,
 							new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_5,
 							new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
-					} else if (startingPos == 2) { // left speaker
+					} else if (startingPos == 1) { // left speaker
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_4,
 							new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_4,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
-					} else if (startingPos == 3) { // right speaker
+					} else if (startingPos == 2) { // right speaker
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_5, 0,
 							new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_5,
@@ -253,83 +253,208 @@ public class DriveFSMSystem {
 					}
 				}
 				return driveAlongPath(leaveSpeaker);
-
 			case TURN_TO_SPEAKER:
 				ArrayList<Pose2d> turn = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					if (startingPos == 1) {
+					if (startingPos == 0) {
 						turn.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					} else if (startingPos == 2) {
+					} else if (startingPos == 1) {
 						turn.add(new Pose2d(0, 0,
 									new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-					} else if (startingPos == 3) {
+					} else if (startingPos == 2) {
 						turn.add(new Pose2d(0, 0,
 									new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
 					}
 				} else {
-					if (startingPos == 2) {
-						turn.add(new Pose2d(0, 0,
-									new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-					} else if (startingPos == 3) {
-						turn.add(new Pose2d(0, 0,
-									new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-					} else {
+					if (startingPos == 0) {
 						turn.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						turn.add(new Pose2d(0, 0,
+							new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
+					} else if (startingPos == 2) {
+						turn.add(new Pose2d(0, 0,
+							new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
 					}
 				}
 				return driveAlongPath(turn);
-
 			case PICK_UP_1:
 				ArrayList<Pose2d> pickUp1 = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					if (startingPos == 1) {
+					if (startingPos == 0) {
 						pickUp1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
-					} else if (startingPos == 2) {
+					} else if (startingPos == 1) {
 						pickUp1.add(new Pose2d(-1, -AutoConstants.N_0_5, new Rotation2d(
 							Math.toRadians(0))));
-					} else if (startingPos == 3) {
+					} else if (startingPos == 2) {
 						pickUp1.add(new Pose2d(-1, AutoConstants.N_0_5, new Rotation2d(
 							Math.toRadians(0))));
 					}
 				} else {
-					if (startingPos == 1) {
+					if (startingPos == 0) {
 						pickUp1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
-					} else if (startingPos == 2) {
+					} else if (startingPos == 1) {
 						pickUp1.add(new Pose2d(-1, AutoConstants.N_0_5, new Rotation2d(
 							Math.toRadians(0))));
-					} else if (startingPos == 3) {
+					} else if (startingPos == 2) {
 						pickUp1.add(new Pose2d(-1, -AutoConstants.N_0_5, new Rotation2d(
 							Math.toRadians(0))));
 					}
 				}
 				return driveAlongPath(pickUp1);
-
 			case DRIVE_TO_SPEAKER_1:
 				ArrayList<Pose2d> toSpeaker1 = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					if (startingPos == 1) {
+					if (startingPos == 0) {
 						toSpeaker1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						toSpeaker1.add(new Pose2d(0, 1, new Rotation2d(Math.toRadians(0))));
 					} else if (startingPos == 2) {
-						toSpeaker1.add(new Pose2d(0, 0,
-							new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-					} else if (startingPos == 3) {
-						toSpeaker1.add(new Pose2d(0, 0,
-							new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
+						toSpeaker1.add(new Pose2d(0, -1, new Rotation2d(Math.toRadians(0))));
 					}
 				} else {
-					if (startingPos == 1) {
+					if (startingPos == 0) {
 						toSpeaker1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						toSpeaker1.add(new Pose2d(0, -1, new Rotation2d(Math.toRadians(0))));
 					} else if (startingPos == 2) {
-						toSpeaker1.add(new Pose2d(0, 0,
-							new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-					} else if (startingPos == 3) {
-						toSpeaker1.add(new Pose2d(0, 0,
-							new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
+						toSpeaker1.add(new Pose2d(0, 1, new Rotation2d(Math.toRadians(0))));
 					}
 				}
 				return driveAlongPath(toSpeaker1);
-
-
+			case PICK_UP_2:
+				ArrayList<Pose2d> pickUp2 = new ArrayList<Pose2d>();
+				if (blueAlliance) {
+					if (startingPos == 0) {
+						pickUp2.add(new Pose2d(-1, AutoConstants.N_1_5,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						pickUp2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						pickUp2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
+					}
+				} else {
+					if (startingPos == 0) {
+						pickUp2.add(new Pose2d(-1, -AutoConstants.N_1_5,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						pickUp2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						pickUp2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
+					}
+				}
+				return driveAlongPath(pickUp2);
+			case DRIVE_TO_SPEAKER_2:
+				ArrayList<Pose2d> toSpeaker2 = new ArrayList<Pose2d>();
+				if (blueAlliance) {
+					if (startingPos == 0) {
+						toSpeaker2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						toSpeaker2.add(new Pose2d(0, 1, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						toSpeaker2.add(new Pose2d(0, -1, new Rotation2d(Math.toRadians(0))));
+					}
+				} else {
+					if (startingPos == 0) {
+						toSpeaker2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						toSpeaker2.add(new Pose2d(0, -1, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						toSpeaker2.add(new Pose2d(0, 1, new Rotation2d(Math.toRadians(0))));
+					}
+				}
+				return driveAlongPath(toSpeaker2);
+			case PICK_UP_3:
+				ArrayList<Pose2d> pickUp3 = new ArrayList<Pose2d>();
+				if (blueAlliance) {
+					if (startingPos == 0) {
+						pickUp3.add(new Pose2d(-1, -AutoConstants.N_1_5,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						pickUp3.add(new Pose2d(-1, AutoConstants.N_2_5,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						pickUp3.add(new Pose2d(-1, -AutoConstants.N_2_5,
+							new Rotation2d(Math.toRadians(0))));
+					}
+				} else {
+					if (startingPos == 0) {
+						pickUp3.add(new Pose2d(-1, AutoConstants.N_1_5,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						pickUp3.add(new Pose2d(-1, -AutoConstants.N_2_5,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						pickUp3.add(new Pose2d(-1, AutoConstants.N_2_5,
+							new Rotation2d(Math.toRadians(0))));
+					}
+				}
+				return driveAlongPath(pickUp3);
+			case DRIVE_TO_SPEAKER_3:
+				ArrayList<Pose2d> toSpeaker3 = new ArrayList<Pose2d>();
+				if (blueAlliance) {
+					if (startingPos == 0) {
+						toSpeaker3.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						toSpeaker3.add(new Pose2d(0, 1, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						toSpeaker3.add(new Pose2d(0, -1, new Rotation2d(Math.toRadians(0))));
+					}
+				} else {
+					if (startingPos == 0) {
+						toSpeaker3.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						toSpeaker3.add(new Pose2d(0, -1, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						toSpeaker3.add(new Pose2d(0, 1, new Rotation2d(Math.toRadians(0))));
+					}
+				}
+				return driveAlongPath(toSpeaker3);
+			case PICK_UP_4:
+				ArrayList<Pose2d> pickUp4 = new ArrayList<Pose2d>();
+				if (blueAlliance) {
+					if (startingPos == 0) {
+						pickUp4.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_2,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						pickUp4.add(new Pose2d(-AutoConstants.N_6, -1,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						pickUp4.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_3,
+							new Rotation2d(Math.toRadians(0))));
+					}
+				} else {
+					if (startingPos == 0) {
+						pickUp4.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_2,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						pickUp4.add(new Pose2d(-AutoConstants.N_6, 1,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						pickUp4.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_3,
+							new Rotation2d(Math.toRadians(0))));
+					}
+				}
+				return driveAlongPath(pickUp4);
+			case DRIVE_TO_SPEAKER_4:
+				ArrayList<Pose2d> toSpeaker4 = new ArrayList<Pose2d>();
+				if (blueAlliance) {
+					if (startingPos == 0) {
+						toSpeaker4.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						toSpeaker4.add(new Pose2d(0, 1, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						toSpeaker4.add(new Pose2d(0, -1, new Rotation2d(Math.toRadians(0))));
+					}
+				} else {
+					if (startingPos == 0) {
+						toSpeaker4.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						toSpeaker4.add(new Pose2d(0, -1, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						toSpeaker4.add(new Pose2d(0, 1, new Rotation2d(Math.toRadians(0))));
+					}
+				}
+				return driveAlongPath(toSpeaker4);
 			case LEAVE:
 				ArrayList<Pose2d> leave = new ArrayList<Pose2d>();
 				if (blueAlliance) {
@@ -340,11 +465,9 @@ public class DriveFSMSystem {
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				}
 				return driveAlongPath(leave);
-
 			case PENDING:
 				timer.start();
 				return pause(AutoConstants.WAIT_TIME);
-
 			default:
 				return false;
 		}

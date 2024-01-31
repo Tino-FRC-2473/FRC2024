@@ -47,8 +47,14 @@ public class AutoHandlerSystem {
 		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.PICK_UP_1, AutoFSMState.DRIVE_TO_SPEAKER_1,
 		AutoFSMState.PICK_UP_2, AutoFSMState.DRIVE_TO_SPEAKER_2, AutoFSMState.PICK_UP_3,
 		AutoFSMState.DRIVE_TO_SPEAKER_3, AutoFSMState.PICK_UP_4, AutoFSMState.DRIVE_TO_SPEAKER_4};
+	private static final AutoFSMState[] PATH2 = new AutoFSMState[]{
+		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.PICK_UP_1, AutoFSMState.DRIVE_TO_SPEAKER_1,
+		AutoFSMState.PICK_UP_2, AutoFSMState.DRIVE_TO_SPEAKER_2, AutoFSMState.PICK_UP_3,
+		AutoFSMState.DRIVE_TO_SPEAKER_3, AutoFSMState.PICK_UP_4, AutoFSMState.DRIVE_TO_SPEAKER_4};
 	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{
-		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.LEAVE_SPEAKER};
+		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.PICK_UP_1, AutoFSMState.DRIVE_TO_SPEAKER_1,
+		AutoFSMState.PICK_UP_2, AutoFSMState.DRIVE_TO_SPEAKER_2, AutoFSMState.PICK_UP_3,
+		AutoFSMState.DRIVE_TO_SPEAKER_3, AutoFSMState.PICK_UP_4, AutoFSMState.DRIVE_TO_SPEAKER_4};
 	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{
 		AutoFSMState.LEAVE};
 
@@ -82,7 +88,6 @@ public class AutoHandlerSystem {
 	 * @param path the auto path to be executed
 	 */
 	public void reset(AutoPath path) {
-
 		driveSystem.resetAutonomus();
 
 		currentStateIndex = 0;
@@ -100,7 +105,6 @@ public class AutoHandlerSystem {
 		if (currentStateIndex >= currentStateList.length) {
 			return;
 		}
-
 		boolean isCurrentStateFinished;
 		SmartDashboard.putString("In Auto State: ", "" + getCurrentState());
 		switch (getCurrentState()) {
@@ -111,6 +115,38 @@ public class AutoHandlerSystem {
 			case LEAVE_SPEAKER:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.LEAVE_SPEAKER);
+				break;
+			case PICK_UP_1:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.PICK_UP_1);
+				break;
+			case DRIVE_TO_SPEAKER_1:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.DRIVE_TO_SPEAKER_1);
+				break;
+			case PICK_UP_2:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.PICK_UP_1);
+				break;
+			case DRIVE_TO_SPEAKER_2:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.DRIVE_TO_SPEAKER_1);
+				break;
+			case PICK_UP_3:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.PICK_UP_1);
+				break;
+			case DRIVE_TO_SPEAKER_3:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.DRIVE_TO_SPEAKER_1);
+				break;
+			case PICK_UP_4:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.PICK_UP_1);
+				break;
+			case DRIVE_TO_SPEAKER_4:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.DRIVE_TO_SPEAKER_1);
 				break;
 			case LEAVE:
 				isCurrentStateFinished = driveSystem.updateAutonomous(

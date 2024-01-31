@@ -30,9 +30,9 @@ public class AutoPathChooser {
 		SmartDashboard.putData("Alliance", allianceChooser);
 
 		startingPosChooser = new SendableChooser<>();
-		startingPosChooser.setDefaultOption("Center", 1);
-		startingPosChooser.addOption("Left", 2);
-		startingPosChooser.addOption("Right", 3);
+		startingPosChooser.setDefaultOption("Center", 0);
+		startingPosChooser.addOption("Left", 1);
+		startingPosChooser.addOption("Right", 2);
 		SmartDashboard.putData("Starting Position", startingPosChooser);
 	}
 
