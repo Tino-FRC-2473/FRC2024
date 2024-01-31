@@ -1,18 +1,18 @@
-#import cv2
+import cv2
 import numpy as np
 from detector import Detector
 from vision_input import VisionInput
 import time
-import ntcore
+# import ntcore
 
-inst = ntcore.NetworkTableInstance.getDefault()
-inst.startClient4("python")
-inst.setServerTeam(2473)
+# inst = ntcore.NetworkTableInstance.getDefault()
+# inst.startClient4("python")
+# inst.setServerTeam(2473)
 
 FOV = (50.28, 29.16)
 RES = (320, 240)
-CAM_HEIGHT = 0.4
-CAM_ANGLE = -15
+CAM_HEIGHT = 0.762
+CAM_ANGLE = -45
 d = Detector()
 input = VisionInput(FOV, RES, CAM_HEIGHT, CAM_ANGLE)
 curr = 0
@@ -35,6 +35,7 @@ while True:
     results = d.detectGameElement(np.asarray(frame), ["RING"])
 
     for type, target in results.items():
+        
         if target is not None:
             yaw = target.get_yaw_degrees()
             distance = target.get_distance_meters()

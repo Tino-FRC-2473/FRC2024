@@ -33,6 +33,7 @@ class Target:
         B = center_tag - center_cam
         A = center_cam
         theta = math.atan(B * math.tan(math.radians(Target.FOV[0] / 2)) / A)
+        print(math.degrees(theta))
         return math.degrees(theta)
 
     def get_pitch_degrees(self):
