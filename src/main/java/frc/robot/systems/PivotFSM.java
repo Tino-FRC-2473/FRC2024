@@ -31,9 +31,9 @@ public class PivotFSM {
 		ZEROING
 	}
 
-	private static final float MANUAL_POWER = 0.5f;
-	private static final double MIN_TURN_SPEED = -1.0;
-	private static final double MAX_TURN_SPEED = 1.0;
+	private static final float MANUAL_POWER = 0.25f;
+	private static final double MIN_TURN_SPEED = -5.0;
+	private static final double MAX_TURN_SPEED = 5.0;
 
 	private static final double MAX_VELOCITY = 5;
 	private static final double MAX_ACCEL = 10;
@@ -153,9 +153,8 @@ public class PivotFSM {
 	 */
 	public void update(TeleopInput input) {
 
-		if (input == null) {
-			return;
-		}
+		currentTime = Timer.getFPGATimestamp();
+		lastSpeed = pidPivotController.getSetpoint().velocity;
 
 		if (lastLimitSwitch.isPressed()) {
 			lastLimitHit = true;
@@ -163,6 +162,10 @@ public class PivotFSM {
 
 		if (currentState != PivotFSMState.IDLE_STOP) {
 			currentEncoder = pivotMotor.getEncoder().getPosition();
+		}
+
+		if (input == null) {
+			return;
 		}
 
 		SmartDashboard.putString("Current State", currentState.toString());
@@ -180,6 +183,7 @@ public class PivotFSM {
 		SmartDashboard.putNumber(" velocity dif ",
 			pidPivotController.getSetpoint().velocity - lastSpeed);
 		SmartDashboard.putNumber("time diff", currentTime - lastLoopTime);
+		SmartDashboard.putNumber("voltage", pivotMotor.getAppliedOutput());
 
 		switch (currentState) {
 			case IDLE_STOP:
@@ -218,8 +222,8 @@ public class PivotFSM {
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 
+		lastLoopTime = currentTime;
 		currentState = nextState(input);
-		currentTime = Timer.getFPGATimestamp();
 	}
 
 	/**
@@ -294,7 +298,7 @@ public class PivotFSM {
 				if (currentEncoder > MIN_ENCODER_ROTATIONS
 					&& input.getLeftJoystickY() < -JOYSTICK_DEAD_ZONE) {
 					return PivotFSMState.MANUAL_IN;
-				} else if (input.getLeftJoystickY() == 0 && input.getRightJoystickX() == 0) {
+				} else if (input.getLeftJoystickY() == 0) {
 					return PivotFSMState.IDLE_STOP;
 				}
 
@@ -398,6 +402,7 @@ public class PivotFSM {
 		if (lastLimitHit && !zeroed) {
 			zeroed = true;
 			currentEncoder = 0;
+			pivotMotor.getEncoder().setPosition(0);
 		}
 	}
 
@@ -473,7 +478,7 @@ public class PivotFSM {
  * @return Maximum and Minimum power the motor is allowed to run at
  */
 	public double clamp(double power) {
-		return Math.min(MAX_TURN_SPEED, Math.min(MIN_TURN_SPEED, power));
+		return Math.min(MAX_TURN_SPEED, Math.max(MIN_TURN_SPEED, power));
 	}
 
 	/**
@@ -486,14 +491,8 @@ public class PivotFSM {
 		acceleration = (pidPivotController.getSetpoint().velocity
 			- lastSpeed) / (currentTime - lastLoopTime);
 
-		pivotMotor.setVoltage((pidVal
+		pivotMotor.setVoltage(clamp((pidVal
 			+ pivotFeedforward.calculate(pidPivotController.getSetpoint().velocity,
-			acceleration)));
-
-		lastSpeed = pidPivotController.getSetpoint().velocity;
-
-		if (currentTime != 0) {
-			lastLoopTime = currentTime;
-		}
+			acceleration))));
 	}
 }
