@@ -23,9 +23,7 @@ TAG_LENGTH_METERS = 0.165
 while True:
     frame = input.getFrame()
     annotated_frame = frame.copy()
-    m = time.time()
     tagData = tag_module.estimate_3d_pose(frame, annotated_frame, TAG_LENGTH_METERS)
-    print('Apriltag pipeline runtime: ' + str((time.time() - m)))
 
     pose_list = [4000 for _ in range(16 * 6)]
     for key, value in tagData.items():
@@ -35,7 +33,4 @@ while True:
     key = cv2.waitKey(1) & 0xFF
     if key == ord('q'):
         break
-    
-   #time.sleep(0.02)
-
 
