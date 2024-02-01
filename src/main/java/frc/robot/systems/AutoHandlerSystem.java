@@ -28,7 +28,7 @@ public class AutoHandlerSystem {
 		PATH1, // score and leave
 		PATH2, // score multiple times
 		PATH3, // just leave
-		PATH4, // just shoot
+		PATH4, // just score
 		PATH5 // nothing
 	}
 
@@ -46,17 +46,20 @@ public class AutoHandlerSystem {
 	//Predefined auto paths
 
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
-		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.LEAVE_SPEAKER};
+		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.SHOOT_SPEAKER, AutoFSMState.LEAVE_SPEAKER};
 
 	private static final AutoFSMState[] PATH2 = new AutoFSMState[]{
-		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.PICK_UP_1, AutoFSMState.DRIVE_TO_SPEAKER_1,
-		AutoFSMState.PICK_UP_2, AutoFSMState.DRIVE_TO_SPEAKER_2, AutoFSMState.PICK_UP_3,
-		AutoFSMState.DRIVE_TO_SPEAKER_3, AutoFSMState.PICK_UP_4, AutoFSMState.DRIVE_TO_SPEAKER_4};
+		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.SHOOT_SPEAKER, AutoFSMState.PICK_UP_1,
+		AutoFSMState.DRIVE_TO_SPEAKER_1, AutoFSMState.SHOOT_SPEAKER, AutoFSMState.PICK_UP_2,
+		AutoFSMState.DRIVE_TO_SPEAKER_2, AutoFSMState.SHOOT_SPEAKER, AutoFSMState.PICK_UP_3,
+		AutoFSMState.DRIVE_TO_SPEAKER_3, AutoFSMState.SHOOT_SPEAKER, AutoFSMState.PICK_UP_4,
+		AutoFSMState.DRIVE_TO_SPEAKER_4, AutoFSMState.SHOOT_SPEAKER};
 
 	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{
 		AutoFSMState.LEAVE};
 
-	private static final AutoFSMState[] PATH4 = new AutoFSMState[]{};
+	private static final AutoFSMState[] PATH4 = new AutoFSMState[]{
+		AutoFSMState.SHOOT_SPEAKER};
 
 	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{};
 

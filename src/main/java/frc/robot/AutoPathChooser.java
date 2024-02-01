@@ -20,7 +20,7 @@ public class AutoPathChooser {
 		autoPathChooser.setDefaultOption("Score and Leave", AutoPath.PATH1);
 		autoPathChooser.addOption("MBR ONLY: Score Multiple Times", AutoPath.PATH2);
 		autoPathChooser.addOption("Leave Only", AutoPath.PATH3);
-		autoPathChooser.addOption("Shoot Only", AutoPath.PATH4);
+		autoPathChooser.addOption("Score Only", AutoPath.PATH4);
 		autoPathChooser.addOption("Nothing", AutoPath.PATH5);
 		SmartDashboard.putData("Auto Path", autoPathChooser);
 
