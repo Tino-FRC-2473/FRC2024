@@ -42,9 +42,11 @@ public class PivotFSM {
 	private static final double PID_CONSTANT_PIVOT_I = 0.001;
 	private static final double PID_CONSTANT_PIVOT_D = 0.001;
 
-	private static final double PID_VOLTAGE_CONSTANT = 0.0;
-	private static final double PID_STATIC_CONSTANT = 0.01;
-	private static final double PID_GRAVITY_CONSTANT = 0.0;
+
+	// V = Kg * cos(theta) + Ks * [theta] + Kv * angular vel + Ka * angular acceleration 
+	private static final double PID_VOLTAGE_CONSTANT = 0.4;
+	private static final double PID_STATIC_CONSTANT = 0.1;
+	private static final double PID_GRAVITY_CONSTANT = 0.25;
 
 
 	private static final double JOYSTICK_DEAD_ZONE = 0.15;
