@@ -272,7 +272,7 @@ public class IntakeFSM {
 		if ((autoIntakingTimerStarted
 			&& !timer.hasElapsed(autoIntakingTimerStart + AUTO_INTAKING_TIME))
 			|| !breakBeamSwitch.get()) {
-			intakeMotor.set(-INTAKE_POWER);
+			intakeMotor.set(INTAKE_POWER);
 		} else {
 			intakeMotor.set(0);
 			return true;
