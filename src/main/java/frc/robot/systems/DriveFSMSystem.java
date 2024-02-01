@@ -189,7 +189,7 @@ public class DriveFSMSystem {
 	 * @param autoState autoState that the subsystem executes.
 	 * @return if the action carried out in this state has finished executing
 	 */
-	public boolean updateAutonomous(AutoFSMState autoState){
+	public boolean updateAutonomous(AutoFSMState autoState) {
 		odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()),
 			new SwerveModulePosition[] {
 				frontLeft.getPosition(),
@@ -244,7 +244,7 @@ public class DriveFSMSystem {
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_4,
 							new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_4,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
+							new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 					} else if (startingPos == 2) { // right speaker
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_5, 0,
 							new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));

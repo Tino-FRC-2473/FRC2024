@@ -47,9 +47,7 @@ public class AutoHandlerSystem {
 		AutoFSMState.PICK_UP_2, AutoFSMState.DRIVE_TO_SPEAKER_2, AutoFSMState.PICK_UP_3,
 		AutoFSMState.DRIVE_TO_SPEAKER_3, AutoFSMState.PICK_UP_4, AutoFSMState.DRIVE_TO_SPEAKER_4};
 	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{
-		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.PICK_UP_1, AutoFSMState.DRIVE_TO_SPEAKER_1,
-		AutoFSMState.PICK_UP_2, AutoFSMState.DRIVE_TO_SPEAKER_2, AutoFSMState.PICK_UP_3,
-		AutoFSMState.DRIVE_TO_SPEAKER_3, AutoFSMState.PICK_UP_4, AutoFSMState.DRIVE_TO_SPEAKER_4};
+		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.LEAVE_SPEAKER};
 	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{
 		AutoFSMState.LEAVE};
 
