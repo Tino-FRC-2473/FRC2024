@@ -20,7 +20,6 @@ public class AutoHandlerSystem {
 		PICK_UP_4,
 		DRIVE_TO_SPEAKER_4,
 		LEAVE,
-		PENDING
 	}
 
 	public enum AutoPath {
@@ -44,10 +43,6 @@ public class AutoHandlerSystem {
 
 	//Predefined auto paths
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
-		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.PICK_UP_1, AutoFSMState.DRIVE_TO_SPEAKER_1,
-		AutoFSMState.PICK_UP_2, AutoFSMState.DRIVE_TO_SPEAKER_2, AutoFSMState.PICK_UP_3,
-		AutoFSMState.DRIVE_TO_SPEAKER_3, AutoFSMState.PICK_UP_4, AutoFSMState.DRIVE_TO_SPEAKER_4};
-	private static final AutoFSMState[] PATH2 = new AutoFSMState[]{
 		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.PICK_UP_1, AutoFSMState.DRIVE_TO_SPEAKER_1,
 		AutoFSMState.PICK_UP_2, AutoFSMState.DRIVE_TO_SPEAKER_2, AutoFSMState.PICK_UP_3,
 		AutoFSMState.DRIVE_TO_SPEAKER_3, AutoFSMState.PICK_UP_4, AutoFSMState.DRIVE_TO_SPEAKER_4};
@@ -91,7 +86,9 @@ public class AutoHandlerSystem {
 		driveSystem.resetAutonomus();
 
 		currentStateIndex = 0;
-		if (path == AutoPath.PATH3) {
+		if (path == AutoPath.PATH1) {
+			currentStateList = PATH1;
+		} else if (path == AutoPath.PATH3) {
 			currentStateList = PATH3;
 		} else if (path == AutoPath.PATH5) {
 			currentStateList = PATH5;
@@ -126,35 +123,31 @@ public class AutoHandlerSystem {
 				break;
 			case PICK_UP_2:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.PICK_UP_1);
+					AutoFSMState.PICK_UP_2);
 				break;
 			case DRIVE_TO_SPEAKER_2:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.DRIVE_TO_SPEAKER_1);
+					AutoFSMState.DRIVE_TO_SPEAKER_2);
 				break;
 			case PICK_UP_3:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.PICK_UP_1);
+					AutoFSMState.PICK_UP_3);
 				break;
 			case DRIVE_TO_SPEAKER_3:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.DRIVE_TO_SPEAKER_1);
+					AutoFSMState.DRIVE_TO_SPEAKER_3);
 				break;
 			case PICK_UP_4:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.PICK_UP_1);
+					AutoFSMState.PICK_UP_4);
 				break;
 			case DRIVE_TO_SPEAKER_4:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.DRIVE_TO_SPEAKER_1);
+					AutoFSMState.DRIVE_TO_SPEAKER_4);
 				break;
 			case LEAVE:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.LEAVE);
-				break;
-			case PENDING:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.PENDING);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());

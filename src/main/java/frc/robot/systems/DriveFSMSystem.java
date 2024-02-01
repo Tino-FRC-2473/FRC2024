@@ -229,6 +229,8 @@ public class DriveFSMSystem {
 							new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
 						leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
 							new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
+					} else {
+						leaveSpeaker.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				} else {
 					if (startingPos == 0) {
@@ -264,6 +266,8 @@ public class DriveFSMSystem {
 					} else if (startingPos == 2) {
 						turn.add(new Pose2d(0, 0,
 									new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
+					} else {
+						turn.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				} else {
 					if (startingPos == 0) {
@@ -274,6 +278,8 @@ public class DriveFSMSystem {
 					} else if (startingPos == 2) {
 						turn.add(new Pose2d(0, 0,
 							new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
+					} else {
+						turn.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				}
 				return driveAlongPath(turn);
@@ -288,6 +294,8 @@ public class DriveFSMSystem {
 					} else if (startingPos == 2) {
 						pickUp1.add(new Pose2d(-1, AutoConstants.N_0_5, new Rotation2d(
 							Math.toRadians(0))));
+					} else {
+						pickUp1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				} else {
 					if (startingPos == 0) {
@@ -298,6 +306,8 @@ public class DriveFSMSystem {
 					} else if (startingPos == 2) {
 						pickUp1.add(new Pose2d(-1, -AutoConstants.N_0_5, new Rotation2d(
 							Math.toRadians(0))));
+					} else {
+						pickUp1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				}
 				return driveAlongPath(pickUp1);
@@ -310,6 +320,8 @@ public class DriveFSMSystem {
 						toSpeaker1.add(new Pose2d(0, 1, new Rotation2d(Math.toRadians(0))));
 					} else if (startingPos == 2) {
 						toSpeaker1.add(new Pose2d(0, -1, new Rotation2d(Math.toRadians(0))));
+					} else {
+						toSpeaker1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				} else {
 					if (startingPos == 0) {
@@ -318,6 +330,8 @@ public class DriveFSMSystem {
 						toSpeaker1.add(new Pose2d(0, -1, new Rotation2d(Math.toRadians(0))));
 					} else if (startingPos == 2) {
 						toSpeaker1.add(new Pose2d(0, 1, new Rotation2d(Math.toRadians(0))));
+					} else {
+						toSpeaker1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				}
 				return driveAlongPath(toSpeaker1);
@@ -331,6 +345,8 @@ public class DriveFSMSystem {
 						pickUp2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
 					} else if (startingPos == 2) {
 						pickUp2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
+					} else {
+						pickUp2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				} else {
 					if (startingPos == 0) {
@@ -340,6 +356,8 @@ public class DriveFSMSystem {
 						pickUp2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
 					} else if (startingPos == 2) {
 						pickUp2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
+					} else {
+						pickUp2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				}
 				return driveAlongPath(pickUp2);
@@ -352,6 +370,8 @@ public class DriveFSMSystem {
 						toSpeaker2.add(new Pose2d(0, 1, new Rotation2d(Math.toRadians(0))));
 					} else if (startingPos == 2) {
 						toSpeaker2.add(new Pose2d(0, -1, new Rotation2d(Math.toRadians(0))));
+					} else {
+						toSpeaker2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				} else {
 					if (startingPos == 0) {
@@ -360,6 +380,8 @@ public class DriveFSMSystem {
 						toSpeaker2.add(new Pose2d(0, -1, new Rotation2d(Math.toRadians(0))));
 					} else if (startingPos == 2) {
 						toSpeaker2.add(new Pose2d(0, 1, new Rotation2d(Math.toRadians(0))));
+					} else {
+						toSpeaker2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				}
 				return driveAlongPath(toSpeaker2);
@@ -375,6 +397,8 @@ public class DriveFSMSystem {
 					} else if (startingPos == 2) {
 						pickUp3.add(new Pose2d(-1, -AutoConstants.N_2_5,
 							new Rotation2d(Math.toRadians(0))));
+					} else {
+						pickUp3.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				} else {
 					if (startingPos == 0) {
@@ -386,6 +410,8 @@ public class DriveFSMSystem {
 					} else if (startingPos == 2) {
 						pickUp3.add(new Pose2d(-1, AutoConstants.N_2_5,
 							new Rotation2d(Math.toRadians(0))));
+					} else {
+						pickUp3.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				}
 				return driveAlongPath(pickUp3);
@@ -398,6 +424,8 @@ public class DriveFSMSystem {
 						toSpeaker3.add(new Pose2d(0, 1, new Rotation2d(Math.toRadians(0))));
 					} else if (startingPos == 2) {
 						toSpeaker3.add(new Pose2d(0, -1, new Rotation2d(Math.toRadians(0))));
+					} else {
+						toSpeaker3.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				} else {
 					if (startingPos == 0) {
@@ -406,6 +434,8 @@ public class DriveFSMSystem {
 						toSpeaker3.add(new Pose2d(0, -1, new Rotation2d(Math.toRadians(0))));
 					} else if (startingPos == 2) {
 						toSpeaker3.add(new Pose2d(0, 1, new Rotation2d(Math.toRadians(0))));
+					} else {
+						toSpeaker3.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				}
 				return driveAlongPath(toSpeaker3);
@@ -421,6 +451,8 @@ public class DriveFSMSystem {
 					} else if (startingPos == 2) {
 						pickUp4.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_3,
 							new Rotation2d(Math.toRadians(0))));
+					} else {
+						pickUp4.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				} else {
 					if (startingPos == 0) {
@@ -432,6 +464,8 @@ public class DriveFSMSystem {
 					} else if (startingPos == 2) {
 						pickUp4.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_3,
 							new Rotation2d(Math.toRadians(0))));
+					} else {
+						pickUp4.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				}
 				return driveAlongPath(pickUp4);
@@ -444,6 +478,8 @@ public class DriveFSMSystem {
 						toSpeaker4.add(new Pose2d(0, 1, new Rotation2d(Math.toRadians(0))));
 					} else if (startingPos == 2) {
 						toSpeaker4.add(new Pose2d(0, -1, new Rotation2d(Math.toRadians(0))));
+					} else {
+						toSpeaker4.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				} else {
 					if (startingPos == 0) {
@@ -452,6 +488,8 @@ public class DriveFSMSystem {
 						toSpeaker4.add(new Pose2d(0, -1, new Rotation2d(Math.toRadians(0))));
 					} else if (startingPos == 2) {
 						toSpeaker4.add(new Pose2d(0, 1, new Rotation2d(Math.toRadians(0))));
+					} else {
+						toSpeaker4.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 					}
 				}
 				return driveAlongPath(toSpeaker4);
@@ -465,9 +503,6 @@ public class DriveFSMSystem {
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				}
 				return driveAlongPath(leave);
-			case PENDING:
-				timer.start();
-				return pause(AutoConstants.WAIT_TIME);
 			default:
 				return false;
 		}
