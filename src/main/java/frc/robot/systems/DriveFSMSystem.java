@@ -169,8 +169,10 @@ public class DriveFSMSystem {
 		currentPointInPath = 0;
 		gyro.reset();
 		resetOdometry(new Pose2d());
-		if (AutoPathChooser.getAutoPathChooser() != null) {
+		if (AutoPathChooser.getAllianceChooser() != null) {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
+		} else {
+			blueAlliance = true;
 		}
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
