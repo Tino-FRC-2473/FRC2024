@@ -9,6 +9,7 @@ public class AutoHandlerSystem {
 	/* ======================== Constants ======================== */
 	// Auto FSM state definitions
 	public enum AutoFSMState {
+		// MBR
 		TURN_TO_SPEAKER,
 		LEAVE_SPEAKER,
 		PICK_UP_1,
@@ -20,6 +21,17 @@ public class AutoHandlerSystem {
 		PICK_UP_4,
 		DRIVE_TO_SPEAKER_4,
 		LEAVE,
+		// SVR
+		DRIVE_PATH_1,
+		DRIVE_PATH_2,
+		DRIVE_PATH_3,
+		DRIVE_PATH_4_STATE_1,
+		DRIVE_PATH_4_STATE_2,
+		DRIVE_PATH_5,
+		//SHOOTER_STATE_1,
+		//SHOOTER_STATE_2,
+		//SHOOTER_STATE_3,
+		PENDING
 	}
 
 	public enum AutoPath {
@@ -40,14 +52,21 @@ public class AutoHandlerSystem {
 
 	//FSM Systems that the autoHandlerFSM uses
 	private DriveFSMSystem driveSystem;
+	//private KitBotShooterFSM shooterFSM;
 
 	//Predefined auto paths
+
+	// FIXXX svr, mbr 
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
 		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.PICK_UP_1, AutoFSMState.DRIVE_TO_SPEAKER_1,
 		AutoFSMState.PICK_UP_2, AutoFSMState.DRIVE_TO_SPEAKER_2, AutoFSMState.PICK_UP_3,
 		AutoFSMState.DRIVE_TO_SPEAKER_3, AutoFSMState.PICK_UP_4, AutoFSMState.DRIVE_TO_SPEAKER_4};
 	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{
 		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.LEAVE_SPEAKER};
+
+	private static final AutoFSMState[] PATH4 = new AutoFSMState[]{
+		AutoFSMState.PENDING, AutoFSMState.DRIVE_PATH_4_STATE_1, AutoFSMState.DRIVE_PATH_4_STATE_2};
+
 	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{
 		AutoFSMState.LEAVE};
 
@@ -60,6 +79,7 @@ public class AutoHandlerSystem {
 	 */
 	public AutoHandlerSystem(DriveFSMSystem fsm1) {
 		driveSystem = fsm1;
+		//shooterFSM = fsm2;
 	}
 
 	/* ======================== Public methods ======================== */
@@ -82,6 +102,7 @@ public class AutoHandlerSystem {
 	 */
 	public void reset(AutoPath path) {
 		driveSystem.resetAutonomus();
+		//shooterFSM.reset();
 
 		currentStateIndex = 0;
 		if (path == AutoPath.PATH1) {
@@ -103,6 +124,8 @@ public class AutoHandlerSystem {
 		boolean isCurrentStateFinished;
 		SmartDashboard.putString("In Auto State: ", "" + getCurrentState());
 		switch (getCurrentState()) {
+
+			// FIXXX 
 			case TURN_TO_SPEAKER:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.TURN_TO_SPEAKER);
@@ -146,6 +169,17 @@ public class AutoHandlerSystem {
 			case LEAVE:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.LEAVE);
+			// case SHOOTER_STATE_1:
+			// 	isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_1);
+			// 	break;
+			// case SHOOTER_STATE_2:
+			// 	isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_2);
+			// 	break;
+			// case SHOOTER_STATE_3:
+			// 	isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_3);
+			// 	break;
+			case PENDING:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.PENDING);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());
