@@ -17,17 +17,10 @@ public class TeleopInput {
 	private static final int INTAKE_BUTTON = 2;
 	private static final int OUTTAKE_BUTTON = 1;
 	private static final int SHOOT_BUTTON = 3;
-<<<<<<< HEAD
-	private static final int GROUND_POS_BUTTON = 4;
-	private static final int AMP_POS_BUTTON = 5;
-	private static final int SOURCE_POS_BUTTON = 6;
-	private static final int SHOOTER_POS_BUTTON = 7;
-=======
 	private static final int GROUND_ARM_BUTTON = 4;
 	private static final int AMP_ARM_BUTTON = 5;
 	private static final int SOURCE_ARM_BUTTON = 6;
 	private static final int SHOOTER_ARM_BUTTON = 7;
->>>>>>> 72573e3a27a6f22c14128af86010faaac65776ca
 	private static final int ABORT_BUTTON = 8;
 
 	/* ======================== Private variables ======================== */
@@ -93,13 +86,8 @@ public class TeleopInput {
 	 * Get the value of the Outtake button.
 	 * @return True if button is pressed
 	 */
-<<<<<<< HEAD
-	public boolean isGroundButtonPressed() {
-		return leftJoystick.getRawButton(GROUND_POS_BUTTON);
-=======
 	public boolean isGroundArmButtonPressed() {
 		return leftJoystick.getRawButton(GROUND_ARM_BUTTON);
->>>>>>> 72573e3a27a6f22c14128af86010faaac65776ca
 	}
 
 
@@ -107,13 +95,8 @@ public class TeleopInput {
 	 * Get the value of the Outtake button.
 	 * @return True if button is pressed
 	 */
-<<<<<<< HEAD
-	public boolean isSourceButtonPressed() {
-		return leftJoystick.getRawButton(SOURCE_POS_BUTTON);
-=======
 	public boolean isSourceArmButtonPressed() {
 		return leftJoystick.getRawButton(SOURCE_ARM_BUTTON);
->>>>>>> 72573e3a27a6f22c14128af86010faaac65776ca
 	}
 
 	/**
@@ -128,26 +111,16 @@ public class TeleopInput {
 	 * Get the value of the Outtake button.
 	 * @return True if button is pressed
 	 */
-<<<<<<< HEAD
-	public boolean isAmpButtonPressed() {
-		return leftJoystick.getRawButton(AMP_POS_BUTTON);
-=======
 	public boolean isAmpArmButtonPressed() {
 		return leftJoystick.getRawButton(AMP_ARM_BUTTON);
->>>>>>> 72573e3a27a6f22c14128af86010faaac65776ca
 	}
 
 	/**
 	 * Get the value of the Outtake button.
 	 * @return True if button is pressed
 	 */
-<<<<<<< HEAD
-	public boolean isShooterButtonPressed() {
-		return leftJoystick.getRawButton(SHOOTER_POS_BUTTON);
-=======
 	public boolean isShooterArmButtonPressed() {
 		return leftJoystick.getRawButton(SHOOTER_ARM_BUTTON);
->>>>>>> 72573e3a27a6f22c14128af86010faaac65776ca
 	}
 
 	/* ------------------------ Mech Controller ------------------------ */
