@@ -35,12 +35,11 @@ public class AutoHandlerSystem {
 	}
 
 	public enum AutoPath {
-		PATH1,
-		PATH2,
-		PATH3,
-		PATH4,
-		PATH5,
-		PATH6
+		PATH1, // score and leave
+		PATH2, // score multiple times
+		PATH3, // just leave
+		PATH4, // just shoot
+		PATH5 // nothing
 	}
 
 	/* ======================== Private variables ======================== */
