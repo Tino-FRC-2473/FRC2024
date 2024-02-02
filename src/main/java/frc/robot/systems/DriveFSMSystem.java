@@ -169,8 +169,10 @@ public class DriveFSMSystem {
 		currentPointInPath = 0;
 		gyro.reset();
 		resetOdometry(new Pose2d());
-		if (AutoPathChooser.getAutoPathChooser() != null) {
+		if (AutoPathChooser.getAllianceChooser() != null) {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
+		} else {
+			blueAlliance = true;
 		}
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -267,14 +269,12 @@ public class DriveFSMSystem {
 			case DRIVE_PATH_4_STATE_2:
 				ArrayList<Pose2d> path4Points2 = new ArrayList<Pose2d>();
 				if (blueAlliance) {
-					path4Points2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
 					path4Points2.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_3,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
 					path4Points2.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_3,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
 				} else {
-					path4Points2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
-					path4Points2.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_5,
+					path4Points2.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_3,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
 					path4Points2.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_3,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
@@ -339,13 +339,15 @@ public class DriveFSMSystem {
 		switch (currentState) {
 			case TELEOP_STATE:
 				drive(-MathUtil.applyDeadband((input.getControllerLeftJoystickY()
-					* Math.abs(input.getControllerLeftJoystickY())),
-					OIConstants.DRIVE_DEADBAND),
+					* Math.abs(input.getControllerLeftJoystickY()) * ((input.getLeftTrigger() / 2)
+					+ DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT) / 2), OIConstants.DRIVE_DEADBAND),
 					-MathUtil.applyDeadband((input.getControllerLeftJoystickX()
-					* Math.abs(input.getControllerLeftJoystickX())),
-					OIConstants.DRIVE_DEADBAND),
-					-MathUtil.applyDeadband(input.getControllerRightJoystickX(),
-					OIConstants.DRIVE_DEADBAND), true, true);
+					* Math.abs(input.getControllerLeftJoystickX()) * ((input.getLeftTrigger() / 2)
+					+ DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT) / 2), OIConstants.DRIVE_DEADBAND),
+					-MathUtil.applyDeadband((input.getControllerRightJoystickX()
+					* ((input.getLeftTrigger() / 2) + DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT)
+					/ DriveConstants.ANGULAR_SPEED_LIMIT_CONSTANT), OIConstants.DRIVE_DEADBAND),
+					true, true);
 				if (input.isBackButtonPressed()) {
 					gyro.reset();
 					resetOdometry(new Pose2d(new Translation2d(getPose().getX(), getPose().getY()),

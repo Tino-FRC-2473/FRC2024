@@ -50,12 +50,13 @@ public class AutoHandlerSystem {
 		AutoFSMState.DRIVE_PATH_3};
 
 	private static final AutoFSMState[] PATH4 = new AutoFSMState[]{
-		AutoFSMState.DRIVE_PATH_4_STATE_1, AutoFSMState.PENDING, AutoFSMState.DRIVE_PATH_4_STATE_2};
+		AutoFSMState.PENDING, AutoFSMState.DRIVE_PATH_4_STATE_1, AutoFSMState.DRIVE_PATH_4_STATE_2};
 
 	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{
 		AutoFSMState.DRIVE_PATH_5};
 
 	private static final AutoFSMState[] PATH6 = new AutoFSMState[]{};
+
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state.

@@ -104,6 +104,20 @@ public class TeleopInput {
 	public boolean isTriangleButtonReleased() {
 		return driverController.getTriangleButtonReleased();
 	}
+	/**
+	 * Get the value of the left trigger.
+	 * @return value of the left trigger.
+	 */
+	public double getLeftTrigger() {
+		return driverController.getL2Axis();
+	}
+	/**
+	 * Get the value of the right trigger.
+	 * @return value of the right trigger.
+	 */
+	public double getRightTrigger() {
+		return driverController.getR2Axis();
+	}
 
 	/* ------------------------ Left Joystick ------------------------ */
 	/**
@@ -120,7 +134,6 @@ public class TeleopInput {
 	public double getLeftJoystickY() {
 		return leftJoystick.getY();
 	}
-
 	/**
 	 * Get the value of the intake button.
 	 * @return True if button is pressed
@@ -128,7 +141,6 @@ public class TeleopInput {
 	public boolean isIntakeButtonPressed() {
 		return leftJoystick.getRawButton(INTAKE_BUTTON);
 	}
-
 	/**
 	 * Get the value of the outtake button.
 	 * @return True if button is pressed
@@ -136,7 +148,6 @@ public class TeleopInput {
 	public boolean isOuttakeButtonPressed() {
 		return leftJoystick.getRawButton(OUTTAKE_BUTTON);
 	}
-
 	/**
 	 * Get the value of the retract button.
 	 * @return True if button is pressed
@@ -144,6 +155,7 @@ public class TeleopInput {
 	public boolean isRetractClimberButtonPressed() {
 		return leftJoystick.getRawButton(RETRACT_CLIMBER_BUTTON);
 	}
+
 	/* ======================== Private methods ======================== */
 
 }
