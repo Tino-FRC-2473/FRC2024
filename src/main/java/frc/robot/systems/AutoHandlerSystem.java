@@ -16,12 +16,10 @@ public class AutoHandlerSystem {
 		PICK_UP_4,
 		DRIVE_TO_SPEAKER_4,
 		LEAVE,
-		DRIVE_PATH_4_STATE_1,
-		DRIVE_PATH_4_STATE_2,
-		PENDING,
-		SHOOT_SPEAKER,
-		SHOOTER_STATE_2,
-		SHOOTER_STATE_3
+		DRIVE_PATH_5,
+		SHOOTER_STATE,
+		INTAKE_STATE,
+		PENDING
 	}
 
 	public enum AutoPath {
@@ -62,7 +60,6 @@ public class AutoHandlerSystem {
 		AutoFSMState.SHOOT_SPEAKER};
 
 	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{};
-
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -166,14 +163,11 @@ public class AutoHandlerSystem {
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.LEAVE);
 				break;
-			case SHOOT_SPEAKER:
-				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOT_SPEAKER);
+			case SHOOTER_STATE:
+				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE);
 				break;
-			case SHOOTER_STATE_2:
-				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_2);
-				break;
-			case SHOOTER_STATE_3:
-				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_3);
+			case INTAKE_STATE:
+				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.INTAKE_STATE);
 				break;
 			case PENDING:
 				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.PENDING);

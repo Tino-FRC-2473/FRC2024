@@ -709,8 +709,8 @@ public class DriveFSMSystem {
 	 * @return if the robot has driven to the current position
 	 */
 	public boolean driveToPose(Pose2d pose) {
-		double x = pose.getX() / 2; //remove /2 after testing
-		double y = pose.getY() / 2;
+		double x = pose.getX();
+		double y = pose.getY();
 		double angle = pose.getRotation().getDegrees();
 
 		double xDiff = x - getPose().getX();
