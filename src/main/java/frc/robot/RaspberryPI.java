@@ -62,7 +62,7 @@ public class RaspberryPI {
 			int rows = 240;
 			int cols = 320;
 
-			Mat reshapedMat = new Mat(rows, cols, CvType.CV_64F);
+			Mat reshapedMat = new Mat(rows, cols, CvType.CV_8UC3);
 
 			reshapedMat.put(0, 0, outputFrameSub.get());
 			outputStream.putFrame(reshapedMat);

@@ -166,12 +166,12 @@ public class DriveFSMSystem {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
 			if (blueAlliance) {
 				tagOrientationAngles = new Double[]
-					{null, 315, 315, null, null, null, 90, 180,
-					180, null, null, null, null, null, null, null, null};
+					{null, 315.0, 315.0, null, null, null, 90.0, 180.0,
+					180.0, null, null, null, null, null, null, null, null};
 			} else {
 				tagOrientationAngles = new Double[]
-					{null, null, null, 180, 180, 270, null, null,
-					null, 45, 45, null, null, null, null, null, null};
+					{null, null, null, 180.0, 180.0, 270.0, null, null,
+					null, 45.0, 45.0, null, null, null, null, null, null};
 			}
 		}
 		lockedSourceId = -1;
@@ -198,12 +198,12 @@ public class DriveFSMSystem {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
 			if (blueAlliance) {
 				tagOrientationAngles = new Double[]
-					{null, 315, 315, null, null, null, 90, 180,
-					180, null, null, null, null, null, null, null, null};
+					{null, 315.0, 315.0, null, null, null, 90.0, 180.0,
+					180.0, null, null, null, null, null, null, null, null};
 			} else {
 				tagOrientationAngles = new Double[]
-					{null, null, null, 180, 180, 270, null, null,
-					null, 45, 45, null, null, null, null, null, null};
+					{null, null, null, 180.0, 180.0, 270.0, null, null,
+					null, 45.0, 45.0, null, null, null, null, null, null};
 			}
 		}
 		lockedSourceId = -1;
@@ -370,6 +370,7 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
 		SmartDashboard.putNumber("Heading", getPose().getRotation().getDegrees());
 
+		rpi.update();
 		if (input == null) {
 			return;
 		}
