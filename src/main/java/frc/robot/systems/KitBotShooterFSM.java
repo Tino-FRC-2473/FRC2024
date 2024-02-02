@@ -1,5 +1,7 @@
 package frc.robot.systems;
 
+import edu.wpi.first.wpilibj.Timer;
+
 // WPILib Imports
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -23,6 +25,8 @@ public class KitBotShooterFSM {
 
 	private static final float L_MOTOR_RUN_POWER = 0.05f;
 	private static final float U_MOTOR_RUN_POWER = 0.1f;
+	private static final float AUTO_OUTTAKING_TIME = 2.0f;
+	private static final float AUTO_INTAKING_TIME = 2.0f;
 
 	/* ======================== Private variables ======================== */
 	private ShooterFSMState currentState;
@@ -32,6 +36,12 @@ public class KitBotShooterFSM {
 	private CANSparkMax lowMotor;
 	private CANSparkMax highMotor;
 	private SparkLimitSwitch bottomLimitSwitch;
+
+	private boolean autoOuttakingTimerStarted;
+	private double autoOuttakingTimerStart;
+	private boolean autoIntakingTimerStarted;
+	private double autoIntakingTimerStart;
+	private Timer timer;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -51,6 +61,11 @@ public class KitBotShooterFSM {
 		highMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_UPPER,
 		CANSparkMax.MotorType.kBrushless);
 		highMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+		autoOuttakingTimerStarted = false;
+		autoIntakingTimerStarted = false;
+
+		timer = new Timer();
 
 		// Reset state machine
 		reset();
@@ -118,12 +133,10 @@ public class KitBotShooterFSM {
 	 */
 	public boolean updateAutonomous(AutoFSMState autoState) {
 		switch (autoState) {
-			// case SHOOTER_STATE_1:
-			// 	return handleAutoState1();
-			// case SHOOTER_STATE_2:
-			// 	return handleAutoState2();
-			// case SHOOTER_STATE_3:
-			// 	return handleAutoState3();
+			case SHOOTER_STATE:
+				return handleAutoOuttakingState();
+			case INTAKE_STATE:
+				return handleAutoIntakingState();
 			default:
 				return true;
 		}
@@ -202,28 +215,48 @@ public class KitBotShooterFSM {
 		highMotor.set(U_MOTOR_RUN_POWER);
 	}
 
-	/**
-	 * Performs action for auto STATE1.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState1() {
-		return true;
+	private boolean handleAutoOuttakingState() {
+		if (!autoOuttakingTimerStarted) {
+			autoOuttakingTimerStarted = true;
+			autoOuttakingTimerStart = timer.get();
+		}
+
+		if (autoOuttakingTimerStarted
+			&& !timer.hasElapsed(autoOuttakingTimerStart + AUTO_OUTTAKING_TIME)) {
+			lowMotor.set(L_MOTOR_RUN_POWER);
+			highMotor.set(U_MOTOR_RUN_POWER);
+		} else {
+			lowMotor.set(0);
+			highMotor.set(0);
+
+			autoOuttakingTimerStarted = false;
+
+			return true;
+		}
+
+		return false;
 	}
 
-	/**
-	 * Performs action for auto STATE2.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState2() {
-		return true;
-	}
+	private boolean handleAutoIntakingState() {
+		if (!autoIntakingTimerStarted) {
+			autoIntakingTimerStarted = true;
+			autoIntakingTimerStart = timer.get();
+		}
 
-	/**
-	 * Performs action for auto STATE3.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState3() {
-		return true;
+		if (autoIntakingTimerStarted
+			&& !timer.hasElapsed(autoIntakingTimerStart + AUTO_INTAKING_TIME)) {
+			lowMotor.set(-L_MOTOR_RUN_POWER);
+			highMotor.set(-U_MOTOR_RUN_POWER);
+		} else {
+			lowMotor.set(0);
+			highMotor.set(0);
+
+			autoIntakingTimerStarted = false;
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private boolean hasNote() {

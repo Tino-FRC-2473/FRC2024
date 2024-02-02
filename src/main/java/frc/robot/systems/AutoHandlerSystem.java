@@ -15,9 +15,8 @@ public class AutoHandlerSystem {
 		DRIVE_PATH_4_STATE_1,
 		DRIVE_PATH_4_STATE_2,
 		DRIVE_PATH_5,
-		//SHOOTER_STATE_1,
-		//SHOOTER_STATE_2,
-		//SHOOTER_STATE_3,
+		SHOOTER_STATE,
+		INTAKE_STATE,
 		PENDING
 	}
 	public enum AutoPath {
@@ -38,7 +37,7 @@ public class AutoHandlerSystem {
 
 	//FSM Systems that the autoHandlerFSM uses
 	private DriveFSMSystem driveSystem;
-	//private KitBotShooterFSM shooterFSM;
+	private KitBotShooterFSM shooterFSM;
 
 	//Predefined auto paths
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
@@ -57,15 +56,17 @@ public class AutoHandlerSystem {
 		AutoFSMState.DRIVE_PATH_5};
 
 	private static final AutoFSMState[] PATH6 = new AutoFSMState[]{};
+  
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state.
 	 * Initializes any subsystems such as driveFSM, armFSM, ect.
 	 * @param fsm1 the first subsystem that the auto handler will call functions on
+	 * @param fsm2 the second subsystem that the auto handler will call functions on
 	 */
-	public AutoHandlerSystem(DriveFSMSystem fsm1) {
+	public AutoHandlerSystem(DriveFSMSystem fsm1, KitBotShooterFSM fsm2) {
 		driveSystem = fsm1;
-		//shooterFSM = fsm2;
+		shooterFSM = fsm2;
 	}
 
 	/* ======================== Public methods ======================== */
@@ -87,9 +88,8 @@ public class AutoHandlerSystem {
 	 * @param path the auto path to be executed
 	 */
 	public void reset(AutoPath path) {
-
 		driveSystem.resetAutonomus();
-		//shooterFSM.reset();
+		shooterFSM.reset();
 
 		currentStateIndex = 0;
 		if (path == AutoPath.PATH1) {
@@ -138,15 +138,12 @@ public class AutoHandlerSystem {
 			case DRIVE_PATH_5:
 				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DRIVE_PATH_5);
 				break;
-			// case SHOOTER_STATE_1:
-			// 	isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_1);
-			// 	break;
-			// case SHOOTER_STATE_2:
-			// 	isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_2);
-			// 	break;
-			// case SHOOTER_STATE_3:
-			// 	isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_3);
-			// 	break;
+			case SHOOTER_STATE:
+				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE);
+				break;
+			case INTAKE_STATE:
+				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.INTAKE_STATE);
+				break;
 			case PENDING:
 				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.PENDING);
 				break;
