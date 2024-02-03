@@ -15,6 +15,8 @@ public class TeleopInput {
 	/* ======================== Constants ======================== */
 	private static final int LEFT_JOYSTICK_PORT = 1;
 	private static final int RETRACT_CLIMBER_BUTTON = 3;
+	private static final int EXTEND_CLIMBER_BUTTON = 4;
+
 	private static final int INTAKE_BUTTON = 2;
 	private static final int OUTTAKE_BUTTON = 1;
 	public static final int DRIVER_CONTROLLER_PORT = 0;
@@ -144,8 +146,13 @@ public class TeleopInput {
 	public boolean isRetractClimberButtonPressed() {
 		return leftJoystick.getRawButton(RETRACT_CLIMBER_BUTTON);
 	}
+
+	/**
+	 * Get the value of the extend button.
+	 * @return True if button is pressed
+	 */
 	public boolean isExtendClimberButtonPressed() {
-		return leftJoystick.getRawButton(2);
+		return leftJoystick.getRawButton(EXTEND_CLIMBER_BUTTON);
 
 	}
 	/* ======================== Private methods ======================== */

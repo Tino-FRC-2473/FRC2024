@@ -136,9 +136,9 @@ public class ClimberMechFSMLeft {
 			case IDLE_STOP:
 				if (input.isRetractClimberButtonPressed() && !peakLimitSwitchHit()) {
 					return ClimberMechFSMState.RETRACTING;
-				} else if (input.isExtendClimberButtonPressed()) { 
+				} else if (input.isExtendClimberButtonPressed()) {
 					return ClimberMechFSMState.EXTENDING;
-				}else {
+				} else {
 					return ClimberMechFSMState.IDLE_STOP;
 				}
 			case RETRACTING:

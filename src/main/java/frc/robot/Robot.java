@@ -11,6 +11,7 @@ import frc.robot.systems.KitBotShooterFSM;
 import frc.robot.systems.AutoHandlerSystem;
 import frc.robot.systems.ClimberMechFSMLeft;
 import frc.robot.systems.ClimberMechFSMRight;
+import frc.robot.systems.AutoHandlerSystem.AutoPath;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -36,28 +37,28 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
-		//shooterFSM = new KitBotShooterFSM();
+		shooterFSM = new KitBotShooterFSM();
 		climberMechLeftFSM = new ClimberMechFSMLeft();
 		climberMechRightFSM = new ClimberMechFSMRight();
 
-		//autoPathChooser = new AutoPathChooser();
-		//driveFSMSystem = new DriveFSMSystem();
-		//autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
+		autoPathChooser = new AutoPathChooser();
+		driveFSMSystem = new DriveFSMSystem();
+		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		//AutoPath path = AutoPath.PATH1;
-		//if (AutoPathChooser.getSelectedPath() != null) {
-		//	path = AutoPathChooser.getSelectedPath();
-		//}
-		//autoHandler.reset(path);
+		AutoPath path = AutoPath.PATH1;
+		if (AutoPathChooser.getSelectedPath() != null) {
+			path = AutoPathChooser.getSelectedPath();
+		}
+		autoHandler.reset(path);
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		//autoHandler.update();
+		autoHandler.update();
 	}
 
 	@Override
@@ -65,16 +66,16 @@ public class Robot extends TimedRobot {
 		System.out.println("-------- Teleop Init --------");
 		climberMechLeftFSM.reset();
 		climberMechRightFSM.reset();
-		//driveFSMSystem.reset();
-		//shooterFSM.reset();
+		driveFSMSystem.reset();
+		shooterFSM.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		climberMechLeftFSM.update(input);
 		climberMechRightFSM.update(input);
-		//driveFSMSystem.update(input);
-		//shooterFSM.update(input);
+		driveFSMSystem.update(input);
+		shooterFSM.update(input);
 	}
 
 	@Override
