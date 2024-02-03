@@ -66,7 +66,7 @@ class Detector:
 
         cv2.destroyAllWindows()
 
-        results[object] = Target(contours, object)
+        results[object] = Target(contours[0], object)
 
         return results
 

@@ -11,7 +11,7 @@ class Target:
     def __init__(self, contour, target_type):
         self.contour = contour
         self.target_type = target_type
-        self.heights = {"RING": 0.24/2} #need to change
+        self.heights = {"RING": 0.3556} #need to change
 
     def __str__(self):
         return self.target_type + " coords - " + self.contour
