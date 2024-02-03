@@ -11,7 +11,6 @@ import frc.robot.systems.KitBotShooterFSM;
 import frc.robot.systems.AutoHandlerSystem;
 import frc.robot.systems.ClimberMechFSMLeft;
 import frc.robot.systems.ClimberMechFSMRight;
-import frc.robot.systems.AutoHandlerSystem.AutoPath;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -38,7 +37,7 @@ public class Robot extends TimedRobot {
 		input = new TeleopInput();
 		// Instantiate all systems here
 		//shooterFSM = new KitBotShooterFSM();
-		//climberMechLeftFSM = new ClimberMechFSMLeft();
+		climberMechLeftFSM = new ClimberMechFSMLeft();
 		climberMechRightFSM = new ClimberMechFSMRight();
 
 		//autoPathChooser = new AutoPathChooser();
@@ -64,7 +63,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		//climberMechLeftFSM.reset();
+		climberMechLeftFSM.reset();
 		climberMechRightFSM.reset();
 		//driveFSMSystem.reset();
 		//shooterFSM.reset();
@@ -72,7 +71,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopPeriodic() {
-		//climberMechLeftFSM.update(input);
+		climberMechLeftFSM.update(input);
 		climberMechRightFSM.update(input);
 		//driveFSMSystem.update(input);
 		//shooterFSM.update(input);

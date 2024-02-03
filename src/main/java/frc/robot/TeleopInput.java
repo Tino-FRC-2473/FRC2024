@@ -144,6 +144,10 @@ public class TeleopInput {
 	public boolean isRetractClimberButtonPressed() {
 		return leftJoystick.getRawButton(RETRACT_CLIMBER_BUTTON);
 	}
+	public boolean isExtendClimberButtonPressed() {
+		return leftJoystick.getRawButton(2);
+
+	}
 	/* ======================== Private methods ======================== */
 
 }
