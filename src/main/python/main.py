@@ -50,4 +50,6 @@ while True:
         print("keyboard interrupt")
         input.close()
         break
+    except Exception as error:
+        print("An exception occurred:", error)
     print('Loop time: ' + str(time.time()-p))
