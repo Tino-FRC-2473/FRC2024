@@ -161,17 +161,36 @@ public final class SwerveConstants {
 	public static final class VisionConstants {
 		public static final double MAX_SPEED_METERS_PER_SECOND = 0.2;
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 30;
-		public static final double SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT = 5;
-		public static final double SPEAKER_ROTATIONAL_ACCEL_CONSTANT = 6;
-		public static final double X_MARGIN_TO_SPEAKER = 0.03;
-		public static final double Z_MARGIN_TO_SPEAKER = 1.1;
-		public static final double Z_MARGIN_SPEAKER_OFFSET = 0.05;
-		public static final double SPEAKER_DRIVE_FORWARD_POWER = 0.1;
-		public static final double UNABLE_TO_SEE_TAG_CONSTANT = 4000;
-		public static final double ROTATIONAL_POWER_LOWER_THRESHOLD = 0.02;
-		public static final int SPEAKER_TAG_ID1 = 4;
-		public static final int SPEAKER_TAG_ID2 = 7;
-		public static final int SOURCE_TAG_ID1 = 3;
 
+		public static final double SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT = 3;
+		public static final double SPEAKER_ROTATIONAL_ACCEL_CONSTANT = 2;
+		public static final double X_MARGIN_TO_SPEAKER = 0.02;
+		public static final double Y_MARGIN_TO_SPEAKER = 0.02;
+		public static final double ROT_MARGIN_TO_SPEAKER = 0.01;
+		public static final double SPEAKER_TARGET_DISTANCE = 0.7;
+
+		public static final double SOURCE_TRANSLATIONAL_ACCEL_CONSTANT = 3;
+		public static final double SOURCE_ROTATIONAL_ACCEL_CONSTANT = 2;
+		public static final double X_MARGIN_TO_SOURCE = 0.02;
+		public static final double Y_MARGIN_TO_SOURCE = 0.02;
+		public static final double ROT_MARGIN_TO_SOURCE = 0.025;
+		public static final double SOURCE_DRIVE_FORWARD_POWER = 0.25;
+		public static final double SOURCE_TARGET_DISTANCE = 0.85;
+
+
+		public static final double UNABLE_TO_SEE_TAG_CONSTANT = 4000;
+
+		public static final int RED_SPEAKER_TAG_ID = 4;
+		public static final int BLUE_SPEAKER_TAG_ID = 7;
+		public static final int RED_SOURCE_TAG1_ID = 9;
+		public static final int RED_SOURCE_TAG2_ID = 10;
+		public static final int BLUE_SOURCE_TAG1_ID = 1;
+		public static final int BLUE_SOURCE_TAG2_ID = 2;
+		public static final int RED_AMP_TAG_ID = 5;
+		public static final int BLUE_AMP_TAG_ID = 6;
+
+		public static final double MIN_SPEED_THRESHOLD = 0.01;
+		public static final double SOURCE_TAG_ANGLE_DEGREES = 45.0;
+		public static final double SPEAKER_TAG_ANGLE_DEGREES = 180.0;
 	}
 }

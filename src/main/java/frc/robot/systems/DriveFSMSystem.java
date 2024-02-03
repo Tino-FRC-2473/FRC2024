@@ -166,12 +166,18 @@ public class DriveFSMSystem {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
 			if (blueAlliance) {
 				tagOrientationAngles = new Double[]
-					{null, 315.0, 315.0, null, null, null, 90.0, 180.0,
-					180.0, null, null, null, null, null, null, null, null};
+					{null, VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
+						VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null,
+						null, null, null, VisionConstants.SPEAKER_TAG_ANGLE_DEGREES,
+						VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null,
+						null, null, null, null, null};
 			} else {
 				tagOrientationAngles = new Double[]
-					{null, null, null, 180.0, 180.0, 270.0, null, null,
-					null, 45.0, 45.0, null, null, null, null, null, null};
+					{null, null, null, VisionConstants.SPEAKER_TAG_ANGLE_DEGREES,
+						VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null, null,
+						-VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
+						-VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null, null, null, null, null,
+						null};
 			}
 		}
 		lockedSourceId = -1;
@@ -198,12 +204,18 @@ public class DriveFSMSystem {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
 			if (blueAlliance) {
 				tagOrientationAngles = new Double[]
-					{null, 315.0, 315.0, null, null, null, 90.0, 180.0,
-					180.0, null, null, null, null, null, null, null, null};
+					{null, VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
+						VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null,
+						null, null, null, VisionConstants.SPEAKER_TAG_ANGLE_DEGREES,
+						VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null,
+						null, null, null, null, null};
 			} else {
 				tagOrientationAngles = new Double[]
-					{null, null, null, 180.0, 180.0, 270.0, null, null,
-					null, 45.0, 45.0, null, null, null, null, null, null};
+					{null, null, null, VisionConstants.SPEAKER_TAG_ANGLE_DEGREES,
+						VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null, null,
+						-VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
+						-VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null, null, null, null, null,
+						null};
 			}
 		}
 		lockedSourceId = -1;
@@ -370,10 +382,10 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
 		SmartDashboard.putNumber("Heading", getPose().getRotation().getDegrees());
 
-		rpi.update();
 		if (input == null) {
 			return;
 		}
+
 		switch (currentState) {
 			case TELEOP_STATE:
 				drive(-MathUtil.applyDeadband((input.getControllerLeftJoystickY()
@@ -395,35 +407,37 @@ public class DriveFSMSystem {
 				if (lockedSourceId == -1) {
 					if (blueAlliance) {
 						//id 1 and 2
-						double z1 = rpi.getAprilTagZInv(1);
-						double z2 = rpi.getAprilTagZInv(2);
-						if (!(z1 == 4000 && z2 == 4000)) {
-							if (z1 == 4000) {
-								lockedSourceId = 2;
-							} else if (z2 == 4000){
-								lockedSourceId = 1;
+						double z1 = rpi.getAprilTagZInv(VisionConstants.BLUE_SOURCE_TAG1_ID);
+						double z2 = rpi.getAprilTagZInv(VisionConstants.BLUE_SOURCE_TAG2_ID);
+						if (!(z1 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
+							&& z2 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT)) {
+							if (z1 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+								lockedSourceId = VisionConstants.BLUE_SOURCE_TAG2_ID;
+							} else if (z2 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+								lockedSourceId = VisionConstants.BLUE_SOURCE_TAG1_ID;
 							} else {
 								if (z1 <= z2) {
-									lockedSourceId = 1;
+									lockedSourceId = VisionConstants.BLUE_SOURCE_TAG1_ID;
 								} else {
-									lockedSourceId = 2;
+									lockedSourceId = VisionConstants.BLUE_SOURCE_TAG2_ID;
 								}
 							}
 						}
 					} else {
 						//id 9 and 10
-						double z9 = rpi.getAprilTagZInv(9);
-						double z10 = rpi.getAprilTagZInv(10);
-						if (!(z9 == 4000 && z10 == 4000)) {
-							if (z9 == 4000) {
-								lockedSourceId = 10;
-							} else if (z10 == 4000){
-								lockedSourceId = 9;
+						double z9 = rpi.getAprilTagZInv(VisionConstants.RED_SOURCE_TAG1_ID);
+						double z10 = rpi.getAprilTagZInv(VisionConstants.RED_SOURCE_TAG2_ID);
+						if (!(z9 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
+							&& z10 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT)) {
+							if (z9 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+								lockedSourceId = VisionConstants.RED_SOURCE_TAG2_ID;
+							} else if (z10 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+								lockedSourceId = VisionConstants.RED_SOURCE_TAG1_ID;
 							} else {
 								if (z9 <= z10) {
-									lockedSourceId = 9;
+									lockedSourceId = VisionConstants.RED_SOURCE_TAG1_ID;
 								} else {
-									lockedSourceId = 10;
+									lockedSourceId = VisionConstants.RED_SOURCE_TAG2_ID;
 								}
 							}
 						}
@@ -438,13 +452,15 @@ public class DriveFSMSystem {
 				if (lockedSpeakerId == -1) {
 					if (blueAlliance) {
 						//id 7
-						if (rpi.getAprilTagZInv(7)!=4000) {
-							lockedSpeakerId = 7;
+						if (rpi.getAprilTagZInv(VisionConstants.BLUE_SPEAKER_TAG_ID)
+							!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+							lockedSpeakerId = VisionConstants.BLUE_SPEAKER_TAG_ID;
 						}
 					} else {
 						//id 4
-						if (rpi.getAprilTagZInv(4)!=4000) {
-							lockedSpeakerId = 4;
+						if (rpi.getAprilTagZInv(VisionConstants.RED_SPEAKER_TAG_ID)
+							!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+							lockedSpeakerId = VisionConstants.RED_SPEAKER_TAG_ID;
 						}
 					}
 				} else {
@@ -661,14 +677,14 @@ public class DriveFSMSystem {
 	}
 
 	/**
-	 * @param rotFinal a number proportional to the angle from the camera to the tag
+	 * @param id Id of the tag we are positioning towards.
 	 * Turns the robot towards the source's april tag and drives
 	 * towards it and straightens the robot when driving against the wall. This positions
 	 * robot to be at the source to pickup a note.
 	 */
 	public void alignToSource(int id) {
 		double yDiff = rpi.getAprilTagX(id);
-		double xDiff = rpi.getAprilTagZ(id) - 0.7;
+		double xDiff = rpi.getAprilTagZ(id) - VisionConstants.SOURCE_TARGET_DISTANCE;
 		double aDiff = rpi.getAprilTagXInv(id);
 
 		SmartDashboard.putNumber("x diff", xDiff);
@@ -676,115 +692,70 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("a diff", aDiff);
 
 		double xSpeed = clamp(xDiff
-			/ 3,
+			/ VisionConstants.SOURCE_TRANSLATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
 			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
 		double ySpeed = clamp(yDiff
-			/ 3,
+			/ VisionConstants.SOURCE_TRANSLATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
 			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
-		double aSpeed = -clamp(aDiff / 2,
+		double aSpeed = -clamp(aDiff / VisionConstants.SOURCE_ROTATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
 
-		double xSpeedField = Math.abs(xDiff) > 0.02
+		double xSpeedField = Math.abs(xDiff) > VisionConstants.X_MARGIN_TO_SOURCE
 			? (xSpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
 			+ (ySpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
-		double ySpeedField = Math.abs(yDiff) > 0.02
+		double ySpeedField = Math.abs(yDiff) > VisionConstants.X_MARGIN_TO_SOURCE
 			? (ySpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
 			- (xSpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
-		aSpeed = Math.abs(aDiff) > 0.01
+		aSpeed = Math.abs(aDiff) > VisionConstants.ROT_MARGIN_TO_SOURCE
 			? aSpeed : 0;
 
 		if (!isSourceAligned) {
 			drive(xSpeedField, ySpeedField, aSpeed, true, false);
-			if (xSpeedField == 0 && ySpeedField == 0 && aSpeed == 0) {
+			if (Math.abs(xSpeedField) < VisionConstants.MIN_SPEED_THRESHOLD
+				&& Math.abs(ySpeedField) < VisionConstants.MIN_SPEED_THRESHOLD
+				&& Math.abs(aSpeed) < VisionConstants.MIN_SPEED_THRESHOLD) {
 				isSourceAligned = true;
 			}
 		} else {
-			drive(0.1 * Math.cos(Math.toRadians(tagOrientationAngles[id])),
-				-0.1 * Math.sin(Math.toRadians(tagOrientationAngles[id])),
-				aSpeed, true, false);
+			drive(VisionConstants.SOURCE_DRIVE_FORWARD_POWER, 0, 0, false, false);
 		}
 	}
 
 	/**
-	 * @param rotFinal a number proportional to the angle from the camera to the tag
-	 * @param dist the distance in meters from the camera to the tag
-	 * Turns the robot towards the speaker's april tag and drives it
-	 * forward to be a set distance away from the speaker. This positions
-	 * robot to be at the ideal shooting position relative to the speaker.
+	 * @param id Id of the tag we are positioning towards.
+	 * Positions the robot to the correct distance from the speaker to shoot
 	 */
 	public void alignToSpeaker(int id) {
 		double yDiff = rpi.getAprilTagX(id);
-		double xDiff = rpi.getAprilTagZ(id) - 0.7;
+		double xDiff = rpi.getAprilTagZ(id) - VisionConstants.SPEAKER_TARGET_DISTANCE;
 		double aDiff = rpi.getAprilTagXInv(id);
 
-		SmartDashboard.putNumber("x diff", xDiff);
-		SmartDashboard.putNumber("y diff", yDiff);
-		SmartDashboard.putNumber("a diff", aDiff);
-
 		double xSpeed = clamp(xDiff
-			/ 3,
+			/ VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
 			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
 		double ySpeed = clamp(yDiff
-			/ 3,
+			/ VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
 			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
-		double aSpeed = -clamp(aDiff / 2,
+		double aSpeed = -clamp(aDiff / VisionConstants.SPEAKER_ROTATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
 
-		double xSpeedField = Math.abs(xDiff) > 0.02
+		double xSpeedField = Math.abs(xDiff) > VisionConstants.X_MARGIN_TO_SPEAKER
 			? (xSpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
 			+ (ySpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
-		double ySpeedField = Math.abs(yDiff) > 0.02
+		double ySpeedField = Math.abs(yDiff) > VisionConstants.Y_MARGIN_TO_SPEAKER
 			? (ySpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
 			- (xSpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
-		aSpeed = Math.abs(aDiff) > 0.01
+		aSpeed = Math.abs(aDiff) > VisionConstants.ROT_MARGIN_TO_SPEAKER
 			? aSpeed : 0;
 
 		drive(xSpeedField, ySpeedField, aSpeed, true, false);
 	}
-
-	// public boolean driveToTag(int id) {
-	// 	double xDiff = rpi.getAprilTagX(id);
-	// 	double yDiff = rpi.getAprilTagZ(id) - 0.7;
-	// 	double aDiff = rpi.getAprilTagXInv(id);
-
-	// 	if (xDiff == 4000) {
-	// 		drive(0,0,0, false, false);
-	// 	}
-	// 	SmartDashboard.putNumber("x diff", xDiff);
-	// 	SmartDashboard.putNumber("y diff", yDiff);
-	// 	SmartDashboard.putNumber("a diff", aDiff);
-
-	// 	double xSpeed = clamp(xDiff
-	// 		/ 3,
-	// 		-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
-	// 		VisionConstants.MAX_SPEED_METERS_PER_SECOND);
-	// 	double ySpeed = clamp(yDiff
-	// 		/ 3,
-	// 		-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
-	// 		VisionConstants.MAX_SPEED_METERS_PER_SECOND);
-	// 	double aSpeed = -clamp(aDiff / 2,
-	// 		-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
-	// 		VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
-
-	// 	xSpeed = Math.abs(xDiff) > 0.02
-	// 		? xSpeed : 0;
-	// 	ySpeed = Math.abs(yDiff) > 0.02
-	// 		? ySpeed : 0;
-	// 	aSpeed = Math.abs(aDiff) > 0.01
-	// 		? aSpeed : 0;
-
-	// 	drive(ySpeed, xSpeed, aSpeed, true, false);
-	// 	if (xSpeed == 0 && aSpeed == 0) {
-	// 		return true;
-	// 	}
-	// 	return false;
-	// }
 
 	/**
 	 * Drives the robot until it reaches a given object.
