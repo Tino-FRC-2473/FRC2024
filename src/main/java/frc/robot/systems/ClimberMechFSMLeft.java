@@ -17,8 +17,7 @@ public class ClimberMechFSMLeft {
 	// FSM state definitions
 	public enum ClimberMechFSMState {
 		IDLE_STOP,
-		RETRACTING,
-		EXTENDING
+		RETRACTING
 	}
 
 	private static final float MOTOR_RUN_POWER = -0.1f;
@@ -97,9 +96,6 @@ public class ClimberMechFSMLeft {
 			case RETRACTING:
 				handleRetractingState(input);
 				break;
-			case EXTENDING:
-				handleExtendingState(input);
-				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -136,20 +132,12 @@ public class ClimberMechFSMLeft {
 			case IDLE_STOP:
 				if (input.isRetractClimberButtonPressed() && !peakLimitSwitchHit()) {
 					return ClimberMechFSMState.RETRACTING;
-				} else if (input.isExtendClimberButtonPressed()) {
-					return ClimberMechFSMState.EXTENDING;
 				} else {
 					return ClimberMechFSMState.IDLE_STOP;
 				}
 			case RETRACTING:
 				if (input.isRetractClimberButtonPressed() && !peakLimitSwitchHit()) {
 					return ClimberMechFSMState.RETRACTING;
-				} else {
-					return ClimberMechFSMState.IDLE_STOP;
-				}
-			case EXTENDING:
-				if (input.isExtendClimberButtonPressed()) {
-					return ClimberMechFSMState.EXTENDING;
 				} else {
 					return ClimberMechFSMState.IDLE_STOP;
 				}
@@ -176,14 +164,7 @@ public class ClimberMechFSMLeft {
 		motor.set(-MOTOR_RUN_POWER);
 	}
 
-	private void handleExtendingState(TeleopInput input) {
-		motor.set(MOTOR_RUN_POWER);
-	}
-
 	private boolean peakLimitSwitchHit() {
 		return limitPressed;
 	}
-
-
-
 }

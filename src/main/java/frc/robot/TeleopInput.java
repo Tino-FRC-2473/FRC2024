@@ -147,14 +147,6 @@ public class TeleopInput {
 		return leftJoystick.getRawButton(RETRACT_CLIMBER_BUTTON);
 	}
 
-	/**
-	 * Get the value of the extend button.
-	 * @return True if button is pressed
-	 */
-	public boolean isExtendClimberButtonPressed() {
-		return leftJoystick.getRawButton(EXTEND_CLIMBER_BUTTON);
-
-	}
 	/* ======================== Private methods ======================== */
 
 }
