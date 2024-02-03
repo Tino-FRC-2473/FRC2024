@@ -68,7 +68,7 @@ public class ClimberMechFSMRight {
 	 */
 	public void reset() {
 		currentState = ClimberMechFSMState.IDLE_STOP;
-
+		limitPressed = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -81,7 +81,7 @@ public class ClimberMechFSMRight {
 	 */
 	public void update(TeleopInput input) {
 
-		if (peakLimitSwitch.isPressed()) {
+		if (!peakLimitSwitch.isPressed()) {
 			limitPressed = true;
 		}
 
@@ -161,7 +161,7 @@ public class ClimberMechFSMRight {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleRetractingState(TeleopInput input) {
-		motor.set(-MOTOR_RUN_POWER);
+		motor.set(MOTOR_RUN_POWER);
 	}
 
 	private boolean peakLimitSwitchHit() {

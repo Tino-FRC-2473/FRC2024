@@ -37,45 +37,45 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
-		shooterFSM = new KitBotShooterFSM();
-		climberMechLeftFSM = new ClimberMechFSMLeft();
+		//shooterFSM = new KitBotShooterFSM();
+		//climberMechLeftFSM = new ClimberMechFSMLeft();
 		climberMechRightFSM = new ClimberMechFSMRight();
 
-		autoPathChooser = new AutoPathChooser();
-		driveFSMSystem = new DriveFSMSystem();
-		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
+		//autoPathChooser = new AutoPathChooser();
+		//driveFSMSystem = new DriveFSMSystem();
+		//autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		AutoPath path = AutoPath.PATH1;
-		if (AutoPathChooser.getSelectedPath() != null) {
-			path = AutoPathChooser.getSelectedPath();
-		}
-		autoHandler.reset(path);
+		//AutoPath path = AutoPath.PATH1;
+		//if (AutoPathChooser.getSelectedPath() != null) {
+		//	path = AutoPathChooser.getSelectedPath();
+		//}
+		//autoHandler.reset(path);
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		autoHandler.update();
+		//autoHandler.update();
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		climberMechLeftFSM.reset();
+		//climberMechLeftFSM.reset();
 		climberMechRightFSM.reset();
-		driveFSMSystem.reset();
-		shooterFSM.reset();
+		//driveFSMSystem.reset();
+		//shooterFSM.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		climberMechLeftFSM.update(input);
+		//climberMechLeftFSM.update(input);
 		climberMechRightFSM.update(input);
-		driveFSMSystem.update(input);
-		shooterFSM.update(input);
+		//driveFSMSystem.update(input);
+		//shooterFSM.update(input);
 	}
 
 	@Override
