@@ -7,18 +7,14 @@ public class AutoHandlerSystem {
 	public enum AutoFSMState {
 		TURN_TO_SPEAKER,
 		LEAVE_SPEAKER,
+		DRIVE_TO_SPEAKER,
 		PICK_UP_1,
-		DRIVE_TO_SPEAKER_1,
 		PICK_UP_2,
-		DRIVE_TO_SPEAKER_2,
 		PICK_UP_3,
-		DRIVE_TO_SPEAKER_3,
 		PICK_UP_4,
-		DRIVE_TO_SPEAKER_4,
 		LEAVE,
-		DRIVE_PATH_5,
-		SHOOTER_STATE,
-		INTAKE_STATE,
+		//SHOOTER_STATE,
+		//INTAKE_STATE,
 		PENDING
 	}
 
@@ -39,25 +35,24 @@ public class AutoHandlerSystem {
 
 	//FSM Systems that the autoHandlerFSM uses
 	private DriveFSMSystem driveSystem;
-	private KitBotShooterFSM shooterFSM;
+	//private KitBotShooterFSM shooterFSM;
 
 	//Predefined auto paths
 
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
-		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.SHOOTER_STATE, AutoFSMState.LEAVE_SPEAKER};
+		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.LEAVE_SPEAKER};
 
 	private static final AutoFSMState[] PATH2 = new AutoFSMState[]{
-		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_1,
-		AutoFSMState.DRIVE_TO_SPEAKER_1, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_2,
-		AutoFSMState.DRIVE_TO_SPEAKER_2, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_3,
-		AutoFSMState.DRIVE_TO_SPEAKER_3, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_4,
-		AutoFSMState.DRIVE_TO_SPEAKER_4, AutoFSMState.SHOOTER_STATE};
+		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.PICK_UP_1,
+		AutoFSMState.DRIVE_TO_SPEAKER, AutoFSMState.PICK_UP_2,
+		AutoFSMState.DRIVE_TO_SPEAKER, AutoFSMState.PICK_UP_3,
+		AutoFSMState.DRIVE_TO_SPEAKER, AutoFSMState.PICK_UP_4,
+		AutoFSMState.DRIVE_TO_SPEAKER};
 
 	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{
 		AutoFSMState.LEAVE};
 
-	private static final AutoFSMState[] PATH4 = new AutoFSMState[]{
-		AutoFSMState.SHOOTER_STATE};
+	private static final AutoFSMState[] PATH4 = new AutoFSMState[]{};
 
 	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{};
 
@@ -68,9 +63,9 @@ public class AutoHandlerSystem {
 	 * @param fsm1 the first subsystem that the auto handler will call functions on
 	 * @param fsm2 the second subsystem that the auto handler will call functions on
 	 */
-	public AutoHandlerSystem(DriveFSMSystem fsm1, KitBotShooterFSM fsm2) {
+	public AutoHandlerSystem(DriveFSMSystem fsm1) {
 		driveSystem = fsm1;
-		shooterFSM = fsm2;
+		//shooterFSM = fsm2;
 	}
 
 	/* ======================== Public methods ======================== */
@@ -93,7 +88,7 @@ public class AutoHandlerSystem {
 	 */
 	public void reset(AutoPath path) {
 		driveSystem.resetAutonomus();
-		shooterFSM.reset();
+		//shooterFSM.reset();
 
 		if (path == AutoPath.PATH1) {
 			currentStateList = PATH1;
@@ -106,6 +101,7 @@ public class AutoHandlerSystem {
 		} else if (path == AutoPath.PATH5) {
 			currentStateList = PATH5;
 		}
+		currentStateIndex = 0;
 	}
 
 	/**
@@ -131,44 +127,32 @@ public class AutoHandlerSystem {
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.PICK_UP_1);
 				break;
-			case DRIVE_TO_SPEAKER_1:
+			case DRIVE_TO_SPEAKER:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.DRIVE_TO_SPEAKER_1);
+					AutoFSMState.DRIVE_TO_SPEAKER);
 				break;
 			case PICK_UP_2:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.PICK_UP_2);
 				break;
-			case DRIVE_TO_SPEAKER_2:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.DRIVE_TO_SPEAKER_2);
-				break;
 			case PICK_UP_3:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.PICK_UP_3);
-				break;
-			case DRIVE_TO_SPEAKER_3:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.DRIVE_TO_SPEAKER_3);
 				break;
 			case PICK_UP_4:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.PICK_UP_4);
 				break;
-			case DRIVE_TO_SPEAKER_4:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.DRIVE_TO_SPEAKER_4);
-				break;
 			case LEAVE:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.LEAVE);
 				break;
-			case SHOOTER_STATE:
-				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE);
-				break;
-			case INTAKE_STATE:
-				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.INTAKE_STATE);
-				break;
+			// case SHOOTER_STATE:
+			// 	isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE);
+			// 	break;
+			// case INTAKE_STATE:
+			// 	isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.INTAKE_STATE);
+			// 	break;
 			case PENDING:
 				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.PENDING);
 				break;

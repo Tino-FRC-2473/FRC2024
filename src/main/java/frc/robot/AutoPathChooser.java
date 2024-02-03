@@ -31,8 +31,8 @@ public class AutoPathChooser {
 
 		startingPosChooser = new SendableChooser<>();
 		startingPosChooser.setDefaultOption("Center Speaker", 0);
-		startingPosChooser.addOption("Left Speaker", 1);
-		startingPosChooser.addOption("Right Speaker", 2);
+		startingPosChooser.addOption("Source Side Speaker", 1);
+		startingPosChooser.addOption("Amp Side Speaker", 2);
 		// startingPosChooser.addOption("Amp", 3);
 		// startingPosChooser.addOption("Other", 4);
 		SmartDashboard.putData("Starting Position", startingPosChooser);
