@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.PS4Controller;
 public class TeleopInput {
 	/* ======================== Constants ======================== */
 	private static final int LEFT_JOYSTICK_PORT = 1;
+	private static final int RETRACT_CLIMBER_BUTTON = 3;
 	private static final int INTAKE_BUTTON = 2;
 	private static final int OUTTAKE_BUTTON = 1;
 	public static final int DRIVER_CONTROLLER_PORT = 0;
@@ -103,6 +104,20 @@ public class TeleopInput {
 	public boolean isTriangleButtonReleased() {
 		return driverController.getTriangleButtonReleased();
 	}
+	/**
+	 * Get the value of the left trigger.
+	 * @return value of the left trigger.
+	 */
+	public double getLeftTrigger() {
+		return driverController.getL2Axis();
+	}
+	/**
+	 * Get the value of the right trigger.
+	 * @return value of the right trigger.
+	 */
+	public double getRightTrigger() {
+		return driverController.getR2Axis();
+	}
 
 	/* ------------------------ Left Joystick ------------------------ */
 	/**
@@ -120,13 +135,6 @@ public class TeleopInput {
 		return leftJoystick.getY();
 	}
 	/**
-	 * Get the value of the shooter button.
-	 * @return True if button is pressed
-	 */
-	public boolean isShooterButtonPressed() {
-		return leftJoystick.getRawButton(1);
-	}
-	/**
 	 * Get the value of the intake button.
 	 * @return True if button is pressed
 	 */
@@ -139,6 +147,13 @@ public class TeleopInput {
 	 */
 	public boolean isOuttakeButtonPressed() {
 		return leftJoystick.getRawButton(OUTTAKE_BUTTON);
+	}
+	/**
+	 * Get the value of the retract button.
+	 * @return True if button is pressed
+	 */
+	public boolean isRetractClimberButtonPressed() {
+		return leftJoystick.getRawButton(RETRACT_CLIMBER_BUTTON);
 	}
 
 	/* ======================== Private methods ======================== */
