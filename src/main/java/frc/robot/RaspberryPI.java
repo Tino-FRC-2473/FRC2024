@@ -5,7 +5,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.NetworkTablesConstants;
 import frc.robot.SwerveConstants.VisionConstants;
 
 public class RaspberryPI {
@@ -22,7 +21,7 @@ public class RaspberryPI {
 	/**Updates the FPS each iteration of the robot.*/
 	public RaspberryPI() {
 		timer.start();
-		table = NetworkTableInstance.getDefault().getTable(NetworkTablesConstants.TABLE_NAME);
+		table = NetworkTableInstance.getDefault().getTable("datatable");
 		fpsCounter = table.getDoubleTopic("x").subscribe(-1);
 		tagSubscriber = table.getDoubleArrayTopic("april_tag_data").subscribe(null);
 	}
