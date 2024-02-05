@@ -26,22 +26,27 @@ import frc.robot.TeleopInput;
 import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 import frc.robot.utils.SwerveUtils;
 import frc.robot.HardwareMap;
+import frc.robot.RaspberryPI;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.SwerveConstants.AutoConstants;
 import frc.robot.AutoPathChooser;
+import frc.robot.SwerveConstants.VisionConstants;
 
 public class DriveFSMSystem {
 	/* ======================== Constants ======================== */
 	// FSM state definitions
 	public enum FSMState {
-		TELEOP_STATE
+		TELEOP_STATE,
+		ALIGN_TO_SPEAKER_STATE,
+		ALIGN_TO_SOURCE_STATE
 	}
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
 	private int currentPointInPath;
 	private boolean blueAlliance;
+	private Double[] tagOrientationAngles;
 	private int startingPos;
 	private boolean svrMech;
 
@@ -51,6 +56,9 @@ public class DriveFSMSystem {
 	// The gyro sensor
 	private AHRS gyro = new AHRS(SPI.Port.kMXP);
 	private Timer timer = new Timer();
+
+	// The raspberry pi
+	private RaspberryPI rpi = new RaspberryPI();
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double currentRotation = 0.0;
@@ -93,6 +101,9 @@ public class DriveFSMSystem {
 			rearRight.getPosition()
 		});
 
+	private int lockedSourceId;
+	private int lockedSpeakerId;
+	private boolean isSourceAligned;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -154,6 +165,29 @@ public class DriveFSMSystem {
 		currentState = FSMState.TELEOP_STATE;
 		gyro.reset();
 		resetOdometry(new Pose2d());
+		if (AutoPathChooser.getAllianceChooser() != null) {
+			blueAlliance = AutoPathChooser.getSelectedAlliance();
+		} else {
+			blueAlliance = true;
+		}
+		if (blueAlliance) {
+			tagOrientationAngles = new Double[]
+				{null, VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
+					VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null,
+					null, null, null, VisionConstants.SPEAKER_TAG_ANGLE_DEGREES,
+					VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null,
+					null, null, null, null, null};
+		} else {
+			tagOrientationAngles = new Double[]
+				{null, null, null, VisionConstants.SPEAKER_TAG_ANGLE_DEGREES,
+					VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null, null,
+					-VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
+					-VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null, null, null, null, null,
+					null};
+		}
+		lockedSourceId = -1;
+		lockedSpeakerId = -1;
+		isSourceAligned = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -186,6 +220,24 @@ public class DriveFSMSystem {
 		} else {
 			startingPos = 1;
 		}
+		if (blueAlliance) {
+			tagOrientationAngles = new Double[]
+				{null, VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
+					VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null,
+					null, null, null, VisionConstants.SPEAKER_TAG_ANGLE_DEGREES,
+					VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null,
+					null, null, null, null, null};
+		} else {
+			tagOrientationAngles = new Double[]
+				{null, null, null, VisionConstants.SPEAKER_TAG_ANGLE_DEGREES,
+					VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null, null,
+					-VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
+					-VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null, null, null, null, null,
+					null};
+		}
+		lockedSourceId = -1;
+		lockedSpeakerId = -1;
+		isSourceAligned = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -513,6 +565,71 @@ public class DriveFSMSystem {
 				}
 				break;
 
+			case ALIGN_TO_SOURCE_STATE:
+				if (lockedSourceId == -1) {
+					if (blueAlliance) {
+						//id 1 and 2
+						double z1 = rpi.getAprilTagZInv(VisionConstants.BLUE_SOURCE_TAG1_ID);
+						double z2 = rpi.getAprilTagZInv(VisionConstants.BLUE_SOURCE_TAG2_ID);
+						if (!(z1 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
+							&& z2 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT)) {
+							if (z1 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+								lockedSourceId = VisionConstants.BLUE_SOURCE_TAG2_ID;
+							} else if (z2 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+								lockedSourceId = VisionConstants.BLUE_SOURCE_TAG1_ID;
+							} else {
+								if (z1 <= z2) {
+									lockedSourceId = VisionConstants.BLUE_SOURCE_TAG1_ID;
+								} else {
+									lockedSourceId = VisionConstants.BLUE_SOURCE_TAG2_ID;
+								}
+							}
+						}
+					} else {
+						//id 9 and 10
+						double z9 = rpi.getAprilTagZInv(VisionConstants.RED_SOURCE_TAG1_ID);
+						double z10 = rpi.getAprilTagZInv(VisionConstants.RED_SOURCE_TAG2_ID);
+						if (!(z9 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
+							&& z10 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT)) {
+							if (z9 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+								lockedSourceId = VisionConstants.RED_SOURCE_TAG2_ID;
+							} else if (z10 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+								lockedSourceId = VisionConstants.RED_SOURCE_TAG1_ID;
+							} else {
+								if (z9 <= z10) {
+									lockedSourceId = VisionConstants.RED_SOURCE_TAG1_ID;
+								} else {
+									lockedSourceId = VisionConstants.RED_SOURCE_TAG2_ID;
+								}
+							}
+						}
+					}
+				} else {
+					alignToSource(lockedSourceId);
+				}
+
+				break;
+
+			case ALIGN_TO_SPEAKER_STATE:
+				if (lockedSpeakerId == -1) {
+					if (blueAlliance) {
+						//id 7
+						if (rpi.getAprilTagZInv(VisionConstants.BLUE_SPEAKER_TAG_ID)
+							!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+							lockedSpeakerId = VisionConstants.BLUE_SPEAKER_TAG_ID;
+						}
+					} else {
+						//id 4
+						if (rpi.getAprilTagZInv(VisionConstants.RED_SPEAKER_TAG_ID)
+							!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+							lockedSpeakerId = VisionConstants.RED_SPEAKER_TAG_ID;
+						}
+					}
+				} else {
+					alignToSpeaker(lockedSpeakerId);
+				}
+
+				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -532,7 +649,27 @@ public class DriveFSMSystem {
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case TELEOP_STATE:
+				if (input.isCircleButtonPressed()) {
+					return FSMState.ALIGN_TO_SPEAKER_STATE;
+				} else if (input.isTriangleButtonPressed()) {
+					return FSMState.ALIGN_TO_SOURCE_STATE;
+				}
 				return FSMState.TELEOP_STATE;
+
+			case ALIGN_TO_SOURCE_STATE:
+				if (input.isTriangleButtonReleased()) {
+					lockedSourceId = -1;
+					isSourceAligned = false;
+					return FSMState.TELEOP_STATE;
+				}
+				return FSMState.ALIGN_TO_SOURCE_STATE;
+
+			case ALIGN_TO_SPEAKER_STATE:
+				if (input.isCircleButtonReleased()) {
+					lockedSpeakerId = -1;
+					return FSMState.TELEOP_STATE;
+				}
+				return FSMState.ALIGN_TO_SPEAKER_STATE;
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -703,6 +840,87 @@ public class DriveFSMSystem {
 			currentPointInPath++;
 		}
 		return false;
+	}
+
+	/**
+	 * @param id Id of the tag we are positioning towards.
+	 * Turns the robot towards the source's april tag and drives
+	 * towards it and straightens the robot when driving against the wall. This positions
+	 * robot to be at the source to pickup a note.
+	 */
+	public void alignToSource(int id) {
+		double yDiff = rpi.getAprilTagX(id);
+		double xDiff = rpi.getAprilTagZ(id) - VisionConstants.SOURCE_TARGET_DISTANCE;
+		double aDiff = rpi.getAprilTagXInv(id);
+
+		SmartDashboard.putNumber("x diff", xDiff);
+		SmartDashboard.putNumber("y diff", yDiff);
+		SmartDashboard.putNumber("a diff", aDiff);
+
+		double xSpeed = clamp(xDiff
+			/ VisionConstants.SOURCE_TRANSLATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
+			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
+		double ySpeed = clamp(yDiff
+			/ VisionConstants.SOURCE_TRANSLATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
+			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
+		double aSpeed = -clamp(aDiff / VisionConstants.SOURCE_ROTATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
+
+		double xSpeedField = Math.abs(xDiff) > VisionConstants.X_MARGIN_TO_SOURCE
+			? (xSpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
+			+ (ySpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
+		double ySpeedField = Math.abs(yDiff) > VisionConstants.X_MARGIN_TO_SOURCE
+			? (ySpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
+			- (xSpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
+		aSpeed = Math.abs(aDiff) > VisionConstants.ROT_MARGIN_TO_SOURCE
+			? aSpeed : 0;
+
+		if (!isSourceAligned) {
+			drive(xSpeedField, ySpeedField, aSpeed, true, false);
+			if (Math.abs(xSpeedField) < VisionConstants.MIN_SPEED_THRESHOLD
+				&& Math.abs(ySpeedField) < VisionConstants.MIN_SPEED_THRESHOLD
+				&& Math.abs(aSpeed) < VisionConstants.MIN_SPEED_THRESHOLD) {
+				isSourceAligned = true;
+			}
+		} else {
+			drive(VisionConstants.SOURCE_DRIVE_FORWARD_POWER, 0, 0, false, false);
+		}
+	}
+
+	/**
+	 * @param id Id of the tag we are positioning towards.
+	 * Positions the robot to the correct distance from the speaker to shoot
+	 */
+	public void alignToSpeaker(int id) {
+		double yDiff = rpi.getAprilTagX(id);
+		double xDiff = rpi.getAprilTagZ(id) - VisionConstants.SPEAKER_TARGET_DISTANCE;
+		double aDiff = rpi.getAprilTagXInv(id);
+
+		double xSpeed = clamp(xDiff
+			/ VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
+			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
+		double ySpeed = clamp(yDiff
+			/ VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
+			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
+		double aSpeed = -clamp(aDiff / VisionConstants.SPEAKER_ROTATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
+
+		double xSpeedField = Math.abs(xDiff) > VisionConstants.X_MARGIN_TO_SPEAKER
+			? (xSpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
+			+ (ySpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
+		double ySpeedField = Math.abs(yDiff) > VisionConstants.Y_MARGIN_TO_SPEAKER
+			? (ySpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
+			- (xSpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
+		aSpeed = Math.abs(aDiff) > VisionConstants.ROT_MARGIN_TO_SPEAKER
+			? aSpeed : 0;
+
+		drive(xSpeedField, ySpeedField, aSpeed, true, false);
 	}
 
 	/**

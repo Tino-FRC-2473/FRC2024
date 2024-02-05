@@ -13,8 +13,8 @@ public class AutoHandlerSystem {
 		PICK_UP_3,
 		PICK_UP_4,
 		LEAVE,
-		//SHOOTER_STATE,
-		//INTAKE_STATE,
+		SHOOTER_STATE,
+		INTAKE_STATE,
 		PENDING
 	}
 
@@ -35,7 +35,7 @@ public class AutoHandlerSystem {
 
 	//FSM Systems that the autoHandlerFSM uses
 	private DriveFSMSystem driveSystem;
-	//private KitBotShooterFSM shooterFSM;
+	private KitBotShooterFSM shooterFSM;
 
 	//Predefined auto paths
 
@@ -63,9 +63,9 @@ public class AutoHandlerSystem {
 	 * @param fsm1 the first subsystem that the auto handler will call functions on
 	 * @param fsm2 the second subsystem that the auto handler will call functions on
 	 */
-	public AutoHandlerSystem(DriveFSMSystem fsm1) {
+	public AutoHandlerSystem(DriveFSMSystem fsm1, KitBotShooterFSM fsm2) {
 		driveSystem = fsm1;
-		//shooterFSM = fsm2;
+		shooterFSM = fsm2;
 	}
 
 	/* ======================== Public methods ======================== */
@@ -147,12 +147,12 @@ public class AutoHandlerSystem {
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.LEAVE);
 				break;
-			// case SHOOTER_STATE:
-			// 	isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE);
-			// 	break;
-			// case INTAKE_STATE:
-			// 	isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.INTAKE_STATE);
-			// 	break;
+			case SHOOTER_STATE:
+				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE);
+				break;
+			case INTAKE_STATE:
+				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.INTAKE_STATE);
+				break;
 			case PENDING:
 				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.PENDING);
 				break;
