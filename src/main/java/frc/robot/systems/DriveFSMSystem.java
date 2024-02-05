@@ -307,10 +307,7 @@ public class DriveFSMSystem {
 				if (svrMech) {
 					toSpeaker1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				} else {
-					if (startingPos == 0) {
-						toSpeaker1.add(new Pose2d(0, 0,
-							new Rotation2d(Math.toRadians(0))));
-					} else if (startingPos == 1) {
+					if (startingPos == 1) {
 						toSpeaker1.add(new Pose2d(0, 0,
 							new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
 					} else if (startingPos == 2) {
