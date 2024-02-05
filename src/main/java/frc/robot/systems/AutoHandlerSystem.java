@@ -56,7 +56,6 @@ public class AutoHandlerSystem {
 		AutoFSMState.DRIVE_PATH_5};
 
 	private static final AutoFSMState[] PATH6 = new AutoFSMState[]{};
-
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state.

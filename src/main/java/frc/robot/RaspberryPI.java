@@ -11,14 +11,12 @@ public class RaspberryPI {
 	private double fps = 0;
 	private NetworkTable table;
 
-	//FPS Calculation
 	private DoubleSubscriber fpsCounter;
 	private DoubleArraySubscriber tagSubscriber;
 	private double previousValueReceived = 0;
 	private double previousTimeReceived = 0;
 	private Timer timer = new Timer();
-
-	public static final int APRIL_TAG_CONSTANT = 6;
+	public static final int VALUES_PER_TAG = 6;
 
 	/**Updates the FPS each iteration of the robot.*/
 	public RaspberryPI() {
@@ -46,81 +44,79 @@ public class RaspberryPI {
 		SmartDashboard.putNumber("FPS", fps);
 	}
 
-	//If the number 4000 is returned from any of the methods below, that output is
-	//invalid and no tag of the inputted Id has been detected
 	/**
-	 * Gives information about april tag.
-	 * @param id takes the id of tag
-	 * @return the x distance to the tag in inches
+	 * @param id id of the april tag we are fetching data on
+	 * @return X value from the tag to camera in meters
+	 * This value is used in tag-relative swerve movements
 	 */
 	public double getAprilTagX(int id) {
 		try {
-			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1))];
+			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1))];
 		} catch (NullPointerException e) {
 			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
 	/**
-	 * Gives information about april tag.
-	 * @param id takes the id of tag
-	 * @return the y distance to the tag in inches
+	 * @param id id of the april tag we are fetching data on
+	 * @return Y value from the tag to camera in meters
+	 * This value is used in tag-relative swerve movements
 	 */
 	public double getAprilTagY(int id) {
 		try {
-			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 1];
+			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 1];
 		} catch (NullPointerException e) {
 			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
 	/**
-	 * Gives information about april tag.
-	 * @param id takes the id of tag
-	 * @return the z distance to the tag in inches
+	 * @param id id of the april tag we are fetching data on
+	 * @return Z value from the tag to camera in meters
+	 * This value is used in tag-relative swerve movements
 	 */
 	public double getAprilTagZ(int id) {
 		try {
-			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2];
+			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 2];
 		} catch (NullPointerException e) {
 			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
 	/**
-	 * Gives information about april tag.
-	 * @param id takes the id of tag
-	 * @return the yaw to the tag
+	 * @param id id of the april tag we are fetching data on
+	 * @return X value from the camera to tag in meters
+	 * This value is proportional to yaw and is used in robot-relative swerve movements
 	 */
-	public double getAprilTagYaw(int id) {
+	public double getAprilTagXInv(int id) {
 		try {
-			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 1];
+			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 2 + 1];
 		} catch (NullPointerException e) {
 			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
 	/**
-	 * Gives information about april tag.
-	 * @param id takes the id of tag
-	 * @return the pitch to the tag
+	 * @param id id of the april tag we are fetching data on
+	 * @return Y value from the camera to tag in meters
+	 * This value is proportional to pitch and is used in robot-relative swerve movements
 	 */
-	public double getAprilTagPitch(int id) {
+	public double getAprilTagYInv(int id) {
 		try {
-			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 2];
+			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 2 + 2];
 		} catch (NullPointerException e) {
 			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
 
 	/**
-	 * Gives information about april tag.
-	 * @param id takes the id of tag
-	 * @return the roll to the tag
+	 * @param id id of the april tag we are fetching data on
+	 * @return Z value from the camera to tag in meters
+	 * This value is used in robot-relative swerve movements
 	 */
-	public double getAprilTagRoll(int id) {
+	public double getAprilTagZInv(int id) {
 		try {
-			return tagSubscriber.get()[(APRIL_TAG_CONSTANT * (id - 1)) + 2 + 2 + 1];
+			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 2 + 2 + 1];
 		} catch (NullPointerException e) {
 			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
