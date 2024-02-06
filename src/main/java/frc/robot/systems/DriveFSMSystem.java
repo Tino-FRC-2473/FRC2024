@@ -267,30 +267,33 @@ public class DriveFSMSystem {
 		GD Dir: (FRC > 23-24 > 24 Season > Autonomous > Autonomous Path Planning)
 		*/
 		switch (autoState) {
-			case LEAVE_SPEAKER:
-				ArrayList<Pose2d> leaveSpeaker = new ArrayList<Pose2d>();
+			case LEAVE:
+				ArrayList<Pose2d> leave = new ArrayList<Pose2d>();
 				if (startingPos == 0) { // center
-					leaveSpeaker.add(new Pose2d(-1, AutoConstants.N_3,
+					leave.add(new Pose2d(-1, AutoConstants.N_3,
 						new Rotation2d(Math.toRadians(0))));
-					leaveSpeaker.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_5,
+					leave.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_5,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
+					leave.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
 				} else if (startingPos == 1) { // left speaker
-					leaveSpeaker.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_4,
+					leave.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_4,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_4,
+					leave.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_4,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
 				} else if (startingPos == 2) {
-					leaveSpeaker.add(new Pose2d(-AutoConstants.N_5, 0,
+					leave.add(new Pose2d(-AutoConstants.N_5, 0,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					leaveSpeaker.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
+					leave.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
+				} else if (startingPos == 4) {
+					leave.add(new Pose2d(-AutoConstants.N_6, 0,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				} else {
-					leaveSpeaker.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					leave.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				}
-				return driveAlongPath(leaveSpeaker);
-			case TURN_TO_SPEAKER:
+				return driveAlongPath(leave);
+			case TURN_TO_SCORE:
 				ArrayList<Pose2d> turn = new ArrayList<Pose2d>();
 				if (startingPos == 1) {
 					turn.add(new Pose2d(0, 0,
@@ -302,7 +305,7 @@ public class DriveFSMSystem {
 					turn.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				}
 				return driveAlongPath(turn);
-			case DRIVE_TO_SPEAKER:
+			case DRIVE_TO_SCORE:
 				ArrayList<Pose2d> toSpeaker1 = new ArrayList<Pose2d>();
 				if (svrMech) {
 					toSpeaker1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
@@ -372,11 +375,6 @@ public class DriveFSMSystem {
 					}
 				}
 				return driveAlongPath(pickUp3);
-			case LEAVE:
-				ArrayList<Pose2d> leave = new ArrayList<Pose2d>();
-				leave.add(new Pose2d(-AutoConstants.N_6, 0,
-					new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
-				return driveAlongPath(leave);
 			case PENDING:
 				timer.start();
 				return pause(AutoConstants.WAIT_TIME);

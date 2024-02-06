@@ -19,9 +19,7 @@ public class AutoPathChooser {
 		autoPathChooser = new SendableChooser<>();
 		autoPathChooser.setDefaultOption("Score and Leave", AutoPath.PATH1);
 		autoPathChooser.addOption("MBR ONLY: Score Multiple Times", AutoPath.PATH2);
-		autoPathChooser.addOption("Leave Only", AutoPath.PATH3);
-		autoPathChooser.addOption("Score Only", AutoPath.PATH4);
-		autoPathChooser.addOption("Nothing", AutoPath.PATH5);
+		autoPathChooser.addOption("Score Only", AutoPath.PATH3);
 		SmartDashboard.putData("Auto Path", autoPathChooser);
 
 		allianceChooser = new SendableChooser<>();
@@ -33,8 +31,8 @@ public class AutoPathChooser {
 		startingPosChooser.setDefaultOption("Center Speaker", 0);
 		startingPosChooser.addOption("Source Side Speaker", 1);
 		startingPosChooser.addOption("Amp Side Speaker", 2);
-		// startingPosChooser.addOption("Amp", 3);
-		// startingPosChooser.addOption("Other", 4);
+		startingPosChooser.addOption("Amp", 3);
+		startingPosChooser.addOption("Other", 4);
 		SmartDashboard.putData("Starting Position", startingPosChooser);
 
 		mechChooser = new SendableChooser<>();

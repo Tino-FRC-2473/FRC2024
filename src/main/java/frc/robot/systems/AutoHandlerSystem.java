@@ -5,13 +5,12 @@ public class AutoHandlerSystem {
 	/* ======================== Constants ======================== */
 	// Auto FSM state definitions
 	public enum AutoFSMState {
-		TURN_TO_SPEAKER,
-		LEAVE_SPEAKER,
-		DRIVE_TO_SPEAKER,
+		TURN_TO_SCORE,
+		LEAVE,
+		DRIVE_TO_SCORE,
 		PICK_UP_1,
 		PICK_UP_2,
 		PICK_UP_3,
-		LEAVE,
 		SHOOTER_STATE,
 		INTAKE_STATE,
 		PENDING
@@ -20,9 +19,7 @@ public class AutoHandlerSystem {
 	public enum AutoPath {
 		PATH1, // score and leave
 		PATH2, // score multiple times
-		PATH3, // just leave
-		PATH4, // just score
-		PATH5 // nothing
+		PATH3, // just score
 	}
 
 	/* ======================== Private variables ======================== */
@@ -39,20 +36,17 @@ public class AutoHandlerSystem {
 	//Predefined auto paths
 
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
-		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.LEAVE_SPEAKER};
+		AutoFSMState.TURN_TO_SCORE, AutoFSMState.LEAVE};
 
 	private static final AutoFSMState[] PATH2 = new AutoFSMState[]{
-		AutoFSMState.TURN_TO_SPEAKER, AutoFSMState.PICK_UP_1,
-		AutoFSMState.DRIVE_TO_SPEAKER, AutoFSMState.PICK_UP_2,
-		AutoFSMState.DRIVE_TO_SPEAKER, AutoFSMState.PICK_UP_3,
-		AutoFSMState.DRIVE_TO_SPEAKER};
+		AutoFSMState.TURN_TO_SCORE, AutoFSMState.PICK_UP_1,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_2,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_3,
+		AutoFSMState.DRIVE_TO_SCORE};
 
-	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{
-		AutoFSMState.LEAVE};
+	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{};
 
 	private static final AutoFSMState[] PATH4 = new AutoFSMState[]{};
-
-	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{};
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -94,10 +88,6 @@ public class AutoHandlerSystem {
 			currentStateList = PATH2;
 		} else if (path == AutoPath.PATH3) {
 			currentStateList = PATH3;
-		} else if (path == AutoPath.PATH4) {
-			currentStateList = PATH4;
-		} else if (path == AutoPath.PATH5) {
-			currentStateList = PATH5;
 		}
 		currentStateIndex = 0;
 	}
@@ -113,21 +103,21 @@ public class AutoHandlerSystem {
 		SmartDashboard.putString("In Auto State: ", "" + getCurrentState());
 		switch (getCurrentState()) {
 
-			case TURN_TO_SPEAKER:
+			case TURN_TO_SCORE:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.TURN_TO_SPEAKER);
+					AutoFSMState.TURN_TO_SCORE);
 				break;
-			case LEAVE_SPEAKER:
+			case LEAVE:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.LEAVE_SPEAKER);
+					AutoFSMState.LEAVE);
 				break;
 			case PICK_UP_1:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.PICK_UP_1);
 				break;
-			case DRIVE_TO_SPEAKER:
+			case DRIVE_TO_SCORE:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.DRIVE_TO_SPEAKER);
+					AutoFSMState.DRIVE_TO_SCORE);
 				break;
 			case PICK_UP_2:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
@@ -136,10 +126,6 @@ public class AutoHandlerSystem {
 			case PICK_UP_3:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.PICK_UP_3);
-				break;
-			case LEAVE:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.LEAVE);
 				break;
 			case SHOOTER_STATE:
 				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE);
