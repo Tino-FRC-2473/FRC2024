@@ -31,7 +31,7 @@ public class AutoPathChooser {
 		startingPosChooser.setDefaultOption("Speaker (center)", 0);
 		startingPosChooser.addOption("Speaker (source side)", 1);
 		startingPosChooser.addOption("Speaker (amp side)", 2);
-		startingPosChooser.addOption("Amp", 2 + 1);
+		startingPosChooser.addOption("MBR ONLY: Amp", 2 + 1);
 		startingPosChooser.addOption("Other", 2 + 2);
 		SmartDashboard.putData("Starting Position", startingPosChooser);
 

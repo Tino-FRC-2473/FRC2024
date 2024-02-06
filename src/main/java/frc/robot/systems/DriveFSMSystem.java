@@ -50,6 +50,10 @@ public class DriveFSMSystem {
 	private int startingPos;
 	private boolean svrMech;
 
+	private int lockedSourceId;
+	private int lockedSpeakerId;
+	private boolean isSourceAligned;
+
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 
@@ -101,9 +105,6 @@ public class DriveFSMSystem {
 			rearRight.getPosition()
 		});
 
-	private int lockedSourceId;
-	private int lockedSpeakerId;
-	private boolean isSourceAligned;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -288,106 +289,86 @@ public class DriveFSMSystem {
 				return driveAlongPath(leave);
 			case DRIVE_TO_SCORE:
 				ArrayList<Pose2d> toScore = new ArrayList<Pose2d>();
-				if (svrMech) {
-					toScore.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+				if (startingPos == 1) {
+					toScore.add(new Pose2d(0, 0,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
+				} else if (startingPos == 2) {
+					toScore.add(new Pose2d(0, 0,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
+				} else if (startingPos == 2 + 1) {
+					toScore.add(new Pose2d(-AutoConstants.N_0_5, -1,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
 				} else {
-					if (startingPos == 1) {
-						toScore.add(new Pose2d(0, 0,
-							new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-					} else if (startingPos == 2) {
-						toScore.add(new Pose2d(0, 0,
-							new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-					} else if (startingPos == 2 + 1) {
-						toScore.add(new Pose2d(-AutoConstants.N_0_5, -1,
-							new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					} else {
-						toScore.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					}
+					toScore.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				}
 				return driveAlongPath(toScore);
 			case PICK_UP_1:
 				ArrayList<Pose2d> pickUp1 = new ArrayList<Pose2d>();
-				if (svrMech) {
-					pickUp1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+				if (startingPos == 0) {
+					pickUp1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
+				} else if (startingPos == 1) {
+					pickUp1.add(new Pose2d(-1, AutoConstants.N_0_5, new Rotation2d(
+						Math.toRadians(0))));
+				} else if (startingPos == 2) {
+					pickUp1.add(new Pose2d(-1, -AutoConstants.N_0_5, new Rotation2d(
+						Math.toRadians(0))));
+				} else if (startingPos == 2 + 1) {
+					pickUp1.add(new Pose2d(-AutoConstants.N_0_5, 0,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
 				} else {
-					if (startingPos == 0) {
-						pickUp1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
-					} else if (startingPos == 1) {
-						pickUp1.add(new Pose2d(-1, AutoConstants.N_0_5, new Rotation2d(
-							Math.toRadians(0))));
-					} else if (startingPos == 2) {
-						pickUp1.add(new Pose2d(-1, -AutoConstants.N_0_5, new Rotation2d(
-							Math.toRadians(0))));
-					} else if (startingPos == 2 + 1) {
-						pickUp1.add(new Pose2d(-AutoConstants.N_0_5, 0,
-							new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					} else {
-						pickUp1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					}
+					pickUp1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				}
 				return driveAlongPath(pickUp1);
 			case PICK_UP_2:
 				ArrayList<Pose2d> pickUp2 = new ArrayList<Pose2d>();
-				if (svrMech) {
-					pickUp2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+				if (startingPos == 0) {
+					pickUp2.add(new Pose2d(-1, AutoConstants.N_1_5,
+						new Rotation2d(Math.toRadians(0))));
+				} else if (startingPos == 1) {
+					pickUp2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
+				} else if (startingPos == 2) {
+					pickUp2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
+				} else if (startingPos == 2 + 1) {
+					pickUp2.add(new Pose2d(-AutoConstants.N_0_5, AutoConstants.N_1_5,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
 				} else {
-					if (startingPos == 0) {
-						pickUp2.add(new Pose2d(-1, AutoConstants.N_1_5,
-							new Rotation2d(Math.toRadians(0))));
-					} else if (startingPos == 1) {
-						pickUp2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
-					} else if (startingPos == 2) {
-						pickUp2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
-					} else if (startingPos == 2 + 1) {
-						pickUp2.add(new Pose2d(-AutoConstants.N_0_5, AutoConstants.N_1_5,
-							new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					} else {
-						pickUp2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					}
+					pickUp2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				}
 				return driveAlongPath(pickUp2);
 			case PICK_UP_3:
 				ArrayList<Pose2d> pickUp3 = new ArrayList<Pose2d>();
-				if (svrMech) {
-					pickUp3.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+				if (startingPos == 0) {
+					pickUp3.add(new Pose2d(-1, -AutoConstants.N_1_5,
+						new Rotation2d(Math.toRadians(0))));
+				} else if (startingPos == 1) {
+					pickUp3.add(new Pose2d(-1, -AutoConstants.N_2_5,
+						new Rotation2d(Math.toRadians(0))));
+				} else if (startingPos == 2) {
+					pickUp3.add(new Pose2d(-1, AutoConstants.N_2_5,
+						new Rotation2d(Math.toRadians(0))));
+				} else if (startingPos == 2 + 1) {
+					pickUp3.add(new Pose2d(-AutoConstants.N_0_5, AutoConstants.N_2_5,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
 				} else {
-					if (startingPos == 0) {
-						pickUp3.add(new Pose2d(-1, -AutoConstants.N_1_5,
-							new Rotation2d(Math.toRadians(0))));
-					} else if (startingPos == 1) {
-						pickUp3.add(new Pose2d(-1, -AutoConstants.N_2_5,
-							new Rotation2d(Math.toRadians(0))));
-					} else if (startingPos == 2) {
-						pickUp3.add(new Pose2d(-1, AutoConstants.N_2_5,
-							new Rotation2d(Math.toRadians(0))));
-					} else if (startingPos == 2 + 1) {
-						pickUp3.add(new Pose2d(-AutoConstants.N_0_5, AutoConstants.N_2_5,
-							new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					} else {
-						pickUp3.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					}
+					pickUp3.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				}
 				return driveAlongPath(pickUp3);
 			case PICK_UP_4:
 				ArrayList<Pose2d> pickUp4 = new ArrayList<Pose2d>();
-				if (svrMech) {
+				if (startingPos == 0) {
+					pickUp4.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_2,
+						new Rotation2d(Math.toRadians(0))));
+				} else if (startingPos == 1) {
+					pickUp4.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_3,
+						new Rotation2d(Math.toRadians(0))));
+				} else if (startingPos == 2) {
+					pickUp4.add(new Pose2d(-AutoConstants.N_6, -1,
+						new Rotation2d(Math.toRadians(0))));
+				} else if (startingPos == 2 + 1) {
+					pickUp4.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_0_5,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+				} else {
 					pickUp4.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-				} else if (blueAlliance) {
-					if (startingPos == 0) {
-						pickUp4.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_2,
-							new Rotation2d(Math.toRadians(0))));
-					} else if (startingPos == 1) {
-						pickUp4.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_3,
-							new Rotation2d(Math.toRadians(0))));
-					} else if (startingPos == 2) {
-						pickUp4.add(new Pose2d(-AutoConstants.N_6, -1,
-							new Rotation2d(Math.toRadians(0))));
-					} else if (startingPos == 2 + 1) {
-						pickUp4.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_0_5,
-							new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					} else {
-						pickUp4.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-					}
 				}
 				return driveAlongPath(pickUp4);
 			case PENDING:
