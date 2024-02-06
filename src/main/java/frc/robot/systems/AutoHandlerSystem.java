@@ -11,6 +11,7 @@ public class AutoHandlerSystem {
 		PICK_UP_1,
 		PICK_UP_2,
 		PICK_UP_3,
+		PICK_UP_4,
 		SHOOTER_STATE,
 		INTAKE_STATE,
 		PENDING
@@ -42,7 +43,7 @@ public class AutoHandlerSystem {
 		AutoFSMState.TURN_TO_SCORE, AutoFSMState.PICK_UP_1,
 		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_2,
 		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_3,
-		AutoFSMState.DRIVE_TO_SCORE};
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_4};
 
 	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{};
 
@@ -126,6 +127,10 @@ public class AutoHandlerSystem {
 			case PICK_UP_3:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.PICK_UP_3);
+				break;
+			case PICK_UP_4:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.PICK_UP_4);
 				break;
 			case SHOOTER_STATE:
 				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE);
