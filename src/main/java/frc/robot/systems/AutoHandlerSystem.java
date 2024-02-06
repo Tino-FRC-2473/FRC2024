@@ -20,7 +20,7 @@ public class AutoHandlerSystem {
 	public enum AutoPath {
 		PATH1, // score and leave
 		PATH2, // score multiple times
-		PATH3, // just score
+		PATH3 // tbd emergency path
 	}
 
 	/* ======================== Private variables ======================== */
@@ -40,14 +40,12 @@ public class AutoHandlerSystem {
 		AutoFSMState.TURN_TO_SCORE, AutoFSMState.LEAVE};
 
 	private static final AutoFSMState[] PATH2 = new AutoFSMState[]{
-		AutoFSMState.TURN_TO_SCORE, AutoFSMState.PICK_UP_1,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_1,
 		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_2,
 		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_3,
 		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_4};
 
 	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{};
-
-	private static final AutoFSMState[] PATH4 = new AutoFSMState[]{};
 
 	/* ======================== Constructor ======================== */
 	/**

@@ -28,11 +28,11 @@ public class AutoPathChooser {
 		SmartDashboard.putData("Alliance", allianceChooser);
 
 		startingPosChooser = new SendableChooser<>();
-		startingPosChooser.setDefaultOption("Center Speaker", 0);
-		startingPosChooser.addOption("Source Side Speaker", 1);
-		startingPosChooser.addOption("Amp Side Speaker", 2);
-		startingPosChooser.addOption("Amp", 3);
-		startingPosChooser.addOption("Other", 4);
+		startingPosChooser.setDefaultOption("Speaker (center)", 0);
+		startingPosChooser.addOption("Speaker (source side)", 1);
+		startingPosChooser.addOption("Speaker (amp side)", 2);
+		startingPosChooser.addOption("Amp", 2 + 1);
+		startingPosChooser.addOption("Other", 2 + 2);
 		SmartDashboard.putData("Starting Position", startingPosChooser);
 
 		mechChooser = new SendableChooser<>();
