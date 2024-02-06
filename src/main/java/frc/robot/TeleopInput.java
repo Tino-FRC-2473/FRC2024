@@ -158,7 +158,7 @@ public class TeleopInput {
 	 * on the PivotFSM
 	 * @return if Square Button is pressed
 	 */
-	public boolean isMechSqarePressed() {
+	public boolean isMechSquarePressed() {
 		return mechController.getSquareButton();
 	}
 

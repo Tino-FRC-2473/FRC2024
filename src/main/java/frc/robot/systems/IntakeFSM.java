@@ -23,6 +23,7 @@ public class IntakeFSM {
 	}
 
 	private static final float INTAKE_POWER = 0.1f;
+	private static final float OUTTAKE_POWER = -INTAKE_POWER;
 	private static final float AUTO_INTAKING_TIME = 2.0f;
 	private static final float AUTO_OUTTAKING_TIME = 2.0f;
 
@@ -39,7 +40,7 @@ public class IntakeFSM {
 	private boolean autoOuttakingTimerStarted;
 	private double autoOuttakingTimerStart;
 
-	private Timer timer;
+	private Timer intakeTimer;
 
 
 	/* ======================== Constructor ======================== */
@@ -50,7 +51,8 @@ public class IntakeFSM {
 	 */
 	public IntakeFSM() {
 		// Perform hardware init
-		timer = new Timer();
+		intakeTimer = new Timer();
+
 		intakeMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_INTAKE_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 
@@ -214,7 +216,7 @@ public class IntakeFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleOuttakingState(TeleopInput input) {
-		intakeMotor.set(-INTAKE_POWER); // DO NOT FORGET THE - SIGN
+		intakeMotor.set(OUTTAKE_POWER);
 	}
 
 	/**
@@ -241,20 +243,25 @@ public class IntakeFSM {
 		return true;
 	}
 
+	/**
+	 * Performs action for auto Outtaking.
+	 * @return if the action carried out has finished executing
+	 */
 	private boolean handleAutoOuttakingState() {
 
 		if (!autoOuttakingTimerStarted) {
 			autoOuttakingTimerStarted = true;
-			autoOuttakingTimerStart = timer.get();
+			autoOuttakingTimerStart = intakeTimer.get();
 		}
 
 		if ((autoOuttakingTimerStarted
-			&& !timer.hasElapsed(autoOuttakingTimerStart + AUTO_OUTTAKING_TIME))
+			&& !intakeTimer.hasElapsed(autoOuttakingTimerStart + AUTO_OUTTAKING_TIME))
 			|| !breakBeamSwitch.get()) {
 
-			intakeMotor.set(-INTAKE_POWER);
+			intakeMotor.set(OUTTAKE_POWER);
 		} else {
 			intakeMotor.set(0);
+			autoOuttakingTimerStarted = false;
 
 			return true;
 		}
@@ -262,19 +269,25 @@ public class IntakeFSM {
 		return false;
 	}
 
+	/**
+	 * Performs action for auto Intaking.
+	 * @return if the action carried out has finished executing
+	 */
 	private boolean handleAutoIntakingState() {
 
 		if (!autoIntakingTimerStarted) {
 			autoIntakingTimerStarted = true;
-			autoIntakingTimerStart = timer.get();
+			autoIntakingTimerStart = intakeTimer.get();
 		}
 
 		if ((autoIntakingTimerStarted
-			&& !timer.hasElapsed(autoIntakingTimerStart + AUTO_INTAKING_TIME))
+			&& !intakeTimer.hasElapsed(autoIntakingTimerStart + AUTO_INTAKING_TIME))
 			|| !breakBeamSwitch.get()) {
 			intakeMotor.set(INTAKE_POWER);
 		} else {
 			intakeMotor.set(0);
+			autoIntakingTimerStarted = false;
+
 			return true;
 		}
 

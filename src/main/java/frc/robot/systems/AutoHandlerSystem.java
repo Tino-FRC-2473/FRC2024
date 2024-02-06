@@ -22,9 +22,9 @@ public class AutoHandlerSystem {
 	private int currentStateIndex;
 
 	//FSM Systems that the autoHandlerFSM uses
-	private IntakeFSM subsystem1;
-	private MBRShooterFSM subsystem2;
-	private PivotFSM subsystem3;
+	private IntakeFSM intakeFSM;
+	private MBRShooterFSM shooterFSM;
+	private PivotFSM pivotFSM;
 
 	//Predefined auto paths
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
@@ -44,9 +44,9 @@ public class AutoHandlerSystem {
 	 * @param fsm3 the third subsystem that the auto handler will call functions on
 	 */
 	public AutoHandlerSystem(IntakeFSM fsm1, MBRShooterFSM fsm2, PivotFSM fsm3) {
-		subsystem1 = fsm1;
-		subsystem2 = fsm2;
-		subsystem3 = fsm3;
+		intakeFSM = fsm1;
+		shooterFSM = fsm2;
+		pivotFSM = fsm3;
 	}
 
 	/* ======================== Public methods ======================== */
@@ -68,9 +68,9 @@ public class AutoHandlerSystem {
 	 * @param path the auto path to be executed
 	 */
 	public void reset(AutoPath path) {
-		subsystem1.reset();
-		subsystem2.reset();
-		subsystem3.reset();
+		intakeFSM.reset();
+		shooterFSM.reset();
+		pivotFSM.reset();
 
 		currentStateIndex = 0;
 		if (path == AutoPath.PATH1) {
@@ -94,19 +94,19 @@ public class AutoHandlerSystem {
 		System.out.println("In State: " + getCurrentState());
 		switch (getCurrentState()) {
 			case STATE1:
-				isCurrentStateFinished = subsystem1.updateAutonomous(AutoFSMState.STATE1)
-					&& subsystem2.updateAutonomous(AutoFSMState.STATE1)
-					&& subsystem3.updateAutonomous(AutoFSMState.STATE1);
+				isCurrentStateFinished = intakeFSM.updateAutonomous(AutoFSMState.STATE1)
+					&& shooterFSM.updateAutonomous(AutoFSMState.STATE1)
+					&& pivotFSM.updateAutonomous(AutoFSMState.STATE1);
 				break;
 			case STATE2:
-				isCurrentStateFinished = subsystem1.updateAutonomous(AutoFSMState.STATE2)
-					&& subsystem2.updateAutonomous(AutoFSMState.STATE2)
-					&& subsystem3.updateAutonomous(AutoFSMState.STATE2);
+				isCurrentStateFinished = intakeFSM.updateAutonomous(AutoFSMState.STATE2)
+					&& shooterFSM.updateAutonomous(AutoFSMState.STATE2)
+					&& pivotFSM.updateAutonomous(AutoFSMState.STATE2);
 				break;
 			case STATE3:
-				isCurrentStateFinished = subsystem1.updateAutonomous(AutoFSMState.STATE3)
-					&& subsystem2.updateAutonomous(AutoFSMState.STATE3)
-					&& subsystem3.updateAutonomous(AutoFSMState.STATE3);
+				isCurrentStateFinished = intakeFSM.updateAutonomous(AutoFSMState.STATE3)
+					&& shooterFSM.updateAutonomous(AutoFSMState.STATE3)
+					&& pivotFSM.updateAutonomous(AutoFSMState.STATE3);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());
