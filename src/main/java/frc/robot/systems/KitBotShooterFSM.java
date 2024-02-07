@@ -23,8 +23,9 @@ public class KitBotShooterFSM {
 		OUTTAKING
 	}
 
-	private static final float L_MOTOR_RUN_POWER = 0.05f;
-	private static final float U_MOTOR_RUN_POWER = 0.1f;
+	private static final float L_MOTOR_RUN_POWER = 0.8f;
+	private static final float U_MOTOR_RUN_POWER = -1.0f;
+	private static final float INTAKING_SPEED = -0.4f;
 	private static final float OUTTAKING_TIME = 2.0f;
 
 	/* ======================== Private variables ======================== */
@@ -117,6 +118,8 @@ public class KitBotShooterFSM {
 		SmartDashboard.putBoolean("Bottom Limit Switch Pressed", bottomLimitSwitch.isPressed());
 		SmartDashboard.putBoolean("Outtake Button Pressed", input.isOuttakeButtonPressed());
 		SmartDashboard.putBoolean("Intake Button Pressed", input.isIntakeButtonPressed());
+		SmartDashboard.putNumber("Motor SPeed", highMotor.get());
+		SmartDashboard.putNumber("Get applied output", highMotor.getAppliedOutput());
 		currentState = nextState(input);
 	}
 
@@ -194,8 +197,8 @@ public class KitBotShooterFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleIntakingState(TeleopInput input) {
-		lowMotor.set(-L_MOTOR_RUN_POWER);
-		highMotor.set(-U_MOTOR_RUN_POWER);
+		lowMotor.set(INTAKING_SPEED);
+		highMotor.set(-INTAKING_SPEED);
 	}
 
 	/**
