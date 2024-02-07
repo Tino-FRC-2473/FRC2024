@@ -314,7 +314,7 @@ public class DriveFSMSystem {
 						Math.toRadians(0))));
 				} else if (startingPos == 2 + 1) {
 					pickUp1.add(new Pose2d(-AutoConstants.N_0_5, 0,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+						new Rotation2d(Math.toRadians(0))));
 				} else {
 					pickUp1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				}
@@ -330,7 +330,7 @@ public class DriveFSMSystem {
 					pickUp2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
 				} else if (startingPos == 2 + 1) {
 					pickUp2.add(new Pose2d(-AutoConstants.N_0_5, AutoConstants.N_1_5,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+						new Rotation2d(Math.toRadians(0))));
 				} else {
 					pickUp2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				}
@@ -348,7 +348,7 @@ public class DriveFSMSystem {
 						new Rotation2d(Math.toRadians(0))));
 				} else if (startingPos == 2 + 1) {
 					pickUp3.add(new Pose2d(-AutoConstants.N_0_5, AutoConstants.N_2_5,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+						new Rotation2d(Math.toRadians(0))));
 				} else {
 					pickUp3.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				}
@@ -366,7 +366,7 @@ public class DriveFSMSystem {
 						new Rotation2d(Math.toRadians(0))));
 				} else if (startingPos == 2 + 1) {
 					pickUp4.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_0_5,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+						new Rotation2d(Math.toRadians(0))));
 				} else {
 					pickUp4.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				}
@@ -642,7 +642,8 @@ public class DriveFSMSystem {
 	public boolean driveToPose(Pose2d pose) {
 		double x = pose.getX();
 		double y = (blueAlliance ? pose.getY() : -pose.getY());
-		double angle = pose.getRotation().getDegrees();
+		double angle = (blueAlliance ? pose.getRotation().getDegrees()
+			: -pose.getRotation().getDegrees());
 
 		double xDiff = x - getPose().getX();
 		double yDiff = y - getPose().getY();
@@ -689,6 +690,11 @@ public class DriveFSMSystem {
 			/ AutoConstants.AUTO_DRIVE_ANGULAR_SPEED_ACCEL_CONSTANT) : Math.max(
 			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff
 			/ AutoConstants.AUTO_DRIVE_ANGULAR_SPEED_ACCEL_CONSTANT)) : 0;
+
+		// code to counter slippage
+		// double aSpeed = Math.abs(aDiff) > AutoConstants.AUTO_DRIVE_DEGREES_MARGIN_OF_ERROR
+		// 	? (aDiff > 0 ? AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
+		// 	: -AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND) : 0;
 
 		drive(xSpeed, ySpeed, aSpeed, true, false);
 		if (xSpeed == 0 && ySpeed == 0 && aSpeed == 0) {

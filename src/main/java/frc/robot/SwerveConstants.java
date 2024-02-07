@@ -128,6 +128,7 @@ public final class SwerveConstants {
 		//auto paths constants
 		public static final double MAX_SPEED_METERS_PER_SECOND = 0.5; // 0.5 decided
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 10;
+		// lower angular velocity to fix slipping issue
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI / 2;
 		public static final double AUTO_DRIVE_METERS_MARGIN_OF_ERROR = 0.03;
 		public static final double AUTO_DRIVE_DEGREES_MARGIN_OF_ERROR = 3;
