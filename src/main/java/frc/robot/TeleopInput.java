@@ -13,17 +13,20 @@ import edu.wpi.first.wpilibj.PS4Controller;
  */
 public class TeleopInput {
 	/* ======================== Constants ======================== */
-	private static final int LEFT_JOYSTICK_PORT = 1;
+	private static final int LEFT_JOYSTICK_PORT = 2;
+	private static final int MECH_CONTROLLER_PORT = 1;
+	public static final int DRIVER_CONTROLLER_PORT = 0;
+
 	private static final int RETRACT_CLIMBER_BUTTON = 3;
 	private static final int EXTEND_CLIMBER_BUTTON = 4;
 
 	private static final int INTAKE_BUTTON = 2;
 	private static final int OUTTAKE_BUTTON = 1;
-	public static final int DRIVER_CONTROLLER_PORT = 0;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
 	private Joystick leftJoystick;
+	private PS4Controller mechController;
 	private PS4Controller driverController;
 
 	/* ======================== Constructor ======================== */
@@ -34,6 +37,7 @@ public class TeleopInput {
 	 */
 	public TeleopInput() {
 		leftJoystick = new Joystick(LEFT_JOYSTICK_PORT);
+		mechController = new PS4Controller(MECH_CONTROLLER_PORT);
 		driverController = new PS4Controller(DRIVER_CONTROLLER_PORT);
 	}
 
@@ -105,6 +109,86 @@ public class TeleopInput {
 	 */
 	public boolean isTriangleButtonReleased() {
 		return driverController.getTriangleButtonReleased();
+	}
+
+	/* ------------------------ Mech Controller ------------------------ */
+	/**
+	 * Get X axis of Left Joystick.
+	 * @return Axis value
+	 */
+	public double getMechControllerLeftX() {
+		return mechController.getLeftX();
+	}
+	/**
+	 * Get Y axis of Left Joystick.
+	 * @return Axis value
+	 */
+	public double getMechControllerLeftY() {
+		return mechController.getLeftY();
+	}
+
+	/**
+	 * Get X axis of Right Joystick.
+	 * @return Axis Value
+	 */
+	public double getMechControllerRightX() {
+		return mechController.getRightX();
+	}
+
+	/**
+	 * Get Y axis of Right Joystick.
+	 * @return Axis Value
+	 */
+	public double getMechControllerRightY() {
+		return mechController.getRightY();
+	}
+
+	/**
+	 * Get the value of the Circle button.
+	 * @return True if button is pressed
+	 */
+	public boolean isMechCircleButtonPressed() {
+		return mechController.getCircleButton();
+	}
+
+	/**
+	 * Get the value of the Triangle button.
+	 * @return True if button is pressed
+	 */
+	public boolean isMechTriangleButtonPressed() {
+		return mechController.getTriangleButton();
+	}
+
+	/**
+	 * Get the value of the Square button.
+	 * @return True if button is pressed
+	 */
+	public boolean isMechSquareButtonPressed() {
+		return mechController.getSquareButton();
+	}
+
+	/**
+	 * Get the value of the Cross button.
+	 * @return True if button is pressed
+	 */
+	public boolean isMechCrossButtonPressed() {
+		return mechController.getCrossButton();
+	}
+
+	/**
+	 * Get the value of the R1 button.
+	 * @return True if button is pressed
+	 */
+	public boolean isMechR1ButtonPressed() {
+		return mechController.getR1Button();
+	}
+
+	/**
+	 * Get the value of the L1 button.
+	 * @return True if button is pressed
+	 */
+	public boolean isMechL1ButtonPressed() {
+		return mechController.getL1Button();
 	}
 
 	/* ------------------------ Left Joystick ------------------------ */
