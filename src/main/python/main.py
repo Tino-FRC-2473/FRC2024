@@ -11,8 +11,8 @@ import time
 
 FOV = (50.28, 29.16)
 RES = (320, 240)
-CAM_HEIGHT = 0.762
-CAM_ANGLE = -45
+CAM_HEIGHT = 0.7493
+CAM_ANGLE = 50
 d = Detector()
 input = VisionInput(FOV, RES, CAM_HEIGHT, CAM_ANGLE)
 curr = 0
@@ -40,8 +40,10 @@ while True:
             if target is not None:
                 yaw = target.get_yaw_degrees()
                 distance = target.get_distance_meters()
+                pitch = target.get_pitch_degrees()
                 print("yaw: ", yaw)
                 print("distance: ", distance)
+                print("pitch: ", pitch)
 
                 #print("detection: ", time.time() - curr)
                 curr = time.time()

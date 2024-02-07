@@ -5,13 +5,13 @@ import math
 class Target:
     FOV = (50.28, 29.16)
     RES = (1280, 720)
-    CAM_HEIGHT = 0.15
-    CAM_ANGLE = 0
+    CAM_HEIGHT = 0.7493
+    CAM_ANGLE = 50
 
     def __init__(self, contour, target_type):
         self.contour = contour
         self.target_type = target_type
-        self.heights = {"RING": 0.3556} #need to change
+        self.heights = {"RING": 0.0508} #need to change
 
     def __str__(self):
         return self.target_type + " coords - " + self.contour
@@ -47,4 +47,5 @@ class Target:
 
     def get_distance_meters(self):
         height = self.heights[self.getType()]
-        return (height - Target.CAM_HEIGHT) / math.tan(math.radians(Target.CAM_ANGLE + self.get_pitch_degrees()))
+        print("angle: ", math.radians(Target.CAM_ANGLE + self.get_pitch_degrees()))
+        return math.tan(math.radians(Target.CAM_ANGLE + self.get_pitch_degrees())) * (Target.CAM_HEIGHT-height)
