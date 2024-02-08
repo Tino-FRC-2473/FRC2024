@@ -223,6 +223,7 @@ public class MBRShooterFSM {
 		} else {
 			leftMotor.set(0);
 			rightMotor.set(0);
+
 			autoShootingTimerStarted = false;
 
 			return true;

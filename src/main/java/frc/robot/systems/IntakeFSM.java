@@ -261,6 +261,7 @@ public class IntakeFSM {
 			intakeMotor.set(OUTTAKE_POWER);
 		} else {
 			intakeMotor.set(0);
+
 			autoOuttakingTimerStarted = false;
 
 			return true;
@@ -286,6 +287,7 @@ public class IntakeFSM {
 			intakeMotor.set(INTAKE_POWER);
 		} else {
 			intakeMotor.set(0);
+
 			autoIntakingTimerStarted = false;
 
 			return true;
