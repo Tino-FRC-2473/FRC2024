@@ -26,22 +26,29 @@ import frc.robot.TeleopInput;
 import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 import frc.robot.utils.SwerveUtils;
 import frc.robot.HardwareMap;
+import frc.robot.RaspberryPI;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.SwerveConstants.AutoConstants;
 import frc.robot.AutoPathChooser;
+import frc.robot.SwerveConstants.VisionConstants;
 
 public class DriveFSMSystem {
 	/* ======================== Constants ======================== */
 	// FSM state definitions
 	public enum FSMState {
-		TELEOP_STATE
+		TELEOP_STATE,
+		ALIGN_TO_SPEAKER_STATE,
+		ALIGN_TO_SOURCE_STATE
 	}
 
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
 	private int currentPointInPath;
 	private boolean blueAlliance;
+	private Double[] tagOrientationAngles;
+	private int startingPos;
+	private boolean svrMech;
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -49,6 +56,9 @@ public class DriveFSMSystem {
 	// The gyro sensor
 	private AHRS gyro = new AHRS(SPI.Port.kMXP);
 	private Timer timer = new Timer();
+
+	// The raspberry pi
+	private RaspberryPI rpi = new RaspberryPI();
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double currentRotation = 0.0;
@@ -91,6 +101,9 @@ public class DriveFSMSystem {
 			rearRight.getPosition()
 		});
 
+	private int lockedSourceId;
+	private int lockedSpeakerId;
+	private boolean isSourceAligned;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -152,6 +165,29 @@ public class DriveFSMSystem {
 		currentState = FSMState.TELEOP_STATE;
 		gyro.reset();
 		resetOdometry(new Pose2d());
+		if (AutoPathChooser.getAllianceChooser() != null) {
+			blueAlliance = AutoPathChooser.getSelectedAlliance();
+		} else {
+			blueAlliance = true;
+		}
+		if (blueAlliance) {
+			tagOrientationAngles = new Double[]
+				{null, VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
+					VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null,
+					null, null, null, VisionConstants.SPEAKER_TAG_ANGLE_DEGREES,
+					VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null,
+					null, null, null, null, null};
+		} else {
+			tagOrientationAngles = new Double[]
+				{null, null, null, VisionConstants.SPEAKER_TAG_ANGLE_DEGREES,
+					VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null, null,
+					-VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
+					-VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null, null, null, null, null,
+					null};
+		}
+		lockedSourceId = -1;
+		lockedSpeakerId = -1;
+		isSourceAligned = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -169,9 +205,39 @@ public class DriveFSMSystem {
 		currentPointInPath = 0;
 		gyro.reset();
 		resetOdometry(new Pose2d());
-		if (AutoPathChooser.getAutoPathChooser() != null) {
-			blueAlliance = AutoPathChooser.getSelectedAlliance();
+		if (AutoPathChooser.getMechChooser() != null) {
+			svrMech = AutoPathChooser.getSelectedMech();
+		} else {
+			svrMech = true;
 		}
+		if (AutoPathChooser.getAllianceChooser() != null) {
+			blueAlliance = AutoPathChooser.getSelectedAlliance();
+		} else {
+			blueAlliance = true;
+		}
+		if (AutoPathChooser.getStartPosChooser() != null) {
+			startingPos = AutoPathChooser.getStartingPos();
+		} else {
+			startingPos = 1;
+		}
+		if (blueAlliance) {
+			tagOrientationAngles = new Double[]
+				{null, VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
+					VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null,
+					null, null, null, VisionConstants.SPEAKER_TAG_ANGLE_DEGREES,
+					VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null,
+					null, null, null, null, null};
+		} else {
+			tagOrientationAngles = new Double[]
+				{null, null, null, VisionConstants.SPEAKER_TAG_ANGLE_DEGREES,
+					VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null, null,
+					-VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
+					-VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null, null, null, null, null,
+					null};
+		}
+		lockedSourceId = -1;
+		lockedSpeakerId = -1;
+		isSourceAligned = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -188,108 +254,142 @@ public class DriveFSMSystem {
 				frontRight.getPosition(),
 				rearLeft.getPosition(),
 				rearRight.getPosition()});
-
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
 		SmartDashboard.putNumber("Heading", getPose().getRotation().getDegrees());
 		SmartDashboard.putNumber("Auto point #", currentPointInPath);
 
-		/*
-		Auto Path Points
-		Refer to the following document for point references
-		Link: http://tinyurl.com/2023-auto-planning
-		GD Dir: (FRC > 23-24 > 24 Season > Autonomous > Autonomous Path Planning)
-		*/
 		switch (autoState) {
-			case DRIVE_PATH_1:
-				ArrayList<Pose2d> path1Points = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					path1Points.add(new Pose2d(-1, AutoConstants.N_3,
+			case LEAVE:
+				ArrayList<Pose2d> leave = new ArrayList<Pose2d>();
+				if (startingPos == 0) { // center
+					leave.add(new Pose2d(-1, AutoConstants.N_3,
 						new Rotation2d(Math.toRadians(0))));
-					path1Points.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_5,
+					leave.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_5,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					path1Points.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
+					leave.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
-				} else {
-					path1Points.add(new Pose2d(-1, -AutoConstants.N_3,
-						new Rotation2d(Math.toRadians(0))));
-					path1Points.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_5,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					path1Points.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_5,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
-				}
-				return driveAlongPath(path1Points);
-			case DRIVE_PATH_2:
-				ArrayList<Pose2d> path2Points = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					path2Points.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-					path2Points.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_4,
+				} else if (startingPos == 1) { // source side speaker
+					leave.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_4,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					path2Points.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_4,
+					leave.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_4,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
-				} else {
-					path2Points.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-					path2Points.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_4,
+				} else if (startingPos == 2 || startingPos == 2 + 1) { // amp side speaker
+					leave.add(new Pose2d(-AutoConstants.N_5, 0,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					path2Points.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_4,
+					leave.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
-				}
-				return driveAlongPath(path2Points);
-			case DRIVE_PATH_3:
-				ArrayList<Pose2d> path3Points = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					path3Points.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-					path3Points.add(new Pose2d(-AutoConstants.N_5, 0,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					path3Points.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
+				} else if (startingPos == 2 + 2) { // other (leave in a straight line)
+					leave.add(new Pose2d(-AutoConstants.N_6, 0,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				} else {
-					path3Points.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-					path3Points.add(new Pose2d(-AutoConstants.N_5, 0,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					path3Points.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_5,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
+					leave.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				}
-				return driveAlongPath(path3Points);
-			case DRIVE_PATH_4_STATE_1:
-				ArrayList<Pose2d> path4Points1 = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					path4Points1.add(new Pose2d(0, -AutoConstants.N_2,
-						new Rotation2d(Math.toRadians(0))));
+				return driveAlongPath(leave);
+			case DRIVE_TO_SCORE:
+				ArrayList<Pose2d> toScore = new ArrayList<Pose2d>();
+				if (svrMech) {
+					toScore.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				} else {
-					path4Points1.add(new Pose2d(0, 2, new Rotation2d(Math.toRadians(0))));
+					if (startingPos == 1) {
+						toScore.add(new Pose2d(0, 0,
+							new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
+					} else if (startingPos == 2) {
+						toScore.add(new Pose2d(0, 0,
+							new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
+					} else if (startingPos == 2 + 1) {
+						toScore.add(new Pose2d(-AutoConstants.N_0_5, -1,
+							new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
+					} else {
+						toScore.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					}
 				}
-				return driveAlongPath(path4Points1);
-			case DRIVE_PATH_4_STATE_2:
-				ArrayList<Pose2d> path4Points2 = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					path4Points2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
-					path4Points2.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_3,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					path4Points2.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_3,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
+				return driveAlongPath(toScore);
+			case PICK_UP_1:
+				ArrayList<Pose2d> pickUp1 = new ArrayList<Pose2d>();
+				if (svrMech) {
+					pickUp1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				} else {
-					path4Points2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
-					path4Points2.add(new Pose2d(-AutoConstants.N_3_5, -AutoConstants.N_5,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					path4Points2.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_3,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
+					if (startingPos == 0) {
+						pickUp1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						pickUp1.add(new Pose2d(-1, AutoConstants.N_0_5, new Rotation2d(
+							Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						pickUp1.add(new Pose2d(-1, -AutoConstants.N_0_5, new Rotation2d(
+							Math.toRadians(0))));
+					} else if (startingPos == 2 + 1) {
+						pickUp1.add(new Pose2d(-AutoConstants.N_0_5, 0,
+							new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+					} else {
+						pickUp1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					}
 				}
-				return driveAlongPath(path4Points2);
-			case DRIVE_PATH_5:
-				ArrayList<Pose2d> path5Points = new ArrayList<Pose2d>();
-				if (blueAlliance) {
-					path5Points.add(new Pose2d(-AutoConstants.N_6, 0,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
+				return driveAlongPath(pickUp1);
+			case PICK_UP_2:
+				ArrayList<Pose2d> pickUp2 = new ArrayList<Pose2d>();
+				if (svrMech) {
+					pickUp2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				} else {
-					path5Points.add(new Pose2d(-AutoConstants.N_6, 0,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
+					if (startingPos == 0) {
+						pickUp2.add(new Pose2d(-1, AutoConstants.N_1_5,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						pickUp2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						pickUp2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2 + 1) {
+						pickUp2.add(new Pose2d(-AutoConstants.N_0_5, AutoConstants.N_1_5,
+							new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+					} else {
+						pickUp2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					}
 				}
-				return driveAlongPath(path5Points);
+				return driveAlongPath(pickUp2);
+			case PICK_UP_3:
+				ArrayList<Pose2d> pickUp3 = new ArrayList<Pose2d>();
+				if (svrMech) {
+					pickUp3.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+				} else {
+					if (startingPos == 0) {
+						pickUp3.add(new Pose2d(-1, -AutoConstants.N_1_5,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						pickUp3.add(new Pose2d(-1, -AutoConstants.N_2_5,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						pickUp3.add(new Pose2d(-1, AutoConstants.N_2_5,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2 + 1) {
+						pickUp3.add(new Pose2d(-AutoConstants.N_0_5, AutoConstants.N_2_5,
+							new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+					} else {
+						pickUp3.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					}
+				}
+				return driveAlongPath(pickUp3);
+			case PICK_UP_4:
+				ArrayList<Pose2d> pickUp4 = new ArrayList<Pose2d>();
+				if (svrMech) {
+					pickUp4.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+				} else if (blueAlliance) {
+					if (startingPos == 0) {
+						pickUp4.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_2,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 1) {
+						pickUp4.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_3,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2) {
+						pickUp4.add(new Pose2d(-AutoConstants.N_6, -1,
+							new Rotation2d(Math.toRadians(0))));
+					} else if (startingPos == 2 + 1) {
+						pickUp4.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_0_5,
+							new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+					} else {
+						pickUp4.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+					}
+				}
+				return driveAlongPath(pickUp4);
 			case PENDING:
 				timer.start();
 				return pause(AutoConstants.WAIT_TIME);
@@ -339,13 +439,15 @@ public class DriveFSMSystem {
 		switch (currentState) {
 			case TELEOP_STATE:
 				drive(-MathUtil.applyDeadband((input.getControllerLeftJoystickY()
-					* Math.abs(input.getControllerLeftJoystickY())),
-					OIConstants.DRIVE_DEADBAND),
+					* Math.abs(input.getControllerLeftJoystickY()) * ((input.getLeftTrigger() / 2)
+					+ DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT) / 2), OIConstants.DRIVE_DEADBAND),
 					-MathUtil.applyDeadband((input.getControllerLeftJoystickX()
-					* Math.abs(input.getControllerLeftJoystickX())),
-					OIConstants.DRIVE_DEADBAND),
-					-MathUtil.applyDeadband(input.getControllerRightJoystickX(),
-					OIConstants.DRIVE_DEADBAND), true, true);
+					* Math.abs(input.getControllerLeftJoystickX()) * ((input.getLeftTrigger() / 2)
+					+ DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT) / 2), OIConstants.DRIVE_DEADBAND),
+					-MathUtil.applyDeadband((input.getControllerRightJoystickX()
+					* ((input.getLeftTrigger() / 2) + DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT)
+					/ DriveConstants.ANGULAR_SPEED_LIMIT_CONSTANT), OIConstants.DRIVE_DEADBAND),
+					true, true);
 				if (input.isBackButtonPressed()) {
 					gyro.reset();
 					resetOdometry(new Pose2d(new Translation2d(getPose().getX(), getPose().getY()),
@@ -353,6 +455,71 @@ public class DriveFSMSystem {
 				}
 				break;
 
+			case ALIGN_TO_SOURCE_STATE:
+				if (lockedSourceId == -1) {
+					if (blueAlliance) {
+						//id 1 and 2
+						double z1 = rpi.getAprilTagZInv(VisionConstants.BLUE_SOURCE_TAG1_ID);
+						double z2 = rpi.getAprilTagZInv(VisionConstants.BLUE_SOURCE_TAG2_ID);
+						if (!(z1 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
+							&& z2 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT)) {
+							if (z1 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+								lockedSourceId = VisionConstants.BLUE_SOURCE_TAG2_ID;
+							} else if (z2 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+								lockedSourceId = VisionConstants.BLUE_SOURCE_TAG1_ID;
+							} else {
+								if (z1 <= z2) {
+									lockedSourceId = VisionConstants.BLUE_SOURCE_TAG1_ID;
+								} else {
+									lockedSourceId = VisionConstants.BLUE_SOURCE_TAG2_ID;
+								}
+							}
+						}
+					} else {
+						//id 9 and 10
+						double z9 = rpi.getAprilTagZInv(VisionConstants.RED_SOURCE_TAG1_ID);
+						double z10 = rpi.getAprilTagZInv(VisionConstants.RED_SOURCE_TAG2_ID);
+						if (!(z9 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
+							&& z10 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT)) {
+							if (z9 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+								lockedSourceId = VisionConstants.RED_SOURCE_TAG2_ID;
+							} else if (z10 == VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+								lockedSourceId = VisionConstants.RED_SOURCE_TAG1_ID;
+							} else {
+								if (z9 <= z10) {
+									lockedSourceId = VisionConstants.RED_SOURCE_TAG1_ID;
+								} else {
+									lockedSourceId = VisionConstants.RED_SOURCE_TAG2_ID;
+								}
+							}
+						}
+					}
+				} else {
+					alignToSource(lockedSourceId);
+				}
+
+				break;
+
+			case ALIGN_TO_SPEAKER_STATE:
+				if (lockedSpeakerId == -1) {
+					if (blueAlliance) {
+						//id 7
+						if (rpi.getAprilTagZInv(VisionConstants.BLUE_SPEAKER_TAG_ID)
+							!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+							lockedSpeakerId = VisionConstants.BLUE_SPEAKER_TAG_ID;
+						}
+					} else {
+						//id 4
+						if (rpi.getAprilTagZInv(VisionConstants.RED_SPEAKER_TAG_ID)
+							!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+							lockedSpeakerId = VisionConstants.RED_SPEAKER_TAG_ID;
+						}
+					}
+				} else {
+					alignToSpeaker(lockedSpeakerId);
+				}
+
+				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -372,7 +539,27 @@ public class DriveFSMSystem {
 	private FSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case TELEOP_STATE:
+				if (input.isCircleButtonPressed()) {
+					return FSMState.ALIGN_TO_SPEAKER_STATE;
+				} else if (input.isTriangleButtonPressed()) {
+					return FSMState.ALIGN_TO_SOURCE_STATE;
+				}
 				return FSMState.TELEOP_STATE;
+
+			case ALIGN_TO_SOURCE_STATE:
+				if (input.isTriangleButtonReleased()) {
+					lockedSourceId = -1;
+					isSourceAligned = false;
+					return FSMState.TELEOP_STATE;
+				}
+				return FSMState.ALIGN_TO_SOURCE_STATE;
+
+			case ALIGN_TO_SPEAKER_STATE:
+				if (input.isCircleButtonReleased()) {
+					lockedSpeakerId = -1;
+					return FSMState.TELEOP_STATE;
+				}
+				return FSMState.ALIGN_TO_SPEAKER_STATE;
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -473,16 +660,20 @@ public class DriveFSMSystem {
 	 */
 	public boolean driveToPose(Pose2d pose) {
 		double x = pose.getX();
-		double y = pose.getY();
+		double y = (blueAlliance ? pose.getY() : -pose.getY());
 		double angle = pose.getRotation().getDegrees();
 
 		double xDiff = x - getPose().getX();
 		double yDiff = y - getPose().getY();
 		double aDiff = angle - getPose().getRotation().getDegrees();
 
-		SmartDashboard.putNumber("x diff", xDiff);
-		SmartDashboard.putNumber("y diff", yDiff);
-		SmartDashboard.putNumber("a diff", aDiff);
+		if (aDiff > AutoConstants.DEG_180) {
+			aDiff -= AutoConstants.DEG_360;
+		} else if (aDiff < -AutoConstants.DEG_180) {
+			aDiff += AutoConstants.DEG_360;
+		}
+
+		System.out.println(aDiff);
 
 		double xSpeed;
 		double ySpeed;
@@ -539,6 +730,87 @@ public class DriveFSMSystem {
 			currentPointInPath++;
 		}
 		return false;
+	}
+
+	/**
+	 * @param id Id of the tag we are positioning towards.
+	 * Turns the robot towards the source's april tag and drives
+	 * towards it and straightens the robot when driving against the wall. This positions
+	 * robot to be at the source to pickup a note.
+	 */
+	public void alignToSource(int id) {
+		double yDiff = rpi.getAprilTagX(id);
+		double xDiff = rpi.getAprilTagZ(id) - VisionConstants.SOURCE_TARGET_DISTANCE;
+		double aDiff = rpi.getAprilTagXInv(id);
+
+		SmartDashboard.putNumber("x diff", xDiff);
+		SmartDashboard.putNumber("y diff", yDiff);
+		SmartDashboard.putNumber("a diff", aDiff);
+
+		double xSpeed = clamp(xDiff
+			/ VisionConstants.SOURCE_TRANSLATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
+			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
+		double ySpeed = clamp(yDiff
+			/ VisionConstants.SOURCE_TRANSLATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
+			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
+		double aSpeed = -clamp(aDiff / VisionConstants.SOURCE_ROTATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
+
+		double xSpeedField = Math.abs(xDiff) > VisionConstants.X_MARGIN_TO_SOURCE
+			? (xSpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
+			+ (ySpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
+		double ySpeedField = Math.abs(yDiff) > VisionConstants.X_MARGIN_TO_SOURCE
+			? (ySpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
+			- (xSpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
+		aSpeed = Math.abs(aDiff) > VisionConstants.ROT_MARGIN_TO_SOURCE
+			? aSpeed : 0;
+
+		if (!isSourceAligned) {
+			drive(xSpeedField, ySpeedField, aSpeed, true, false);
+			if (Math.abs(xSpeedField) < VisionConstants.MIN_SPEED_THRESHOLD
+				&& Math.abs(ySpeedField) < VisionConstants.MIN_SPEED_THRESHOLD
+				&& Math.abs(aSpeed) < VisionConstants.MIN_SPEED_THRESHOLD) {
+				isSourceAligned = true;
+			}
+		} else {
+			drive(VisionConstants.SOURCE_DRIVE_FORWARD_POWER, 0, 0, false, false);
+		}
+	}
+
+	/**
+	 * @param id Id of the tag we are positioning towards.
+	 * Positions the robot to the correct distance from the speaker to shoot
+	 */
+	public void alignToSpeaker(int id) {
+		double yDiff = rpi.getAprilTagX(id);
+		double xDiff = rpi.getAprilTagZ(id) - VisionConstants.SPEAKER_TARGET_DISTANCE;
+		double aDiff = rpi.getAprilTagXInv(id);
+
+		double xSpeed = clamp(xDiff
+			/ VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
+			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
+		double ySpeed = clamp(yDiff
+			/ VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
+			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
+		double aSpeed = -clamp(aDiff / VisionConstants.SPEAKER_ROTATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
+
+		double xSpeedField = Math.abs(xDiff) > VisionConstants.X_MARGIN_TO_SPEAKER
+			? (xSpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
+			+ (ySpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
+		double ySpeedField = Math.abs(yDiff) > VisionConstants.Y_MARGIN_TO_SPEAKER
+			? (ySpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
+			- (xSpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
+		aSpeed = Math.abs(aDiff) > VisionConstants.ROT_MARGIN_TO_SPEAKER
+			? aSpeed : 0;
+
+		drive(xSpeedField, ySpeedField, aSpeed, true, false);
 	}
 
 	/**

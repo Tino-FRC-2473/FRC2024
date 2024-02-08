@@ -43,6 +43,9 @@ public class Robot extends TimedRobot {
 
 		autoPathChooser = new AutoPathChooser();
 		driveFSMSystem = new DriveFSMSystem();
+		shooterFSM = new KitBotShooterFSM();
+		climberMechLeftFSM = new ClimberMechFSMLeft();
+		climberMechRightFSM = new ClimberMechFSMRight();
 		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
 	}
 
@@ -67,6 +70,8 @@ public class Robot extends TimedRobot {
 		climberMechLeftFSM.reset();
 		climberMechRightFSM.reset();
 		driveFSMSystem.reset();
+		climberMechLeftFSM.reset();
+		climberMechRightFSM.reset();
 		shooterFSM.reset();
 	}
 
@@ -75,6 +80,8 @@ public class Robot extends TimedRobot {
 		climberMechLeftFSM.update(input);
 		climberMechRightFSM.update(input);
 		driveFSMSystem.update(input);
+		climberMechLeftFSM.update(input);
+		climberMechRightFSM.update(input);
 		shooterFSM.update(input);
 	}
 

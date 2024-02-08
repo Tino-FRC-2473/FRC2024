@@ -29,6 +29,8 @@ public final class SwerveConstants {
 		public static final double MAX_SPEED_METERS_PER_SECOND = 4.8;
 		public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // radians per second
 
+		public static final double LEFT_TRIGGER_DRIVE_CONSTANT = 1.5;
+		public static final double ANGULAR_SPEED_LIMIT_CONSTANT = 1.5;
 		public static final double DIRECTION_SLEW_RATE = 1.2; // radians per second
 		public static final double MAGNITUDE_SLEW_RATE = 1.8; // percent per second (1 = 100%)
 		public static final double ROTATIONAL_SLEW_RATE = 2.0; // percent per second (1 = 100%)
@@ -124,8 +126,8 @@ public final class SwerveConstants {
 
 	public static final class AutoConstants {
 		//auto paths constants
-		public static final double MAX_SPEED_METERS_PER_SECOND = 0.3; // 0.5 decided
-		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 12;
+		public static final double MAX_SPEED_METERS_PER_SECOND = 0.5; // 0.5 decided
+		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 10;
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI / 2;
 		public static final double AUTO_DRIVE_METERS_MARGIN_OF_ERROR = 0.03;
 		public static final double AUTO_DRIVE_DEGREES_MARGIN_OF_ERROR = 3;
@@ -135,6 +137,7 @@ public final class SwerveConstants {
 		public static final double WAIT_TIME = 5; // seconds
 
 		// constants for auto path points
+		public static final double N_0_5 = 0.5;
 		public static final double N_1_5 = 1.5;
 		public static final double N_2 = 2;
 		public static final double N_2_5 = 2.5;
@@ -148,6 +151,7 @@ public final class SwerveConstants {
 		public static final double DEG_45 = 45;
 		public static final double DEG_90 = 90;
 		public static final double DEG_180 = 180;
+		public static final double DEG_360 = 360;
 
 		// Constraint for the motion profiled robot angle controller
 		public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS
@@ -155,11 +159,41 @@ public final class SwerveConstants {
 			MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
 	}
 
-	public static final class VisionConstants {
-		public static final double UNABLE_TO_SEE_TAG_CONSTANT = 4000;
-	}
-
 	public static final class NeoMotorConstants {
 		public static final double FREE_SPEED_RPM = 5676;
+	}
+	public static final class VisionConstants {
+		public static final double MAX_SPEED_METERS_PER_SECOND = 0.2;
+		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 30;
+
+		public static final double SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT = 3;
+		public static final double SPEAKER_ROTATIONAL_ACCEL_CONSTANT = 2;
+		public static final double X_MARGIN_TO_SPEAKER = 0.02;
+		public static final double Y_MARGIN_TO_SPEAKER = 0.02;
+		public static final double ROT_MARGIN_TO_SPEAKER = 0.01;
+		public static final double SPEAKER_TARGET_DISTANCE = 0.7;
+
+		public static final double SOURCE_TRANSLATIONAL_ACCEL_CONSTANT = 3;
+		public static final double SOURCE_ROTATIONAL_ACCEL_CONSTANT = 2;
+		public static final double X_MARGIN_TO_SOURCE = 0.02;
+		public static final double Y_MARGIN_TO_SOURCE = 0.02;
+		public static final double ROT_MARGIN_TO_SOURCE = 0.025;
+		public static final double SOURCE_DRIVE_FORWARD_POWER = 0.25;
+		public static final double SOURCE_TARGET_DISTANCE = 0.85;
+
+		public static final double UNABLE_TO_SEE_TAG_CONSTANT = 4000;
+
+		public static final int RED_SPEAKER_TAG_ID = 4;
+		public static final int BLUE_SPEAKER_TAG_ID = 7;
+		public static final int RED_SOURCE_TAG1_ID = 9;
+		public static final int RED_SOURCE_TAG2_ID = 10;
+		public static final int BLUE_SOURCE_TAG1_ID = 1;
+		public static final int BLUE_SOURCE_TAG2_ID = 2;
+		public static final int RED_AMP_TAG_ID = 5;
+		public static final int BLUE_AMP_TAG_ID = 6;
+
+		public static final double MIN_SPEED_THRESHOLD = 0.01;
+		public static final double SOURCE_TAG_ANGLE_DEGREES = 45.0;
+		public static final double SPEAKER_TAG_ANGLE_DEGREES = 180.0;
 	}
 }

@@ -28,6 +28,7 @@ public class KitBotShooterFSM {
 	private static final float INTAKING_SPEED = -0.4f;
 	private static final float OUTTAKING_TIME = 2.0f;
 
+
 	/* ======================== Private variables ======================== */
 	private ShooterFSMState currentState;
 
@@ -59,6 +60,11 @@ public class KitBotShooterFSM {
 		highMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_UPPER,
 		CANSparkMax.MotorType.kBrushless);
 		highMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+		autoOuttakingTimerStarted = false;
+		autoIntakingTimerStarted = false;
+
+		timer = new Timer();
 
 		// Reset state machine
 		reset();

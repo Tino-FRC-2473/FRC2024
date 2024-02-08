@@ -12,16 +12,19 @@ class VisionInput:
         self.cam_h = cam_height
         self.cam_a = cam_angle
         self.cap = cv2.VideoCapture(0)
-
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, res[0])
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, res[1])
+        
 
     def getFrame(self):
         if not self.cap.isOpened():
             print("cannot open cam")
-        ret, frame = self.cap.read()
-
+        ret, fr = self.cap.read()
         if not ret:
             print('frame malf')
         exit
-
-        fr = cv2.resize(frame, (self.w, self.h), interpolation=cv2.INTER_AREA)
         return fr
+
+
+    def close(self):
+        self.cap.release()
