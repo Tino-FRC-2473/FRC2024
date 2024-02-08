@@ -27,7 +27,7 @@ public final class HardwareMap {
 	// OLD Chassis
 
 	public static final int FRONT_LEFT_DRIVING_CAN_ID = 8;
-	public static final int FRONT_RIGHT_DRIVING_CAN_ID = 100;
+	public static final int FRONT_RIGHT_DRIVING_CAN_ID = 6;
 	public static final int REAR_LEFT_DRIVING_CAN_ID = 2;
 	public static final int REAR_RIGHT_DRIVING_CAN_ID = 4;
 
