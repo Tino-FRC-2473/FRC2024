@@ -167,7 +167,4 @@ public class ClimberMechFSMLeft {
 	private boolean peakLimitSwitchHit() {
 		return limitPressed;
 	}
-
-
-
 }

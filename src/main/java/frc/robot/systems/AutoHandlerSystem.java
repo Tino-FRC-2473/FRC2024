@@ -1,31 +1,26 @@
 package frc.robot.systems;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-//import frc.robot.AutoPathChooser;
 
 public class AutoHandlerSystem {
 	/* ======================== Constants ======================== */
 	// Auto FSM state definitions
 	public enum AutoFSMState {
-		DRIVE_PATH_1,
-		DRIVE_PATH_2,
-		DRIVE_PATH_3,
-		DRIVE_PATH_4_STATE_1,
-		DRIVE_PATH_4_STATE_2,
-		DRIVE_PATH_5,
+		TURN_TO_SCORE,
+		LEAVE,
+		DRIVE_TO_SCORE,
+		PICK_UP_1,
+		PICK_UP_2,
+		PICK_UP_3,
+		PICK_UP_4,
 		SHOOTER_STATE,
 		INTAKE_STATE,
 		PENDING
 	}
+
 	public enum AutoPath {
-		PATH1,
-		PATH2,
-		PATH3,
-		PATH4,
-		PATH5,
-		PATH6
+		PATH1, // score and leave
+		PATH2, // score multiple times
+		PATH3 // tbd emergency path
 	}
 
 	/* ======================== Private variables ======================== */
@@ -40,22 +35,18 @@ public class AutoHandlerSystem {
 	private KitBotShooterFSM shooterFSM;
 
 	//Predefined auto paths
+
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
-		AutoFSMState.DRIVE_PATH_1};
+		AutoFSMState.TURN_TO_SCORE, AutoFSMState.LEAVE};
 
 	private static final AutoFSMState[] PATH2 = new AutoFSMState[]{
-		AutoFSMState.DRIVE_PATH_2};
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_1,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_2,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_3,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_4};
 
-	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{
-		AutoFSMState.DRIVE_PATH_3};
+	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{};
 
-	private static final AutoFSMState[] PATH4 = new AutoFSMState[]{
-		AutoFSMState.PENDING, AutoFSMState.DRIVE_PATH_4_STATE_1, AutoFSMState.DRIVE_PATH_4_STATE_2};
-
-	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{
-		AutoFSMState.DRIVE_PATH_5};
-
-	private static final AutoFSMState[] PATH6 = new AutoFSMState[]{};
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state.
@@ -88,22 +79,16 @@ public class AutoHandlerSystem {
 	 */
 	public void reset(AutoPath path) {
 		driveSystem.resetAutonomus();
-		shooterFSM.reset();
+		//shooterFSM.reset();
 
-		currentStateIndex = 0;
 		if (path == AutoPath.PATH1) {
 			currentStateList = PATH1;
 		} else if (path == AutoPath.PATH2) {
 			currentStateList = PATH2;
 		} else if (path == AutoPath.PATH3) {
 			currentStateList = PATH3;
-		} else if (path == AutoPath.PATH4) {
-			currentStateList = PATH4;
-		} else if (path == AutoPath.PATH5) {
-			currentStateList = PATH5;
-		} else if (path == AutoPath.PATH6) {
-			currentStateList = PATH6;
 		}
+		currentStateIndex = 0;
 	}
 
 	/**
@@ -113,29 +98,37 @@ public class AutoHandlerSystem {
 		if (currentStateIndex >= currentStateList.length) {
 			return;
 		}
-
 		boolean isCurrentStateFinished;
 		SmartDashboard.putString("In Auto State: ", "" + getCurrentState());
 		switch (getCurrentState()) {
-			case DRIVE_PATH_1:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DRIVE_PATH_1);
-				break;
-			case DRIVE_PATH_2:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DRIVE_PATH_2);
-				break;
-			case DRIVE_PATH_3:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DRIVE_PATH_3);
-				break;
-			case DRIVE_PATH_4_STATE_1:
+
+			case TURN_TO_SCORE:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.DRIVE_PATH_4_STATE_1);
+					AutoFSMState.TURN_TO_SCORE);
 				break;
-			case DRIVE_PATH_4_STATE_2:
+			case LEAVE:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.DRIVE_PATH_4_STATE_2);
+					AutoFSMState.LEAVE);
 				break;
-			case DRIVE_PATH_5:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DRIVE_PATH_5);
+			case PICK_UP_1:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.PICK_UP_1);
+				break;
+			case DRIVE_TO_SCORE:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.DRIVE_TO_SCORE);
+				break;
+			case PICK_UP_2:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.PICK_UP_2);
+				break;
+			case PICK_UP_3:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.PICK_UP_3);
+				break;
+			case PICK_UP_4:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.PICK_UP_4);
 				break;
 			case SHOOTER_STATE:
 				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE);
