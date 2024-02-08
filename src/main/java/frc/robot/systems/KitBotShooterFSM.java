@@ -62,7 +62,6 @@ public class KitBotShooterFSM {
 		highMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
 		autoOuttakingTimerStarted = false;
-		autoIntakingTimerStarted = false;
 
 		timer = new Timer();
 
