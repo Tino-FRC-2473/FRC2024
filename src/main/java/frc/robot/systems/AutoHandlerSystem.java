@@ -86,7 +86,7 @@ public class AutoHandlerSystem {
 	 * @param path the auto path to be executed
 	 */
 	public void reset(AutoPath path) {
-		//driveSystem.resetAutonomus();
+		driveSystem.resetAutonomus();
 		shooterFSM.reset();
 
 		currentStateIndex = 0;
@@ -148,7 +148,7 @@ public class AutoHandlerSystem {
 
 		if (isCurrentStateFinished) {
 			currentStateIndex++;
-			//driveSystem.setCurrentPointInPath(0);
+			driveSystem.setCurrentPointInPath(0);
 		}
 	}
 }
