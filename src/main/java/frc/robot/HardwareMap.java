@@ -6,6 +6,11 @@ package frc.robot;
  */
 public final class HardwareMap {
 	// ID numbers for devices on the CAN bus
+	public static final int CAN_ID_SPARK_SHOOTER_UPPER = 33;
+	public static final int CAN_ID_SPARK_SHOOTER_LOWER = 34;
+
+	public static final int CAN_ID_SPARK_LEFT_CLIMBER_MOTOR = 6;
+	public static final int CAN_ID_SPARK_RIGHT_CLIMBER_MOTOR = 32;
 
 	// NEW Chassis
 
@@ -30,10 +35,4 @@ public final class HardwareMap {
 	public static final int FRONT_RIGHT_TURNING_CAN_ID = 5;
 	public static final int REAR_LEFT_TURNING_CAN_ID = 1;
 	public static final int REAR_RIGHT_TURNING_CAN_ID = 3;
-
-	public static final int CAN_ID_SPARK_SHOOTER_UPPER = 31;
-	public static final int CAN_ID_SPARK_SHOOTER_LOWER = 30;
-
-	public static final int CAN_ID_SPARK_LEFT_CLIMBER_MOTOR = 5;
-	public static final int CAN_ID_SPARK_RIGHT_CLIMBER_MOTOR = 32;
 }

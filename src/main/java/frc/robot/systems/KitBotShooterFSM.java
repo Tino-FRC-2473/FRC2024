@@ -23,10 +23,11 @@ public class KitBotShooterFSM {
 		OUTTAKING
 	}
 
-	private static final float L_MOTOR_RUN_POWER = 0.05f;
-	private static final float U_MOTOR_RUN_POWER = 0.1f;
-	private static final float AUTO_OUTTAKING_TIME = 2.0f;
-	private static final float AUTO_INTAKING_TIME = 2.0f;
+	private static final float L_MOTOR_RUN_POWER = 0.8f;
+	private static final float U_MOTOR_RUN_POWER = -1.0f;
+	private static final float INTAKING_SPEED = -0.4f;
+	private static final float OUTTAKING_TIME = 2.0f;
+
 
 	/* ======================== Private variables ======================== */
 	private ShooterFSMState currentState;
@@ -38,10 +39,8 @@ public class KitBotShooterFSM {
 	private SparkLimitSwitch bottomLimitSwitch;
 
 	private boolean autoOuttakingTimerStarted;
-	private double autoOuttakingTimerStart;
-	private boolean autoIntakingTimerStarted;
-	private double autoIntakingTimerStart;
-	private Timer timer;
+	private double outtakingTimerStart;
+	private Timer timer = new Timer();
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -63,7 +62,6 @@ public class KitBotShooterFSM {
 		highMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
 		autoOuttakingTimerStarted = false;
-		autoIntakingTimerStarted = false;
 
 		timer = new Timer();
 
@@ -89,7 +87,9 @@ public class KitBotShooterFSM {
 	 */
 	public void reset() {
 		currentState = ShooterFSMState.IDLE_STOP;
-
+		timer = new Timer();
+		timer.start();
+		autoOuttakingTimerStarted = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -123,6 +123,8 @@ public class KitBotShooterFSM {
 		SmartDashboard.putBoolean("Bottom Limit Switch Pressed", bottomLimitSwitch.isPressed());
 		SmartDashboard.putBoolean("Outtake Button Pressed", input.isOuttakeButtonPressed());
 		SmartDashboard.putBoolean("Intake Button Pressed", input.isIntakeButtonPressed());
+		SmartDashboard.putNumber("Motor SPeed", highMotor.get());
+		SmartDashboard.putNumber("Get applied output", highMotor.getAppliedOutput());
 		currentState = nextState(input);
 	}
 
@@ -135,8 +137,6 @@ public class KitBotShooterFSM {
 		switch (autoState) {
 			case SHOOTER_STATE:
 				return handleAutoOuttakingState();
-			case INTAKE_STATE:
-				return handleAutoIntakingState();
 			default:
 				return true;
 		}
@@ -159,6 +159,7 @@ public class KitBotShooterFSM {
 		switch (currentState) {
 			case IDLE_STOP:
 				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+					outtakingTimerStart = timer.get();
 					return ShooterFSMState.OUTTAKING;
 				}
 				if (input.isIntakeButtonPressed() && !hasNote()
@@ -201,8 +202,8 @@ public class KitBotShooterFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleIntakingState(TeleopInput input) {
-		lowMotor.set(-L_MOTOR_RUN_POWER);
-		highMotor.set(-U_MOTOR_RUN_POWER);
+		lowMotor.set(INTAKING_SPEED);
+		highMotor.set(-INTAKING_SPEED);
 	}
 
 	/**
@@ -211,48 +212,38 @@ public class KitBotShooterFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleOuttakingState(TeleopInput input) {
-		lowMotor.set(L_MOTOR_RUN_POWER);
-		highMotor.set(U_MOTOR_RUN_POWER);
+		if (!timer.hasElapsed(outtakingTimerStart + OUTTAKING_TIME)) {
+			highMotor.set(U_MOTOR_RUN_POWER);
+			if (timer.hasElapsed(outtakingTimerStart + (OUTTAKING_TIME / 2))) {
+				lowMotor.set(L_MOTOR_RUN_POWER);
+			} else {
+				lowMotor.set(0);
+			}
+		} else {
+			highMotor.set(0);
+			lowMotor.set(0);
+		}
 	}
 
 	private boolean handleAutoOuttakingState() {
 		if (!autoOuttakingTimerStarted) {
 			autoOuttakingTimerStarted = true;
-			autoOuttakingTimerStart = timer.get();
+			outtakingTimerStart = timer.get();
 		}
-
 		if (autoOuttakingTimerStarted
-			&& !timer.hasElapsed(autoOuttakingTimerStart + AUTO_OUTTAKING_TIME)) {
-			lowMotor.set(L_MOTOR_RUN_POWER);
+			&& !timer.hasElapsed(outtakingTimerStart + OUTTAKING_TIME)) {
 			highMotor.set(U_MOTOR_RUN_POWER);
+			if (timer.hasElapsed(outtakingTimerStart + (OUTTAKING_TIME / 2))) {
+				lowMotor.set(L_MOTOR_RUN_POWER);
+			} else {
+				lowMotor.set(0);
+			}
+
 		} else {
 			lowMotor.set(0);
 			highMotor.set(0);
 
 			autoOuttakingTimerStarted = false;
-
-			return true;
-		}
-
-		return false;
-	}
-
-	private boolean handleAutoIntakingState() {
-		if (!autoIntakingTimerStarted) {
-			autoIntakingTimerStarted = true;
-			autoIntakingTimerStart = timer.get();
-		}
-
-		if (autoIntakingTimerStarted
-			&& !timer.hasElapsed(autoIntakingTimerStart + AUTO_INTAKING_TIME)) {
-			lowMotor.set(-L_MOTOR_RUN_POWER);
-			highMotor.set(-U_MOTOR_RUN_POWER);
-		} else {
-			lowMotor.set(0);
-			highMotor.set(0);
-
-			autoIntakingTimerStarted = false;
-
 			return true;
 		}
 
