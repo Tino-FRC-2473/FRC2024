@@ -77,7 +77,7 @@ public class AutoHandlerSystem {
 	 */
 	public void reset(AutoPath path) {
 		driveSystem.resetAutonomus();
-		//shooterFSM.reset();
+		shooterFSM.reset();
 
 		if (path == AutoPath.PATH1) {
 			currentStateList = PATH1;
