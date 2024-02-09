@@ -20,7 +20,6 @@ import frc.robot.systems.AutoHandlerSystem.AutoPath;
 public class Robot extends TimedRobot {
 	private TeleopInput input;
 	// Systems
-	private DriveFSMSystem driveFSMSystem;
 	private KitBotShooterFSM shooterFSM;
 	//private ClimberMechFSMLeft climberMechLeftFSM;
 	//private ClimberMechFSMRight climberMechRightFSM;

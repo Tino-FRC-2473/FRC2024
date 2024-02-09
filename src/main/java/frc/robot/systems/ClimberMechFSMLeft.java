@@ -23,7 +23,6 @@ public class ClimberMechFSMLeft {
 	private static final float MOTOR_RUN_POWER = -0.1f;
 	private boolean limitPressed = false;
 
-
 	/* ======================== Private variables ======================== */
 	private ClimberMechFSMState currentState;
 
@@ -69,6 +68,7 @@ public class ClimberMechFSMLeft {
 	 */
 	public void reset() {
 		currentState = ClimberMechFSMState.IDLE_STOP;
+		limitPressed = false;
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -99,8 +99,8 @@ public class ClimberMechFSMLeft {
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-		SmartDashboard.putString("Current State", currentState.toString());
-		SmartDashboard.putBoolean("Bottom Limit Switch Pressed", peakLimitSwitchHit());
+		SmartDashboard.putString("Current State Left", currentState.toString());
+		SmartDashboard.putBoolean("Bottom Limit Left Switch Pressed", peakLimitSwitchHit());
 		SmartDashboard.putBoolean("Retract Button Pressed", input.isRetractClimberButtonPressed());
 		currentState = nextState(input);
 	}
