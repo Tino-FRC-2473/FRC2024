@@ -20,11 +20,14 @@ public class KitBotShooterFSM {
 	public enum ShooterFSMState {
 		IDLE_STOP,
 		INTAKING,
-		OUTTAKING
+		OUTTAKING_SPEAKER,
+		OUTTAKING_AMP
 	}
 
-	private static final float L_MOTOR_RUN_POWER = 0.8f;
-	private static final float U_MOTOR_RUN_POWER = -1.0f;
+	private static final float AMP_L_MOTOR_RUN_POWER = 0.1f;
+	private static final float AMP_U_MOTOR_RUN_POWER = -0.15f; // or -1.16f
+	private static final float SPEAKER_L_MOTOR_RUN_POWER = 0.1f;
+	private static final float SPEAKER_U_MOTOR_RUN_POWER = -0.15f;
 	private static final float INTAKING_SPEED = -0.4f;
 	private static final float OUTTAKING_TIME = 2.0f;
 
@@ -113,15 +116,21 @@ public class KitBotShooterFSM {
 			case INTAKING:
 				handleIntakingState(input);
 				break;
-			case OUTTAKING:
-				handleOuttakingState(input);
+			case OUTTAKING_SPEAKER:
+				handleOuttakingSpeakerState(input);
+				break;
+			case OUTTAKING_AMP:
+				handleOuttakingAmpState(input);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		SmartDashboard.putString("Current State", currentState.toString());
 		SmartDashboard.putBoolean("Bottom Limit Switch Pressed", bottomLimitSwitch.isPressed());
-		SmartDashboard.putBoolean("Outtake Button Pressed", input.isOuttakeButtonPressed());
+		SmartDashboard.putBoolean("Outtake Speaker Button Pressed",
+			input.isOuttakeSpeakerButtonPressed());
+		SmartDashboard.putBoolean("Outtake Amp Button Pressed",
+			input.isOuttakeAmpButtonPressed());
 		SmartDashboard.putBoolean("Intake Button Pressed", input.isIntakeButtonPressed());
 		SmartDashboard.putNumber("Motor SPeed", highMotor.get());
 		SmartDashboard.putNumber("Get applied output", highMotor.getAppliedOutput());
@@ -158,26 +167,42 @@ public class KitBotShooterFSM {
 		}
 		switch (currentState) {
 			case IDLE_STOP:
-				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+				if (input.isOuttakeSpeakerButtonPressed() && !input.isIntakeButtonPressed()
+					&& !input.isOuttakeAmpButtonPressed()) {
 					outtakingTimerStart = timer.get();
-					return ShooterFSMState.OUTTAKING;
+					return ShooterFSMState.OUTTAKING_SPEAKER;
+				}
+				if (input.isOuttakeAmpButtonPressed() && !input.isIntakeButtonPressed()
+					&& !input.isOuttakeSpeakerButtonPressed()) {
+					outtakingTimerStart = timer.get();
+					return ShooterFSMState.OUTTAKING_AMP;
 				}
 				if (input.isIntakeButtonPressed() && !hasNote()
-					&& !input.isOuttakeButtonPressed()) {
+					&& !input.isOuttakeSpeakerButtonPressed()
+					&& !input.isOuttakeAmpButtonPressed()) {
 					return ShooterFSMState.INTAKING;
 				} else {
 					return ShooterFSMState.IDLE_STOP;
 				}
 			case INTAKING:
 				if (input.isIntakeButtonPressed() && !hasNote()
-					&& !input.isOuttakeButtonPressed()) {
+					&& !input.isOuttakeSpeakerButtonPressed()
+					&& !input.isOuttakeAmpButtonPressed()) {
 					return ShooterFSMState.INTAKING;
 				} else {
 					return ShooterFSMState.IDLE_STOP;
 				}
-			case OUTTAKING:
-				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
-					return ShooterFSMState.OUTTAKING;
+			case OUTTAKING_SPEAKER:
+				if (input.isOuttakeSpeakerButtonPressed() && !input.isIntakeButtonPressed()
+					&& !input.isOuttakeAmpButtonPressed()) {
+					return ShooterFSMState.OUTTAKING_SPEAKER;
+				} else {
+					return ShooterFSMState.IDLE_STOP;
+				}
+			case OUTTAKING_AMP:
+				if (input.isOuttakeAmpButtonPressed() && !input.isIntakeButtonPressed()
+					&& !input.isOuttakeSpeakerButtonPressed()) {
+					return ShooterFSMState.OUTTAKING_AMP;
 				} else {
 					return ShooterFSMState.IDLE_STOP;
 				}
@@ -207,15 +232,34 @@ public class KitBotShooterFSM {
 	}
 
 	/**
-	 * Handle behavior in OUTTAKING state.
+	 * Handle behavior in OUTTAKING_SPEAKER state.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-	private void handleOuttakingState(TeleopInput input) {
+	private void handleOuttakingSpeakerState(TeleopInput input) {
 		if (!timer.hasElapsed(outtakingTimerStart + OUTTAKING_TIME)) {
-			highMotor.set(U_MOTOR_RUN_POWER);
+			highMotor.set(SPEAKER_U_MOTOR_RUN_POWER);
 			if (timer.hasElapsed(outtakingTimerStart + (OUTTAKING_TIME / 2))) {
-				lowMotor.set(L_MOTOR_RUN_POWER);
+				lowMotor.set(SPEAKER_L_MOTOR_RUN_POWER);
+			} else {
+				lowMotor.set(0);
+			}
+		} else {
+			highMotor.set(0);
+			lowMotor.set(0);
+		}
+	}
+
+	/**
+	 * Handle behavior in OUTTAKING_AMP state.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 */
+	private void handleOuttakingAmpState(TeleopInput input) {
+		if (!timer.hasElapsed(outtakingTimerStart + OUTTAKING_TIME)) {
+			highMotor.set(AMP_U_MOTOR_RUN_POWER);
+			if (timer.hasElapsed(outtakingTimerStart + (OUTTAKING_TIME / 2))) {
+				lowMotor.set(AMP_L_MOTOR_RUN_POWER);
 			} else {
 				lowMotor.set(0);
 			}
@@ -232,9 +276,9 @@ public class KitBotShooterFSM {
 		}
 		if (autoOuttakingTimerStarted
 			&& !timer.hasElapsed(outtakingTimerStart + OUTTAKING_TIME)) {
-			highMotor.set(U_MOTOR_RUN_POWER);
+			highMotor.set(SPEAKER_U_MOTOR_RUN_POWER);
 			if (timer.hasElapsed(outtakingTimerStart + (OUTTAKING_TIME / 2))) {
-				lowMotor.set(L_MOTOR_RUN_POWER);
+				lowMotor.set(SPEAKER_L_MOTOR_RUN_POWER);
 			} else {
 				lowMotor.set(0);
 			}

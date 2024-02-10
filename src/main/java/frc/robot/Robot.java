@@ -71,7 +71,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopPeriodic() {
-		driveFSMSystem.update(input);
+		//driveFSMSystem.update(input);
 		//climberMechLeftFSM.update(input);
 		//climberMechRightFSM.update(input);
 		shooterFSM.update(input);

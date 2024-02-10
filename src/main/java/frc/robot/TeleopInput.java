@@ -121,11 +121,19 @@ public class TeleopInput {
 	}
 
 	/**
-	 * Get the value of the outtake button.
+	 * Get the value of the outtake speaker button.
 	 * @return True if button is pressed
 	 */
-	public boolean isOuttakeButtonPressed() {
+	public boolean isOuttakeSpeakerButtonPressed() {
 		return mechController.getTriangleButton();
+	}
+
+	/**
+	 * Get the value of the outtake amp button.
+	 * @return True if button is pressed
+	 */
+	public boolean isOuttakeAmpButtonPressed() {
+		return mechController.getSquareButton();
 	}
 
 	/**
