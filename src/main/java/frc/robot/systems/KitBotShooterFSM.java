@@ -26,8 +26,8 @@ public class KitBotShooterFSM {
 
 	private static final float AMP_L_MOTOR_RUN_POWER = 0.1f;
 	private static final float AMP_U_MOTOR_RUN_POWER = -0.15f; // or -1.16f
-	private static final float SPEAKER_L_MOTOR_RUN_POWER = 0.1f;
-	private static final float SPEAKER_U_MOTOR_RUN_POWER = -0.15f;
+	private static final float SPEAKER_L_MOTOR_RUN_POWER = 0.8f;
+	private static final float SPEAKER_U_MOTOR_RUN_POWER = -1.0f;
 	private static final float INTAKING_SPEED = -0.4f;
 	private static final float OUTTAKING_TIME = 2.0f;
 
