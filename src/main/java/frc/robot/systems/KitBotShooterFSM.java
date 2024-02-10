@@ -31,7 +31,6 @@ public class KitBotShooterFSM {
 	private static final float INTAKING_SPEED = -0.4f;
 	private static final float OUTTAKING_TIME = 2.0f;
 
-
 	/* ======================== Private variables ======================== */
 	private ShooterFSMState currentState;
 
