@@ -5,6 +5,7 @@ package frc.robot.systems;
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
 
+import edu.wpi.first.wpilibj.Timer;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
@@ -18,7 +19,8 @@ public class MBRShooterFSM {
 		SHOOTING
 	}
 
-	private static final float SHOOTING_POWER = 0.1f;
+	private static final float SHOOTING_POWER = 0.5f;
+	private static final float SHOOTING_TIME = 2.0f;
 	private boolean buttonToggle = false;
 	private boolean buttonPressedLastFrame = false;
 
@@ -31,6 +33,11 @@ public class MBRShooterFSM {
 	private CANSparkMax leftMotor;
 	private CANSparkMax rightMotor;
 
+	private boolean autoShootingTimerStarted;
+	private double autoShootingTimerStart;
+
+	private Timer shootingTimer;
+
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -39,6 +46,8 @@ public class MBRShooterFSM {
 	 */
 	public MBRShooterFSM() {
 		// Perform hardware init
+		shootingTimer = new Timer();
+
 		leftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LSHOOTER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 
@@ -169,7 +178,7 @@ public class MBRShooterFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleShootingState(TeleopInput input) {
-		leftMotor.set(SHOOTING_POWER);
+		leftMotor.set(-SHOOTING_POWER); //dont forget the "-" sign
 		rightMotor.set(SHOOTING_POWER);
 	}
 
@@ -195,5 +204,31 @@ public class MBRShooterFSM {
 	 */
 	private boolean handleAutoState3() {
 		return true;
+	}
+
+	/**
+	 * Performs action for auto Shooting.
+	 * @return if the action carried out has finished executing
+	 */
+	private boolean handleAutoShootingState() {
+		if (!autoShootingTimerStarted) {
+			autoShootingTimerStarted = true;
+			autoShootingTimerStart = shootingTimer.get();
+		}
+
+		if (autoShootingTimerStarted
+			&& !shootingTimer.hasElapsed(autoShootingTimerStart + SHOOTING_TIME)) {
+			leftMotor.set(-SHOOTING_POWER);
+			rightMotor.set(SHOOTING_POWER);
+		} else {
+			leftMotor.set(0);
+			rightMotor.set(0);
+
+			autoShootingTimerStarted = false;
+
+			return true;
+		}
+
+		return false;
 	}
 }

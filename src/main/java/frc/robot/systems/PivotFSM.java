@@ -61,7 +61,7 @@ public class PivotFSM {
 
 
 
-	/* ======================== Private uwu variables ======================== */
+	/* ======================== Private variables ======================== */
 	private PivotFSMState currentState;
 	private double currentEncoder = 0;
 	private double currentTime;
@@ -266,10 +266,10 @@ public class PivotFSM {
 				if (!zeroed && !lastLimitHit && !input.isAbortButtonPressed()) {
 					return PivotFSMState.ZEROING;
 				} else if (currentEncoder > MIN_ENCODER_ROTATIONS
-					&& input.getLeftJoystickY() < -JOYSTICK_DEAD_ZONE) {
+					&& input.getMechControllerLeftY() < -JOYSTICK_DEAD_ZONE) {
 					return PivotFSMState.MANUAL_IN;
 				} else if (currentEncoder <= MAX_ENCODER_ROTATIONS
-					&& input.getLeftJoystickY() > JOYSTICK_DEAD_ZONE) {
+					&& input.getMechControllerLeftY() > JOYSTICK_DEAD_ZONE) {
 					return PivotFSMState.MANUAL_OUT;
 				} else if (input.isGroundArmButtonPressed()
 					&& !inRange(currentEncoder, GROUND_ENCODER_ROTATIONS)) {
@@ -291,7 +291,7 @@ public class PivotFSM {
 
 			case MANUAL_OUT:
 				if (currentEncoder < MAX_ENCODER_ROTATIONS
-					&& input.getLeftJoystickY() >= JOYSTICK_DEAD_ZONE) {
+					&& input.getMechControllerLeftY() >= JOYSTICK_DEAD_ZONE) {
 					return PivotFSMState.MANUAL_OUT;
 				} else {
 					return PivotFSMState.IDLE_STOP;
@@ -299,9 +299,9 @@ public class PivotFSM {
 
 			case MANUAL_IN:
 				if (currentEncoder > MIN_ENCODER_ROTATIONS
-					&& input.getLeftJoystickY() < -JOYSTICK_DEAD_ZONE) {
+					&& input.getMechControllerLeftY() < -JOYSTICK_DEAD_ZONE) {
 					return PivotFSMState.MANUAL_IN;
-				} else if (input.getLeftJoystickY() == 0) {
+				} else if (input.getMechControllerLeftY() == 0) {
 					return PivotFSMState.IDLE_STOP;
 				}
 
@@ -416,7 +416,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void handleManualInState(TeleopInput input) {
-		pivotMotor.set(input.getLeftJoystickY() * JOYSTICK_SCALING_CONSTANT);
+		pivotMotor.set(input.getMechControllerLeftY() * JOYSTICK_SCALING_CONSTANT);
 	}
 
 	/**
@@ -425,7 +425,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void handleManualOutState(TeleopInput input) {
-		pivotMotor.set(input.getLeftJoystickY() * JOYSTICK_SCALING_CONSTANT);
+		pivotMotor.set(input.getMechControllerLeftY() * JOYSTICK_SCALING_CONSTANT);
 	}
 
 	/**
