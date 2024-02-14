@@ -10,10 +10,10 @@ class Detector:
     def __init__(self):
         pass
 
-    def bgr_to_rgb(self, image):
+    def bgr_to_rgb(image):
         return image[:,:,::-1]
 
-    def detectGameElement(self, frame, objectsToDetect: list):
+    def detectGameElement(self, array, objectsToDetect: list):
 
         constant = 4.2
         low_threshold = np.array([0.02580477, 0.43139728, 0.34260735])
@@ -21,11 +21,13 @@ class Detector:
         # WRITE CODE HERE
         high_threshold = np.array([1.08496632, 1.08496632, 1.26602557])
 
+        frame = array
         results = dict(zip(objectsToDetect, [None for i in range(len(objectsToDetect))]))
         colors = {
             "RING": [low_threshold, high_threshold]
         }
         for object in objectsToDetect:
+            #Converts the color format of the frame from BGR to HSV for usage with cv2
 
             full_test_image = self.bgr_to_rgb(frame)
             hsv_frame = skimage.color.rgb2hsv(full_test_image)
@@ -33,7 +35,7 @@ class Detector:
             #Creates a mask which is a frame with only the range of colors inputed shown in black and white
             mask = cv2.inRange(hsv_frame, colors[object][0], colors[object][1])
 
-            # print(colors[object][0])
+            print(colors[object][0])
 
             #The following three functinos edits the mask in order to remove potential discrepencies in the frame
             kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (12, 12))
@@ -50,7 +52,7 @@ class Detector:
             #The below code runs to detect if there is a ring in the given frame.
             if (object == "RING"):
                 contours, hier = cv2.findContours(morph, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-                # print(len(contours))
+                print(len(contours))
                 contours = sorted(contours, key=cv2.contourArea)
                 # cnt = None
                 # contour = contours[len(contours) -1]
@@ -66,7 +68,7 @@ class Detector:
 
         cv2.destroyAllWindows()
 
-        results[object] = Target(contours[0], object)
+        results[object] = Target(contours, object)
 
         return results
 
@@ -101,7 +103,7 @@ class Detector:
                 #print(tx, ty, tw, th)
                 if (tw * th > w * h and not
                    (tx == 0 and ty == 0 and tw == frame.shape[1] and th == frame.shape[0])):
-                    x = tx
+                    x = math.sqrt((1.05 * tx - 0.975)/0.227)
                     y = ty
                     w = tw
                     h = th
