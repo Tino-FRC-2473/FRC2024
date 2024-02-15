@@ -6,10 +6,12 @@ import time
 
 
 class VisionInput:
+   
     def __init__(self, fov, res: tuple, height, angle):
+        self.stream = 0
         self.w = res[0]
         self.h = res[1]
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(self.stream)
         Target.FOV = fov
         Target.RES = res
         Target.CAM_HEIGHT = height
@@ -17,7 +19,9 @@ class VisionInput:
 
     def calibrate(self):
         pass
-
+    
+    def changeStream(self, stream):
+        self.stream = stream
     def getFrame(self):
         if not self.cap.isOpened():
             print("cannot open cam")
