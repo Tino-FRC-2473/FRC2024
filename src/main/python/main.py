@@ -4,6 +4,7 @@ import time
 import ntcore
 import numpy as np
 import cv2
+import pdb 
 
 inst = ntcore.NetworkTableInstance.getDefault()
 inst.startClient4("python")
@@ -13,13 +14,15 @@ FOV = (50.28, 29.16)
 RES = (640 , 480)
 CAM_HEIGHT = 0.4
 CAM_ANGLE = -15
-input = VisionInput(FOV, RES, CAM_HEIGHT, CAM_ANGLE)
-tag_module = AprilTag()
 ARUCO_LENGTH_METERS = 0.165
+
+tag_module = AprilTag()
+input = VisionInput(FOV, RES, CAM_HEIGHT, CAM_ANGLE)
 
 while True:
     p = time.time()
     try: 
+        pdb.set_trace()
         frame = input.getFrame()
 
         annotated_frame = frame.copy()
@@ -41,13 +44,21 @@ while True:
         outputStreamPub = table.getDoubleArrayTopic("output_stream").publish()
         outputStreamPub.set(annotated_frame.flatten().tolist())
 
-        cv2.imshow('result', annotated_frame)
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord('q'):
-            break
+        # cv2.imshow('result', annotated_frame)
+        # key = cv2.waitKey(1) & 0xFF
+        # if key == ord('q'):
+        #     break
+
+        print('Loop time: ' + str(time.time()-p))
         time.sleep(0.02)
     except KeyboardInterrupt:
         print("keyboard interrupt")
+        print("closing cam")
         input.close()
         break
-    print('Loop time: ' + str(time.time()-p))
+    except Exception as error:
+        print("An exception occurred:", error)
+        print("closing cam")
+        input.close()
+        break
+    
