@@ -21,12 +21,18 @@ while True:
         #print("here1")
         print("first stream")
         frame = input.getFrame()
-        cv2.imshow('Frame', image)
-        time.sleep(1)
+        frame1 = frame.copy()
+        cv2.imshow('Frame', frame1)
+        cv2.waitKey()
+
         print("second stream")
         input.changeStream(1)
         frame = input.getFrame()
-        cv2.imshow('Frame', image)
+        frame2 = frame.copy()
+        cv2.imshow('Frame', frame2)
+        cv2.waitKey()
+
+        input.changeStream(0)
         # table = inst.getTable("datatable")
         # xPub = table.getDoubleTopic("fps_incremented_value").publish()
         # xPub.set(frame.sum())
@@ -58,7 +64,7 @@ while True:
         #         #     cubeD.set(distance)
         # #print("here")
         # # cnt = cnt + 1
-        time.sleep(0.02)
+        #time.sleep(0.02)
     except KeyboardInterrupt:
         print("keyboard interrupt")
         input.close()

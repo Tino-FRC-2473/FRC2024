@@ -22,6 +22,8 @@ class VisionInput:
     
     def changeStream(self, stream):
         self.stream = stream
+        self.cap = cv2.VideoCapture(self.stream)
+
     def getFrame(self):
         if not self.cap.isOpened():
             print("cannot open cam")
@@ -31,7 +33,7 @@ class VisionInput:
 
         if not ret:
             print('frame malf')
-        exit
+            return
 
         fr = cv2.resize(frame, (self.w, self.h), interpolation=cv2.INTER_AREA)
         return fr
