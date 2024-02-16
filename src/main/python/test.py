@@ -3,6 +3,29 @@ import numpy as np
 from apriltag import AprilTag
 from vision_input import VisionInput
 import time
+import threading
+
+class MyThread (threading.Thread):
+
+    def __init__(self, tag_module):
+        self.params = None
+        self.lock = threading.RLock()
+        self.tag_module = tag_module
+        super(MyThread, self).__init__()
+
+    def set_params(self, params):  # you can use a proper setter if you want
+        with self.lock:
+            self.params=params
+
+    def run(self):
+        while True:
+            p = time.time()
+            self.tag_module.estimate_3d_pose(self.params)
+            print("loop time: " + str(time.time()-p))
+            cv2.imshow('result', self.params[1])
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord('q'):
+                break
 
 RES = (640, 480)
 
@@ -19,18 +42,15 @@ CAM_HEIGHT = 0.4
 CAM_ANGLE = -15
 input = VisionInput(FOV, RES, CAM_HEIGHT, CAM_ANGLE)
 TAG_LENGTH_METERS = 0.165
+tagThread = MyThread(tag_module)
+tagThread.set_params((input.getFrame(), input.getFrame().copy(), TAG_LENGTH_METERS))
+tagThread.start()
+
 
 while True:
     frame = input.getFrame()
     annotated_frame = frame.copy()
-    tagData = tag_module.estimate_3d_pose(frame, annotated_frame, TAG_LENGTH_METERS)
+    params = (frame, annotated_frame, TAG_LENGTH_METERS)
+    tagThread.set_params(params)
 
-    pose_list = [4000 for _ in range(16 * 6)]
-    for key, value in tagData.items():
-        pose_list[(key - 1) * 6 : (key * 6)] = np.concatenate((value[0].flatten(), value[1].flatten()), axis=0).tolist()
-    
-    cv2.imshow('result', annotated_frame)
-    key = cv2.waitKey(1) & 0xFF
-    if key == ord('q'):
-        break
 

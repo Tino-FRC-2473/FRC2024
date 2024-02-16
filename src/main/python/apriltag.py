@@ -13,7 +13,9 @@ class AprilTag():
     def __init__(self):
         self.camera_matrix = np.load('calibration_data/camera1_matrix.npy')
         self.dist_coeffs = np.load('calibration_data/camera1_dist.npy')
-        self.detector = apriltag.Detector(families="tag36h11", nthreads=4) 
+        self.detector = apriltag.Detector(families="tag36h11", nthreads=3)
+        #[y,x,theta]
+        self.tagMap = {1:np.array([4,4,math.pi]), 2:np.array([1,1,math.pi * 2 / 3]), 3:np.array([5,1,math.pi]), 4:np.array([0,0,math.pi]), 5:None, 6:None, 7:np.array([0,0,0]), 8:np.array([0,0,0]), 9:np.array([0,0,math.pi/3]), 10:np.array([0,0,math.pi/3]), 11:None, 12:None, 13:None, 14:None, 15:None, 16:None}
         pass
 
     def calibrate(self, RES, dirpath, square_size, width, height, visualize=False):
@@ -89,7 +91,7 @@ class AprilTag():
             # Add text to the image
 
             text = str(cvec * 39.37) + ' ' + str(tvec)
-            cv2.putText(image, text, text_position, font, font_scale, text_color, font_thickness)
+            #cv2.putText(image, text, text_position, font, font_scale, text_color, font_thickness)
             return image
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -116,25 +118,73 @@ class AprilTag():
             return None, None
 
     def estimate_3d_pose(self, image, frame_ann, ARUCO_LENGTH_METERS):
-
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
             results = self.detector.detect(gray)
             ids = [r.tag_id for r in results]
             corners = [r.corners for r in results]
 
-            pose_data = {}
+            pose_data = []
             num_tags = len(ids) if ids is not None else 0
             if num_tags != 0:
                 # Estimate the pose of each detected marker
                 for i in range(len(ids)):
                     # Estimate the pose
                     tvec, rvec, cvec= self.estimate_pose_single_marker(corners[i], ARUCO_LENGTH_METERS, self.camera_matrix, self.dist_coeffs)
-                    
-                    pose_data[ids[i]] = (cvec, tvec)
-                    
+                    tag_to_cam = [cvec[0], cvec[2], rvec[2]]
+                    real_tag_pos = self.tagMap[ids[i]]
+                    if real_tag_pos is None:
+                        continue
+                    field_pose = self.calculate_camera_real_world_pose(tag_to_cam, real_tag_pos)
+                    pose_data.append(field_pose)
                     self.draw_axis_on_image(frame_ann, self.camera_matrix, self.dist_coeffs, rvec, tvec, cvec, 0.1)
-
+            pose_data = np.array(pose_data)
+            if (len(pose_data) != 0):
+                pose_data = np.mean(pose_data, axis=0)
+                self.draw_world_pos(frame_ann, pose_data)
+            print(pose_data)
             return pose_data
 
 
+    def calculate_camera_real_world_pose(self, relative_camera_pose, tag_real_world_pose):
+        # Extract the components of the relative camera pose
+        x_cam, y_cam, theta_cam = relative_camera_pose
+
+        # Extract the components of the real-world tag pose
+        x_tag, y_tag, theta_tag = tag_real_world_pose
+
+        # Calculate the rotation matrix for the tag orientation
+        rotation_matrix = np.array([[np.cos(theta_tag), -np.sin(theta_tag)],
+                                    [np.sin(theta_tag), np.cos(theta_tag)]])
+
+        # Calculate the camera position in the real world
+        x_real_world = x_tag + (rotation_matrix[0, 0] * x_cam - rotation_matrix[0, 1] * y_cam)
+        y_real_world = y_tag + (rotation_matrix[1, 0] * x_cam + rotation_matrix[1, 1] * y_cam)
+
+        # Calculate the camera orientation in the real world
+        theta_real_world = turn_angle(theta_tag + (-theta_cam))
+
+        return [x_real_world, y_real_world, theta_real_world]
+    
+    def draw_world_pos(self, img, res):
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_scale = 0.4
+        font_thickness = 1
+        text_color = (255, 0, 255)  # White color
+        text_position = (10, 30)  # Top-left corner coordinates
+        # Add text to the image
+
+        text = str([res[0] * 39.37, res[1] * 39.37, res[2] * 180/math.pi])
+        cv2.putText(img, text, text_position, font, font_scale, text_color, font_thickness)
+
+def turn_angle(angle):
+    # Add pi to the given angle
+    turned_angle = (angle + math.pi) % (2*math.pi)
+    
+    # Adjust the angle to stay within the interval (-pi, pi]
+    if turned_angle > math.pi:
+        turned_angle -= 2 * math.pi
+    elif turned_angle <= -math.pi:
+        turned_angle += 2 * math.pi
+    
+    return turned_angle

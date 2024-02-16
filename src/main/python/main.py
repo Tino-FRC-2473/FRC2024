@@ -23,12 +23,12 @@ while True:
         frame = input.getFrame()
 
         annotated_frame = frame.copy()
-        tagData = tag_module.estimate_3d_pose(frame, annotated_frame, ARUCO_LENGTH_METERS)
+        vision_pose = tag_module.estimate_3d_pose(frame, annotated_frame, ARUCO_LENGTH_METERS)
         annotated_frame = cv2.resize(annotated_frame, (320,240))
         
-        pose_list = [4000 for _ in range(16 * 6)]
-        for key, value in tagData.items():
-            pose_list[(key - 1) * 6 : (key * 6)] = np.concatenate((value[0].flatten(), value[1].flatten()), axis=0).tolist()
+        # pose_list = [4000 for _ in range(16 * 6)]
+        # for key, value in tagData.items():
+        #     pose_list[(key - 1) * 6 : (key * 6)] = np.concatenate((value[0].flatten(), value[1].flatten()), axis=0).tolist()
             
         table = inst.getTable("datatable")
 
@@ -36,10 +36,15 @@ while True:
         xPub.set(frame.sum())
 
         tagDataPub = table.getDoubleArrayTopic("april_tag_data").publish()
-        tagDataPub.set(pose_list)
-        
-        outputStreamPub = table.getDoubleArrayTopic("output_stream").publish()
-        outputStreamPub.set(annotated_frame.flatten().tolist())
+        res = vision_pose.tolist()
+        print(res)
+        if len(res) != 0:
+            tagDataPub.set(res)
+        else:
+            tagDataPub.set([4000,4000,4000])
+
+        #outputStreamPub = table.getDoubleArrayTopic("output_stream").publish()
+        #outputStreamPub.set(annotated_frame.flatten().tolist())
 
         cv2.imshow('result', annotated_frame)
         key = cv2.waitKey(1) & 0xFF
@@ -50,6 +55,6 @@ while True:
         print("keyboard interrupt")
         input.close()
         break
-    except Exception as error:
-        print("An exception occurred:", error)
+    # except Exception as error:
+    #     print("An exception occurred:", error)
     print('Loop time: ' + str(time.time()-p))

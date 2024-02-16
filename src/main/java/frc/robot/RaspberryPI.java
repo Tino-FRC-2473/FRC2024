@@ -1,4 +1,6 @@
 package frc.robot;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
@@ -44,81 +46,11 @@ public class RaspberryPI {
 		SmartDashboard.putNumber("FPS", fps);
 	}
 
-	/**
-	 * @param id id of the april tag we are fetching data on
-	 * @return X value from the tag to camera in meters
-	 * This value is used in tag-relative swerve movements
-	 */
-	public double getAprilTagX(int id) {
-		try {
-			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1))];
-		} catch (NullPointerException e) {
-			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
+	public Pose2d getPose() {
+		double[] arr = tagSubscriber.get();
+		if (arr[0] == 4000 && arr[1] == 4000 && arr[2] == 4000) {
+			return null;
 		}
-	}
-
-	/**
-	 * @param id id of the april tag we are fetching data on
-	 * @return Y value from the tag to camera in meters
-	 * This value is used in tag-relative swerve movements
-	 */
-	public double getAprilTagY(int id) {
-		try {
-			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 1];
-		} catch (NullPointerException e) {
-			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
-		}
-	}
-
-	/**
-	 * @param id id of the april tag we are fetching data on
-	 * @return Z value from the tag to camera in meters
-	 * This value is used in tag-relative swerve movements
-	 */
-	public double getAprilTagZ(int id) {
-		try {
-			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 2];
-		} catch (NullPointerException e) {
-			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
-		}
-	}
-
-	/**
-	 * @param id id of the april tag we are fetching data on
-	 * @return X value from the camera to tag in meters
-	 * This value is proportional to yaw and is used in robot-relative swerve movements
-	 */
-	public double getAprilTagXInv(int id) {
-		try {
-			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 2 + 1];
-		} catch (NullPointerException e) {
-			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
-		}
-	}
-
-	/**
-	 * @param id id of the april tag we are fetching data on
-	 * @return Y value from the camera to tag in meters
-	 * This value is proportional to pitch and is used in robot-relative swerve movements
-	 */
-	public double getAprilTagYInv(int id) {
-		try {
-			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 2 + 2];
-		} catch (NullPointerException e) {
-			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
-		}
-	}
-
-	/**
-	 * @param id id of the april tag we are fetching data on
-	 * @return Z value from the camera to tag in meters
-	 * This value is used in robot-relative swerve movements
-	 */
-	public double getAprilTagZInv(int id) {
-		try {
-			return tagSubscriber.get()[(VALUES_PER_TAG * (id - 1)) + 2 + 2 + 1];
-		} catch (NullPointerException e) {
-			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
-		}
+		return new Pose2d(arr[0], arr[1], new Rotation2d(arr[2]));
 	}
 }
