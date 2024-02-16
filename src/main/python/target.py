@@ -48,4 +48,4 @@ class Target:
     def get_distance_meters(self):
         height = self.heights[self.getType()]
         print("angle: ", math.radians(Target.CAM_ANGLE + self.get_pitch_degrees()))
-        return math.tan(math.radians(Target.CAM_ANGLE + self.get_pitch_degrees())) * (Target.CAM_HEIGHT-height)
+        return 0.684*math.tan(math.radians(Target.CAM_ANGLE + self.get_pitch_degrees())) * (Target.CAM_HEIGHT-height)-0.138
