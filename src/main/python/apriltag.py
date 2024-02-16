@@ -13,9 +13,16 @@ class AprilTag():
     def __init__(self):
         self.camera_matrix = np.load('calibration_data/camera1_matrix.npy')
         self.dist_coeffs = np.load('calibration_data/camera1_dist.npy')
-        self.detector = apriltag.Detector(families="tag36h11", nthreads=3)
-        #[y,x,theta]
-        self.tagMap = {1:np.array([4,4,math.pi]), 2:np.array([1,1,math.pi * 2 / 3]), 3:np.array([5,1,math.pi]), 4:np.array([0,0,math.pi]), 5:None, 6:None, 7:np.array([0,0,0]), 8:np.array([0,0,0]), 9:np.array([0,0,math.pi/3]), 10:np.array([0,0,math.pi/3]), 11:None, 12:None, 13:None, 14:None, 15:None, 16:None}
+        self.detector = apriltag.Detector(families="tag36h11", nthreads=4)
+        #[y,x,theta] 
+        self.tagMap = {1:np.array([-5.302,15.117,math.pi * 2 / 3]), 
+                       2:np.array([-4.664,16.223,math.pi * 2 / 3]), 
+                       3:np.array([-0.565,16.617,math.pi]), 
+                       4:np.array([0,16.617,math.pi]), 5:None, 6:None, 
+                       7:np.array([0,0,0]), 
+                       8:np.array([-0.565,0,0]), 
+                       9:np.array([-4.664,0.394,math.pi/3]), 
+                       10:np.array([-5.302,1.499,math.pi/3]), 11:None, 12:None, 13:None, 14:None, 15:None, 16:None}
         pass
 
     def calibrate(self, RES, dirpath, square_size, width, height, visualize=False):

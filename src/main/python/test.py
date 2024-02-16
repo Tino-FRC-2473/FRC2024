@@ -20,10 +20,8 @@ while True:
 
         annotated_frame = frame.copy()
         vision_pose = tag_module.estimate_3d_pose(frame, annotated_frame, ARUCO_LENGTH_METERS)
-        annotated_frame = cv2.resize(annotated_frame, (320,240))
         
         res = vision_pose.tolist()
-        print(res)
 
         cv2.imshow('result', annotated_frame)
         key = cv2.waitKey(1) & 0xFF
@@ -34,6 +32,6 @@ while True:
         print("keyboard interrupt")
         input.close()
         break
-    # except Exception as error:
-    #     print("An exception occurred:", error)
+    except Exception as error:
+         print("An exception occurred:", error)
     print('Loop time: ' + str(time.time()-p))

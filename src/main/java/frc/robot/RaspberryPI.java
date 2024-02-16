@@ -51,6 +51,6 @@ public class RaspberryPI {
 		if (arr[0] == 4000 && arr[1] == 4000 && arr[2] == 4000) {
 			return null;
 		}
-		return new Pose2d(arr[0], arr[1], new Rotation2d(arr[2]));
+		return new Pose2d(arr[1], arr[0], new Rotation2d(arr[2]));
 	}
 }

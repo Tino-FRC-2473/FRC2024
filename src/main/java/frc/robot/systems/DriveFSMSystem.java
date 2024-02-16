@@ -460,20 +460,23 @@ public class DriveFSMSystem {
 				break;
 
 			case ALIGN_TO_SOURCE_STATE:
-				// if (blueAlliance) {
-				// 		//id 1 and 2
-				// } else {
-				// 		//id 9 and 10
-				// }
+				if (blueAlliance) {
+					//id 1 and 2
+					driveToTarget(new Pose2d(15.67, -4.983, new Rotation2d(-Math.PI / 3)));
+				} else {
+					//id 9 and 10
+					driveToTarget(new Pose2d(0.9465, -4.983, new Rotation2d(-2 * Math.PI / 3)));
+				}
 				break;
 
 			case ALIGN_TO_SPEAKER_STATE:
-				// if (blueAlliance) {
-				// 		//id 7
-				// } else {
-				// 		//id 4
-				// }
-				driveToTarget(new Pose2d(4, 3, new Rotation2d(0)));
+				if (blueAlliance) {
+					//id 7
+					driveToTarget(new Pose2d(1, 0, new Rotation2d(Math.PI)));
+				} else {
+					//id 4
+					driveToTarget(new Pose2d(16.617 - 1, 0, new Rotation2d(0)));
+				}
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -676,8 +679,9 @@ public class DriveFSMSystem {
 		double y = pose.getY();
 		double angle = pose.getRotation().getDegrees();
 
-		double xDiff = x - getPose().getX();
-		double yDiff = y - getPose().getY();
+		//flip sign based on alliance
+		double xDiff = blueAlliance ? x - getPose().getX() : getPose().getX() - x;
+		double yDiff = blueAlliance ? y - getPose().getY() : getPose().getY() - y;
 		double aDiff = angle - getPose().getRotation().getDegrees();
 
 		if (aDiff > AutoConstants.DEG_180) {
