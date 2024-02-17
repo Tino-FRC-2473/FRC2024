@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.systems.DriveFSMSystem;
 import frc.robot.systems.KitBotShooterFSM;
 import frc.robot.systems.AutoHandlerSystem;
-//import frc.robot.systems.ClimberMechFSMLeft;
-//import frc.robot.systems.ClimberMechFSMRight;
+import frc.robot.systems.ClimberMechFSMLeft;
+import frc.robot.systems.ClimberMechFSMRight;
 import frc.robot.systems.AutoHandlerSystem.AutoPath;
 
 /**
@@ -21,8 +21,8 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 	// Systems
 	private KitBotShooterFSM shooterFSM;
-	//private ClimberMechFSMLeft climberMechLeftFSM;
-	//private ClimberMechFSMRight climberMechRightFSM;
+	private ClimberMechFSMLeft climberMechLeftFSM;
+	private ClimberMechFSMRight climberMechRightFSM;
 	private DriveFSMSystem driveFSMSystem;
 
 	private AutoHandlerSystem autoHandler;
@@ -40,8 +40,8 @@ public class Robot extends TimedRobot {
 		autoPathChooser = new AutoPathChooser();
 		driveFSMSystem = new DriveFSMSystem();
 		shooterFSM = new KitBotShooterFSM();
-		//climberMechLeftFSM = new ClimberMechFSMLeft();
-		//climberMechRightFSM = new ClimberMechFSMRight();
+		climberMechLeftFSM = new ClimberMechFSMLeft();
+		climberMechRightFSM = new ClimberMechFSMRight();
 		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
 	}
 
@@ -64,16 +64,16 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
 		driveFSMSystem.reset();
-		//climberMechLeftFSM.reset();
-		//climberMechRightFSM.reset();
+		climberMechLeftFSM.reset();
+		climberMechRightFSM.reset();
 		shooterFSM.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		//driveFSMSystem.update(input);
-		//climberMechLeftFSM.update(input);
-		//climberMechRightFSM.update(input);
+		driveFSMSystem.update(input);
+		climberMechLeftFSM.update(input);
+		climberMechRightFSM.update(input);
 		shooterFSM.update(input);
 	}
 
@@ -100,4 +100,3 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotPeriodic() { }
 }
-

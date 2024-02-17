@@ -20,7 +20,7 @@ public class ClimberMechFSMRight {
 		RETRACTING
 	}
 
-	private static final float MOTOR_RUN_POWER = 0.1f;
+	private static final float MOTOR_RUN_POWER = 0.4f;
 	private boolean limitPressed = false;
 
 	/* ======================== Private variables ======================== */
@@ -103,6 +103,7 @@ public class ClimberMechFSMRight {
 		SmartDashboard.putBoolean("Bottom Limit Right Switch Pressed", peakLimitSwitchHit());
 		SmartDashboard.putBoolean("Retract Button Pressed", input.isRetractClimberButtonPressed());
 		currentState = nextState(input);
+		SmartDashboard.putNumber("right output", motor.getOutputCurrent());
 	}
 
 	/**

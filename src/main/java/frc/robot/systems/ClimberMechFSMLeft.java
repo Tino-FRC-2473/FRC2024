@@ -20,7 +20,7 @@ public class ClimberMechFSMLeft {
 		RETRACTING
 	}
 
-	private static final float MOTOR_RUN_POWER = -0.1f;
+	private static final float MOTOR_RUN_POWER = -0.4f;
 	private boolean limitPressed = false;
 
 	/* ======================== Private variables ======================== */
@@ -69,7 +69,6 @@ public class ClimberMechFSMLeft {
 	public void reset() {
 		currentState = ClimberMechFSMState.IDLE_STOP;
 		limitPressed = false;
-
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -103,6 +102,7 @@ public class ClimberMechFSMLeft {
 		SmartDashboard.putBoolean("Bottom Limit Left Switch Pressed", peakLimitSwitchHit());
 		SmartDashboard.putBoolean("Retract Button Pressed", input.isRetractClimberButtonPressed());
 		currentState = nextState(input);
+		SmartDashboard.putNumber("left output", motor.getOutputCurrent());
 	}
 
 	/**
