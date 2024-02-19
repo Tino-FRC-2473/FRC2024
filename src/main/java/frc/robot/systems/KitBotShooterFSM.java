@@ -21,7 +21,6 @@ public class KitBotShooterFSM {
 		IDLE_STOP,
 		INTAKING,
 		OUTTAKING_SPEAKER,
-		REV_SHOOTER
 	}
 
 	private static final float SPEAKER_L_MOTOR_RUN_POWER = 0.8f;
@@ -116,9 +115,6 @@ public class KitBotShooterFSM {
 			case OUTTAKING_SPEAKER:
 				handleShootSpeakerState(input);
 				break;
-			case REV_SHOOTER:
-				handleRevShooterState(input);
-				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -160,11 +156,8 @@ public class KitBotShooterFSM {
 		}
 		switch (currentState) {
 			case IDLE_STOP:
-				if (input.isShootButtonPressed() && !input.isIntakeButtonPressed()) {
+				if ((input.isShootButtonPressed() || input.isRevOuttakeButtonPressed()) && !input.isIntakeButtonPressed()) {
 					return ShooterFSMState.OUTTAKING_SPEAKER;
-				}
-				if (input.isRevOuttakeButtonPressed() && !input.isIntakeButtonPressed() && !input.isShootButtonPressed()) {
-					return ShooterFSMState.REV_SHOOTER;
 				}
 				if (input.isIntakeButtonPressed() && !hasNote()
 					&& !input.isShootButtonPressed()
@@ -181,14 +174,8 @@ public class KitBotShooterFSM {
 					return ShooterFSMState.IDLE_STOP;
 				}
 			case OUTTAKING_SPEAKER:
-				if (input.isShootButtonPressed() && !input.isIntakeButtonPressed()) {
+				if ((input.isShootButtonPressed() || input.isRevOuttakeButtonPressed()) && !input.isIntakeButtonPressed()) {
 					return ShooterFSMState.OUTTAKING_SPEAKER;
-				} else {
-					return ShooterFSMState.IDLE_STOP;
-				}
-			case REV_SHOOTER:
-				if (input.isRevOuttakeButtonPressed() && !input.isIntakeButtonPressed() && !input.isShootButtonPressed()) {
-					return ShooterFSMState.REV_SHOOTER;
 				} else {
 					return ShooterFSMState.IDLE_STOP;
 				}
@@ -223,13 +210,16 @@ public class KitBotShooterFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleShootSpeakerState(TeleopInput input) {
-		highMotor.set(SPEAKER_U_MOTOR_RUN_POWER);
-		lowMotor.set(SPEAKER_L_MOTOR_RUN_POWER);
-	}
-	
-	private void handleRevShooterState(TeleopInput input) {
-		highMotor.set(SPEAKER_U_MOTOR_RUN_POWER);
-		lowMotor.set(0);
+		if (input.isRevOuttakeButtonPressed()) {
+			highMotor.set(SPEAKER_U_MOTOR_RUN_POWER);
+		} else {
+			highMotor.set(0);
+		}
+		if (input.isShootButtonPressed()) {
+			lowMotor.set(SPEAKER_L_MOTOR_RUN_POWER);
+		} else {
+			lowMotor.set(0);
+		}
 	}
 
 	private boolean handleAutoOuttakingState() {
