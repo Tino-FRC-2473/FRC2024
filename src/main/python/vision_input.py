@@ -11,7 +11,9 @@ class VisionInput:
         self.stream = 0
         self.w = res[0]
         self.h = res[1]
-        self.cap = cv2.VideoCapture(self.stream)
+        self.cap = None
+        self.cap1 = cv2.VideoCapture(0)
+        self.cap2 = cv2.VideoCapture(2)
         Target.FOV = fov
         Target.RES = res
         Target.CAM_HEIGHT = height
@@ -24,7 +26,11 @@ class VisionInput:
         self.stream = stream
         self.cap = cv2.VideoCapture(self.stream)
 
-    def getFrame(self):
+    def getFrame(self, stream):
+        if(stream == 2):
+            self.cap = self.cap1
+        else:
+            self.cap = self.cap2
         if not self.cap.isOpened():
             print("cannot open cam")
 

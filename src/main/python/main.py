@@ -20,19 +20,18 @@ while True:
     try:
         #print("here1")
         print("first stream")
-        frame = input.getFrame()
+        frame = input.getFrame(2)
         frame1 = frame.copy()
         cv2.imshow('Frame', frame1)
-        cv2.waitKey()
+     
 
         print("second stream")
-        input.changeStream(1)
-        frame = input.getFrame()
+        
+        frame = input.getFrame(4)
         frame2 = frame.copy()
-        cv2.imshow('Frame', frame2)
-        cv2.waitKey()
+        cv2.imshow('Frame2', frame2)
+        
 
-        input.changeStream(0)
         # table = inst.getTable("datatable")
         # xPub = table.getDoubleTopic("fps_incremented_value").publish()
         # xPub.set(frame.sum())
