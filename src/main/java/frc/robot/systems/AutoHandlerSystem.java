@@ -5,7 +5,6 @@ public class AutoHandlerSystem {
 	/* ======================== Constants ======================== */
 	// Auto FSM state definitions
 	public enum AutoFSMState {
-		TURN_TO_SCORE,
 		LEAVE,
 		DRIVE_TO_SCORE,
 		PICK_UP_1,
@@ -36,15 +35,15 @@ public class AutoHandlerSystem {
 	//Predefined auto paths
 
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
-		AutoFSMState.TURN_TO_SCORE, AutoFSMState.LEAVE};
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.LEAVE};
 
 	private static final AutoFSMState[] PATH2 = new AutoFSMState[]{
-		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_1,
-		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_2,
-		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_3,
-		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.PICK_UP_4};
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_1,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_2,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_3,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_4};
 
-	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{};
+	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{AutoFSMState.SHOOTER_STATE};
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -78,7 +77,7 @@ public class AutoHandlerSystem {
 	 */
 	public void reset(AutoPath path) {
 		driveSystem.resetAutonomus();
-		//shooterFSM.reset();
+		shooterFSM.reset();
 
 		if (path == AutoPath.PATH1) {
 			currentStateList = PATH1;
@@ -100,11 +99,6 @@ public class AutoHandlerSystem {
 		boolean isCurrentStateFinished;
 		SmartDashboard.putString("In Auto State: ", "" + getCurrentState());
 		switch (getCurrentState()) {
-
-			case TURN_TO_SCORE:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.TURN_TO_SCORE);
-				break;
 			case LEAVE:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.LEAVE);
