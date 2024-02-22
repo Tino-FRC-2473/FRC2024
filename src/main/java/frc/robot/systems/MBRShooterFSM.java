@@ -19,7 +19,7 @@ public class MBRShooterFSM {
 		SHOOTING
 	}
 
-	private static final float SHOOTING_POWER = 0.5f;
+	private static final float SHOOTING_POWER = 0.7f;
 	private static final float SHOOTING_TIME = 2.0f;
 	private boolean buttonToggle = false;
 	private boolean buttonPressedLastFrame = false;
