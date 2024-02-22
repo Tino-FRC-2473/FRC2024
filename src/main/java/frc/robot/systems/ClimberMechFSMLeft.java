@@ -102,7 +102,8 @@ public class ClimberMechFSMLeft {
 		SmartDashboard.putBoolean("Bottom Limit Left Switch Pressed", peakLimitSwitchHit());
 		SmartDashboard.putBoolean("Retract Button Pressed", input.isRetractClimberButtonPressed());
 		currentState = nextState(input);
-		SmartDashboard.putNumber("left output", motor.getOutputCurrent());
+		SmartDashboard.putNumber("left output", motor.getAppliedOutput());
+		SmartDashboard.putNumber("left motor applied", motor.get());
 	}
 
 	/**

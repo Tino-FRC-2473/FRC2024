@@ -156,7 +156,8 @@ public class KitBotShooterFSM {
 		}
 		switch (currentState) {
 			case IDLE_STOP:
-				if ((input.isShootButtonPressed() || input.isRevOuttakeButtonPressed()) && !input.isIntakeButtonPressed()) {
+				if ((input.isShootButtonPressed() || input.isRevOuttakeButtonPressed())
+					&& !input.isIntakeButtonPressed()) {
 					return ShooterFSMState.OUTTAKING_SPEAKER;
 				}
 				if (input.isIntakeButtonPressed() && !hasNote()
@@ -174,7 +175,8 @@ public class KitBotShooterFSM {
 					return ShooterFSMState.IDLE_STOP;
 				}
 			case OUTTAKING_SPEAKER:
-				if ((input.isShootButtonPressed() || input.isRevOuttakeButtonPressed()) && !input.isIntakeButtonPressed()) {
+				if ((input.isShootButtonPressed() || input.isRevOuttakeButtonPressed())
+					&& !input.isIntakeButtonPressed()) {
 					return ShooterFSMState.OUTTAKING_SPEAKER;
 				} else {
 					return ShooterFSMState.IDLE_STOP;
