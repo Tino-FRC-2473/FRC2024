@@ -8,6 +8,8 @@ import cv2
 inst = ntcore.NetworkTableInstance.getDefault()
 inst.startClient4("python")
 inst.setServerTeam(2473)
+inst.startDSClient()
+inst.setServer("host", ntcore.NetworkTableInstance.kDefaultPort4)
 
 FOV = (50.28, 29.16)
 RES = (640 , 480)
@@ -38,8 +40,8 @@ while True:
         tagDataPub = table.getDoubleArrayTopic("april_tag_data").publish()
         tagDataPub.set(pose_list)
         
-        outputStreamPub = table.getDoubleArrayTopic("output_stream").publish()
-        outputStreamPub.set(annotated_frame.flatten().tolist())
+        # outputStreamPub = table.getDoubleArrayTopic("output_stream").publish()
+        # outputStreamPub.set(annotated_frame.flatten().tolist())
 
         cv2.imshow('result', annotated_frame)
         key = cv2.waitKey(1) & 0xFF
