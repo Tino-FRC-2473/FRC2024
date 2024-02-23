@@ -193,7 +193,7 @@ public final class SwerveConstants {
 		public static final int BLUE_AMP_TAG_ID = 6;
 
 		public static final double MIN_SPEED_THRESHOLD = 0.01;
-		public static final double SOURCE_TAG_ANGLE_DEGREES = 45.0;
+		public static final double SOURCE_TAG_ANGLE_DEGREES = 60.0;
 		public static final double SPEAKER_TAG_ANGLE_DEGREES = 180.0;
 	}
 }

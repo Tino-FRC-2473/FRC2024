@@ -3,6 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.cscore.UsbCamera;
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
 // Systems
@@ -28,6 +32,9 @@ public class Robot extends TimedRobot {
 	private AutoHandlerSystem autoHandler;
 	private AutoPathChooser autoPathChooser;
 
+	private CameraServer cam;
+	private CvSink cvSink;
+	private CvSource outputStrem;
 	/**
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
@@ -39,10 +46,17 @@ public class Robot extends TimedRobot {
 		// Instantiate all systems here
 		autoPathChooser = new AutoPathChooser();
 		driveFSMSystem = new DriveFSMSystem();
-		shooterFSM = new KitBotShooterFSM();
-		climberMechLeftFSM = new ClimberMechFSMLeft();
-		climberMechRightFSM = new ClimberMechFSMRight();
-		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
+		//shooterFSM = new KitBotShooterFSM();
+		//climberMechLeftFSM = new ClimberMechFSMLeft();
+		//climberMechRightFSM = new ClimberMechFSMRight();
+		//autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
+
+		CameraServer.startAutomaticCapture();
+		// Creates the CvSink and connects it to the UsbCamera
+		cvSink = CameraServer.getVideo();
+		// Creates the CvSource and MjpegServer [2] and connects them
+		outputStrem = CameraServer.putVideo("Driver Camera",
+			1280, 720);
 	}
 
 	@Override
@@ -64,17 +78,17 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
 		driveFSMSystem.reset();
-		climberMechLeftFSM.reset();
-		climberMechRightFSM.reset();
-		shooterFSM.reset();
+		//climberMechLeftFSM.reset();
+		//climberMechRightFSM.reset();
+		//shooterFSM.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		driveFSMSystem.update(input);
-		climberMechLeftFSM.update(input);
-		climberMechRightFSM.update(input);
-		shooterFSM.update(input);
+		//climberMechLeftFSM.update(input);
+		//climberMechRightFSM.update(input);
+		//shooterFSM.update(input);
 	}
 
 	@Override

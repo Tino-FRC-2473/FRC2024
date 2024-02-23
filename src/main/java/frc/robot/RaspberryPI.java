@@ -23,7 +23,7 @@ public class RaspberryPI {
 	public RaspberryPI() {
 		timer.start();
 		inst = NetworkTableInstance.getDefault();
-		inst.startServer();
+		//inst.startServer();
 		table = inst.getTable("datatable");
 		fpsCounter = table.getDoubleTopic("x").subscribe(-1);
 		tagSubscriber = table.getDoubleArrayTopic("april_tag_data").subscribe(null);

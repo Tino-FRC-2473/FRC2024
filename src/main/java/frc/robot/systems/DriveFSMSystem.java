@@ -422,12 +422,12 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-		odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()),
-			new SwerveModulePosition[] {
-				frontLeft.getPosition(),
-				frontRight.getPosition(),
-				rearLeft.getPosition(),
-				rearRight.getPosition()});
+		// odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()),
+		// 	new SwerveModulePosition[] {
+		// 		frontLeft.getPosition(),
+		// 		frontRight.getPosition(),
+		// 		rearLeft.getPosition(),
+		// 		rearRight.getPosition()});
 
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
@@ -739,9 +739,12 @@ public class DriveFSMSystem {
 	 * robot to be at the source to pickup a note.
 	 */
 	public void alignToSource(int id) {
-		double yDiff = rpi.getAprilTagX(id);
-		double xDiff = rpi.getAprilTagZ(id) - VisionConstants.SOURCE_TARGET_DISTANCE;
-		double aDiff = rpi.getAprilTagXInv(id);
+		if (rpi.getAprilTagX(id) != VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+			resetOdometry(new Pose2d(rpi.getAprilTagZ(id),rpi.getAprilTagX(id), new Rotation2d(rpi.getAprilTagXInv(id))));
+		}
+		double yDiff = odometry.getPoseMeters().getY();
+		double xDiff = odometry.getPoseMeters().getX() - VisionConstants.SPEAKER_TARGET_DISTANCE;
+		double aDiff = odometry.getPoseMeters().getRotation().getRadians();
 
 		SmartDashboard.putNumber("x diff", xDiff);
 		SmartDashboard.putNumber("y diff", yDiff);
@@ -785,9 +788,12 @@ public class DriveFSMSystem {
 	 * Positions the robot to the correct distance from the speaker to shoot
 	 */
 	public void alignToSpeaker(int id) {
-		double yDiff = rpi.getAprilTagX(id);
-		double xDiff = rpi.getAprilTagZ(id) - VisionConstants.SPEAKER_TARGET_DISTANCE;
-		double aDiff = rpi.getAprilTagXInv(id);
+		if (rpi.getAprilTagX(id) != VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+			resetOdometry(new Pose2d(rpi.getAprilTagZ(id),rpi.getAprilTagX(id), new Rotation2d(rpi.getAprilTagXInv(id))));
+		}
+		double yDiff = odometry.getPoseMeters().getY();
+		double xDiff = odometry.getPoseMeters().getX() - VisionConstants.SPEAKER_TARGET_DISTANCE;
+		double aDiff = odometry.getPoseMeters().getRotation().getRadians();
 
 		double xSpeed = clamp(xDiff
 			/ VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,
