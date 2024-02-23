@@ -27,7 +27,7 @@ public class LED extends TimedRobot{
 
     public void orangeLight() {
       for (var i = 0; i < ledBuffer.getLength(); i++) {
-        ledBuffer.setRGB(i, 255, 128, 0);
+        ledBuffer.setRGB(i, 255, 92, 5);
       }
       led.setData(ledBuffer);
     }
@@ -44,13 +44,6 @@ public class LED extends TimedRobot{
         ledBuffer.setRGB(i, 199, greenVal, 0);
       }
 
-      // if (greenVal > 100) {
-      //   greenVal -= 1;
-      // } else if (greenVal < 0) {
-      //   greenVal += 1;
-      // } else {
-
-      // }
       if (greenVal >= 100) {
         forward = false;
       } else if (greenVal <= 0) {

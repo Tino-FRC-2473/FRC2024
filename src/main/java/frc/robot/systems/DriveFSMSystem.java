@@ -460,6 +460,9 @@ public class DriveFSMSystem {
 				break;
 
 			case ALIGN_TO_SOURCE_STATE:
+				System.out.println("in state");
+				System.out.println("turn off LEDs");
+				led.turnOff();
 				if (lockedSourceId == -1) {
 					if (blueAlliance) {
 						//id 1 and 2
@@ -499,6 +502,7 @@ public class DriveFSMSystem {
 						}
 					}
 				} else {
+					System.out.println("hello");
 					alignToSource(lockedSourceId);
 				}
 
@@ -551,10 +555,12 @@ public class DriveFSMSystem {
 				return FSMState.TELEOP_STATE;
 
 			case ALIGN_TO_SOURCE_STATE:
+				System.out.println("source");
 				if (input.isTriangleButtonReleased()) {
 					lockedSourceId = -1;
 					isSourceAligned = false;
-					//led.turnOff();
+					led.turnOff();
+					System.out.println("turn off LEDs");
 					return FSMState.TELEOP_STATE;
 				}
 				return FSMState.ALIGN_TO_SOURCE_STATE;
@@ -562,7 +568,7 @@ public class DriveFSMSystem {
 			case ALIGN_TO_SPEAKER_STATE:
 				if (input.isCircleButtonReleased()) {
 					lockedSpeakerId = -1;
-					//led.turnOff();
+					led.turnOff();
 					return FSMState.TELEOP_STATE;
 				}
 				return FSMState.ALIGN_TO_SPEAKER_STATE;
@@ -782,8 +788,10 @@ public class DriveFSMSystem {
 				&& Math.abs(aSpeed) < VisionConstants.MIN_SPEED_THRESHOLD) {
 				isSourceAligned = true;
 			}
+			System.out.println("orange light");
 			led.orangeLight();
 		} else {
+			System.out.println("green light");
 			led.greenLight();
 			drive(VisionConstants.SOURCE_DRIVE_FORWARD_POWER, 0, 0, false, false);
 		}
