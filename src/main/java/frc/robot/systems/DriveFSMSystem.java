@@ -27,6 +27,7 @@ import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 import frc.robot.utils.SwerveUtils;
 import frc.robot.HardwareMap;
 import frc.robot.RaspberryPI;
+import frc.robot.LED;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.SwerveConstants.AutoConstants;
@@ -59,6 +60,9 @@ public class DriveFSMSystem {
 
 	// The raspberry pi
 	private RaspberryPI rpi = new RaspberryPI();
+
+	// led
+	private LED led = new LED();
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double currentRotation = 0.0;
@@ -550,6 +554,8 @@ public class DriveFSMSystem {
 				if (input.isTriangleButtonReleased()) {
 					lockedSourceId = -1;
 					isSourceAligned = false;
+					led.turnOff();
+					System.out.println("turn off LEDs");
 					return FSMState.TELEOP_STATE;
 				}
 				return FSMState.ALIGN_TO_SOURCE_STATE;
@@ -777,8 +783,12 @@ public class DriveFSMSystem {
 				&& Math.abs(ySpeedField) < VisionConstants.MIN_SPEED_THRESHOLD
 				&& Math.abs(aSpeed) < VisionConstants.MIN_SPEED_THRESHOLD) {
 				isSourceAligned = true;
+				System.out.println("orange light");
+				led.orangeLight();
 			}
 		} else {
+			System.out.println("green light");
+			led.greenLight();
 			drive(VisionConstants.SOURCE_DRIVE_FORWARD_POWER, 0, 0, false, false);
 		}
 	}
