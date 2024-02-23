@@ -6,6 +6,7 @@ package frc.robot.systems;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
@@ -98,6 +99,11 @@ public class MBRShooterFSM {
 		} else if (!input.isShootButtonPressed()) {
 			buttonPressedLastFrame = false;
 		}
+
+		SmartDashboard.putBoolean("SHOOT BUTTON", input.isShootButtonPressed());
+		SmartDashboard.putString("Current State", currentState.toString());
+		SmartDashboard.putNumber("Left Motor Power", leftMotor.get());
+		SmartDashboard.putNumber("Right Motor Power", rightMotor.get());
 
 		switch (currentState) {
 			case IDLE_STOP:
