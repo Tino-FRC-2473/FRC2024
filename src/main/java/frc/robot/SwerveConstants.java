@@ -167,17 +167,17 @@ public final class SwerveConstants {
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 30;
 
 		public static final double SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT = 3;
-		public static final double SPEAKER_ROTATIONAL_ACCEL_CONSTANT = 2;
-		public static final double X_MARGIN_TO_SPEAKER = 0.02;
-		public static final double Y_MARGIN_TO_SPEAKER = 0.02;
-		public static final double ROT_MARGIN_TO_SPEAKER = 0.02;
-		public static final double SPEAKER_TARGET_DISTANCE = 1;
+		public static final double SPEAKER_ROTATIONAL_ACCEL_CONSTANT =3;
+		public static final double X_MARGIN_TO_SPEAKER = 0.04;
+		public static final double Y_MARGIN_TO_SPEAKER = 0.04;
+		public static final double ROT_MARGIN_TO_SPEAKER = 0.03;
+		public static final double SPEAKER_TARGET_DISTANCE = 1.4;
 
-		public static final double SOURCE_TRANSLATIONAL_ACCEL_CONSTANT = 3;
-		public static final double SOURCE_ROTATIONAL_ACCEL_CONSTANT = 3;
+		public static final double SOURCE_TRANSLATIONAL_ACCEL_CONSTANT = 2;
+		public static final double SOURCE_ROTATIONAL_ACCEL_CONSTANT = 4;
 		public static final double X_MARGIN_TO_SOURCE = 0.02;
 		public static final double Y_MARGIN_TO_SOURCE = 0.02;
-		public static final double ROT_MARGIN_TO_SOURCE = 0.03;
+		public static final double ROT_MARGIN_TO_SOURCE = 0.05;
 		public static final double SOURCE_DRIVE_FORWARD_POWER = 0.25;
 		public static final double SOURCE_TARGET_DISTANCE = 0.85;
 

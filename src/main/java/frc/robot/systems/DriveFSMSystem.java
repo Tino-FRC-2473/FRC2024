@@ -759,10 +759,11 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("y diff", yDiff);
 		SmartDashboard.putNumber("a diff", aDiff);
 
-		double xSpeed = clamp(xDiff
-			/ VisionConstants.SOURCE_TRANSLATIONAL_ACCEL_CONSTANT,
-			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
-			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
+		// double xSpeed = clamp(xDiff
+		// 	/ VisionConstants.SOURCE_TRANSLATIONAL_ACCEL_CONSTANT,
+		// 	-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
+		// 	VisionConstants.MAX_SPEED_METERS_PER_SECOND);
+		double xSpeed = 0;
 		double ySpeed = clamp(yDiff
 			/ VisionConstants.SOURCE_TRANSLATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
@@ -779,7 +780,8 @@ public class DriveFSMSystem {
 			- (xSpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
 		aSpeed = Math.abs(aDiff) > VisionConstants.ROT_MARGIN_TO_SOURCE
 			? aSpeed : 0;
-
+		//xSpeedField = 0;
+		//ySpeedField = 0;
 		if (!isSourceAligned) {
 			drive(xSpeedField, ySpeedField, aSpeed, true, false);
 			if (Math.abs(xSpeedField) < VisionConstants.MIN_SPEED_THRESHOLD
@@ -824,7 +826,8 @@ public class DriveFSMSystem {
 			- (xSpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
 		aSpeed = Math.abs(aDiff) > VisionConstants.ROT_MARGIN_TO_SPEAKER
 			? aSpeed : 0;
-
+		//xSpeedField = 0;
+		//ySpeedField = 0;
 		drive(xSpeedField, ySpeedField, aSpeed, true, false);
 	}
 
