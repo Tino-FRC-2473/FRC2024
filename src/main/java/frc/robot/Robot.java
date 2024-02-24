@@ -50,12 +50,12 @@ public class Robot extends TimedRobot {
 		climberMechRightFSM = new ClimberMechFSMRight();
 		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
 
-		// CameraServer.startAutomaticCapture();
-		// // Creates the CvSink and connects it to the UsbCamera
-		// cvSink = CameraServer.getVideo();
-		// // Creates the CvSource and MjpegServer [2] and connects them
-		// outputStrem = CameraServer.putVideo("Driver Camera",
-		// 	1280, 720);
+		CameraServer.startAutomaticCapture();
+		// Creates the CvSink and connects it to the UsbCamera
+		cvSink = CameraServer.getVideo();
+		// Creates the CvSource and MjpegServer [2] and connects them
+		outputStrem = CameraServer.putVideo("Driver Camera",
+			1280, 720);
 	}
 
 	@Override
