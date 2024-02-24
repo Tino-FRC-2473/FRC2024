@@ -6,6 +6,7 @@ package frc.robot.systems;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
@@ -19,7 +20,7 @@ public class MBRShooterFSM {
 		SHOOTING
 	}
 
-	private static final float SHOOTING_POWER = 0.5f;
+	private static final float SHOOTING_POWER = 0.2f;
 	private static final float SHOOTING_TIME = 2.0f;
 	private boolean buttonToggle = false;
 	private boolean buttonPressedLastFrame = false;
@@ -112,6 +113,7 @@ public class MBRShooterFSM {
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		currentState = nextState(input);
+		SmartDashboard.putBoolean("Shoot Button", input.isShootButtonPressed());
 	}
 
 	/**
@@ -178,7 +180,7 @@ public class MBRShooterFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleShootingState(TeleopInput input) {
-		leftMotor.set(-SHOOTING_POWER); //dont forget the "-" sign
+		leftMotor.set(SHOOTING_POWER); //dont forget the "-" sign
 		rightMotor.set(SHOOTING_POWER);
 	}
 
@@ -218,7 +220,7 @@ public class MBRShooterFSM {
 
 		if (autoShootingTimerStarted
 			&& !shootingTimer.hasElapsed(autoShootingTimerStart + SHOOTING_TIME)) {
-			leftMotor.set(-SHOOTING_POWER);
+			leftMotor.set(SHOOTING_POWER);
 			rightMotor.set(SHOOTING_POWER);
 		} else {
 			leftMotor.set(0);
