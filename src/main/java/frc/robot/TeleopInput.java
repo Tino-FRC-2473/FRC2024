@@ -125,7 +125,7 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isShootButtonPressed() {
-		return mechController.getR2Button();
+		return mechController.getR1Button();
 	}
 
 	/**
@@ -133,15 +133,14 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isRevOuttakeButtonPressed() {
-		return mechController.getL2Button();
+		return mechController.getL1Button();
 	}
 
-	/**
-	 * Get the value of the retract button.
-	 * @return True if button is pressed
-	 */
-	public boolean isRetractClimberButtonPressed() {
-		return mechController.getCrossButton();
-	}
 
+	public double leftClimberTrigger() {
+		return mechController.getL2Axis();
+	}
+	public double rightClimberTrigger() {
+		return mechController.getR2Axis();
+	}
 }
