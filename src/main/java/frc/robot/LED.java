@@ -2,9 +2,8 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.TimedRobot;
 
-public class LED extends TimedRobot{
+public class LED {
     AddressableLED led;
     AddressableLEDBuffer ledBuffer;
     int m_rainbowFirstPixelHue = 0;
