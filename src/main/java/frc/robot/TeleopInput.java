@@ -125,7 +125,7 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isShootButtonPressed() {
-		return mechController.getR1Button();
+		return mechController.getTriangleButton();
 	}
 
 	/**
