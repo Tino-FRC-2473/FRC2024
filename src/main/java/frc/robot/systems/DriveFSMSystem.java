@@ -772,7 +772,7 @@ public class DriveFSMSystem {
 		// 	-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
 		// 	VisionConstants.MAX_SPEED_METERS_PER_SECOND);
 		double xSpeed = 0;
-		double ySpeed = Math.abs(yDiff) > VisionConstants.X_MARGIN_TO_SOURCE ? clamp(yDiff
+		double ySpeed = Math.abs(yDiff) > VisionConstants.Y_MARGIN_TO_SOURCE ? clamp(yDiff
 			/ VisionConstants.SOURCE_TRANSLATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
 			VisionConstants.MAX_SPEED_METERS_PER_SECOND) : 0;
