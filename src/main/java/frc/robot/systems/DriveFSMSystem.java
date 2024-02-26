@@ -108,6 +108,8 @@ public class DriveFSMSystem {
 	private int lockedSourceId;
 	private int lockedSpeakerId;
 	private boolean isSourceAligned;
+	private boolean isSpeakerPositionAligned;
+	private boolean isSourcePositionAligned;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -193,6 +195,8 @@ public class DriveFSMSystem {
 		lockedSourceId = -1;
 		lockedSpeakerId = -1;
 		isSourceAligned = false;
+		isSourcePositionAligned = false;
+		isSpeakerPositionAligned = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -244,6 +248,8 @@ public class DriveFSMSystem {
 		lockedSourceId = -1;
 		lockedSpeakerId = -1;
 		isSourceAligned = false;
+		isSourcePositionAligned = false;
+		isSpeakerPositionAligned = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -559,6 +565,7 @@ public class DriveFSMSystem {
 				if (input.isTriangleButtonReleased()) {
 					lockedSourceId = -1;
 					isSourceAligned = false;
+					isSourcePositionAligned = false;
 					return FSMState.TELEOP_STATE;
 				}
 				return FSMState.ALIGN_TO_SOURCE_STATE;
@@ -566,6 +573,7 @@ public class DriveFSMSystem {
 			case ALIGN_TO_SPEAKER_STATE:
 				if (input.isCircleButtonReleased()) {
 					lockedSpeakerId = -1;
+					isSpeakerPositionAligned = false;
 					return FSMState.TELEOP_STATE;
 				}
 				return FSMState.ALIGN_TO_SPEAKER_STATE;
@@ -764,29 +772,29 @@ public class DriveFSMSystem {
 		// 	-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
 		// 	VisionConstants.MAX_SPEED_METERS_PER_SECOND);
 		double xSpeed = 0;
-		double ySpeed = clamp(yDiff
+		double ySpeed = Math.abs(yDiff) > VisionConstants.X_MARGIN_TO_SOURCE ? clamp(yDiff
 			/ VisionConstants.SOURCE_TRANSLATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
-			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
-		double aSpeed = -clamp(aDiff / VisionConstants.SOURCE_ROTATIONAL_ACCEL_CONSTANT,
+			VisionConstants.MAX_SPEED_METERS_PER_SECOND) : 0;
+		double aSpeed = Math.abs(aDiff) > VisionConstants.ROT_MARGIN_TO_SOURCE
+			? -clamp(aDiff / VisionConstants.SOURCE_ROTATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
-			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
+			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND) : 0;
 
-		double xSpeedField = Math.abs(xDiff) > VisionConstants.X_MARGIN_TO_SOURCE
-			? (xSpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
-			+ (ySpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
-		double ySpeedField = Math.abs(yDiff) > VisionConstants.X_MARGIN_TO_SOURCE
-			? (ySpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
-			- (xSpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
-		aSpeed = Math.abs(aDiff) > VisionConstants.ROT_MARGIN_TO_SOURCE
-			? aSpeed : 0;
-		//xSpeedField = 0;
-		//ySpeedField = 0;
+		double xSpeedField = (xSpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
+			+ (ySpeed * Math.sin(Math.toRadians(tagOrientationAngles[id])));
+		double ySpeedField = (ySpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
+			- (xSpeed * Math.sin(Math.toRadians(tagOrientationAngles[id])));
 		if (!isSourceAligned) {
-			drive(xSpeedField, ySpeedField, aSpeed, true, false);
-			if (Math.abs(xSpeedField) < VisionConstants.MIN_SPEED_THRESHOLD
-				&& Math.abs(ySpeedField) < VisionConstants.MIN_SPEED_THRESHOLD
-				&& Math.abs(aSpeed) < VisionConstants.MIN_SPEED_THRESHOLD) {
+			if (xSpeedField == 0 && ySpeedField == 0) {
+				isSourcePositionAligned = true;
+			}
+			if (!isSourcePositionAligned) {
+				drive(xSpeedField, ySpeedField, aSpeed, true, false);
+			} else {
+				drive(0,0,aSpeed, true, false);
+			}
+			if (isSourcePositionAligned && Math.abs(aSpeed) < VisionConstants.MIN_SPEED_THRESHOLD) {
 				isSourceAligned = true;
 			}
 		} else {
@@ -806,29 +814,31 @@ public class DriveFSMSystem {
 		double xDiff = odometry.getPoseMeters().getX() - VisionConstants.SPEAKER_TARGET_DISTANCE;
 		double aDiff = odometry.getPoseMeters().getRotation().getRadians();
 
-		double xSpeed = clamp(xDiff
-			/ VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,
+		double xSpeed = Math.abs(xDiff) > VisionConstants.X_MARGIN_TO_SPEAKER
+			? clamp(xDiff / VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
-			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
-		double ySpeed = clamp(yDiff
-			/ VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,
+			VisionConstants.MAX_SPEED_METERS_PER_SECOND) : 0;
+		double ySpeed = Math.abs(yDiff) > VisionConstants.Y_MARGIN_TO_SPEAKER
+			? clamp(yDiff / VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
-			VisionConstants.MAX_SPEED_METERS_PER_SECOND);
-		double aSpeed = -clamp(aDiff / VisionConstants.SPEAKER_ROTATIONAL_ACCEL_CONSTANT,
+			VisionConstants.MAX_SPEED_METERS_PER_SECOND) : 0;
+		double aSpeed = Math.abs(aDiff) > VisionConstants.ROT_MARGIN_TO_SPEAKER
+			? -clamp(aDiff / VisionConstants.SPEAKER_ROTATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
-			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
+			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND) : 0;
 
-		double xSpeedField = Math.abs(xDiff) > VisionConstants.X_MARGIN_TO_SPEAKER
-			? (xSpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
-			+ (ySpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
-		double ySpeedField = Math.abs(yDiff) > VisionConstants.Y_MARGIN_TO_SPEAKER
-			? (ySpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
-			- (xSpeed * Math.sin(Math.toRadians(tagOrientationAngles[id]))) : 0;
-		aSpeed = Math.abs(aDiff) > VisionConstants.ROT_MARGIN_TO_SPEAKER
-			? aSpeed : 0;
-		//xSpeedField = 0;
-		//ySpeedField = 0;
-		drive(xSpeedField, ySpeedField, aSpeed, true, false);
+		double xSpeedField = (xSpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
+			+ (ySpeed * Math.sin(Math.toRadians(tagOrientationAngles[id])));
+		double ySpeedField = (ySpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
+			- (xSpeed * Math.sin(Math.toRadians(tagOrientationAngles[id])));
+		if (xSpeedField == 0 && ySpeedField == 0) {
+			isSpeakerPositionAligned = true;
+		}
+		if (!isSpeakerPositionAligned) {
+			drive(xSpeedField, ySpeedField, aSpeed, true, false);
+		} else {
+			drive(0,0,aSpeed, true, false);
+		}
 	}
 
 	/**
