@@ -757,7 +757,8 @@ public class DriveFSMSystem {
 	 */
 	public void alignToSource(int id) {
 		if (rpi.getAprilTagX(id) != VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
-			resetOdometry(new Pose2d(rpi.getAprilTagZ(id),rpi.getAprilTagX(id), new Rotation2d(rpi.getAprilTagXInv(id))));
+			resetOdometry(new Pose2d(rpi.getAprilTagZ(id), rpi.getAprilTagX(id),
+				new Rotation2d(rpi.getAprilTagXInv(id))));
 		}
 		double yDiff = odometry.getPoseMeters().getY();
 		double xDiff = odometry.getPoseMeters().getX() - VisionConstants.SPEAKER_TARGET_DISTANCE;
@@ -792,7 +793,7 @@ public class DriveFSMSystem {
 			if (!isSourcePositionAligned) {
 				drive(xSpeedField, ySpeedField, aSpeed, true, false);
 			} else {
-				drive(0,0,aSpeed, true, false);
+				drive(0, 0, aSpeed, true, false);
 			}
 			if (isSourcePositionAligned && Math.abs(aSpeed) < VisionConstants.MIN_SPEED_THRESHOLD) {
 				isSourceAligned = true;
@@ -808,7 +809,8 @@ public class DriveFSMSystem {
 	 */
 	public void alignToSpeaker(int id) {
 		if (rpi.getAprilTagX(id) != VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
-			resetOdometry(new Pose2d(rpi.getAprilTagZ(id),rpi.getAprilTagX(id), new Rotation2d(rpi.getAprilTagXInv(id))));
+			resetOdometry(new Pose2d(rpi.getAprilTagZ(id), rpi.getAprilTagX(id),
+				new Rotation2d(rpi.getAprilTagXInv(id))));
 		}
 		double yDiff = odometry.getPoseMeters().getY();
 		double xDiff = odometry.getPoseMeters().getX() - VisionConstants.SPEAKER_TARGET_DISTANCE;
@@ -837,7 +839,7 @@ public class DriveFSMSystem {
 		if (!isSpeakerPositionAligned) {
 			drive(xSpeedField, ySpeedField, aSpeed, true, false);
 		} else {
-			drive(0,0,aSpeed, true, false);
+			drive(0, 0, aSpeed, true, false);
 		}
 	}
 
