@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 // Systems
 import frc.robot.systems.DriveFSMSystem;
 import frc.robot.systems.KitBotShooterFSM;
+import frc.robot.SwerveConstants.VisionConstants;
 import frc.robot.systems.AutoHandlerSystem;
 import frc.robot.systems.ClimberMechFSMLeft;
 import frc.robot.systems.ClimberMechFSMRight;
@@ -55,7 +56,7 @@ public class Robot extends TimedRobot {
 		cvSink = CameraServer.getVideo();
 		// Creates the CvSource and MjpegServer [2] and connects them
 		outputStrem = CameraServer.putVideo("Driver Camera",
-			1280, 720);
+			VisionConstants.DRIVER_CAM_WIDTH_PIXELS, VisionConstants.DRIVER_CAM_HEIGHT_PIXELS);
 	}
 
 	@Override

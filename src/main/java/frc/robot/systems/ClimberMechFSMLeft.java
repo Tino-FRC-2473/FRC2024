@@ -21,6 +21,8 @@ public class ClimberMechFSMLeft {
 	}
 
 	private static final float MOTOR_RUN_POWER = -0.3f;
+	public static final double TRIGGER_DEADZONE = 0.05;
+
 	private boolean limitPressed = false;
 
 	/* ======================== Private variables ======================== */
@@ -132,13 +134,13 @@ public class ClimberMechFSMLeft {
 	private ClimberMechFSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case IDLE_STOP:
-				if (input.leftClimberTrigger() > 0.05 && !peakLimitSwitchHit()) {
+				if (input.leftClimberTrigger() > TRIGGER_DEADZONE && !peakLimitSwitchHit()) {
 					return ClimberMechFSMState.RETRACTING;
 				} else {
 					return ClimberMechFSMState.IDLE_STOP;
 				}
 			case RETRACTING:
-				if (input.leftClimberTrigger() > 0.05 && !peakLimitSwitchHit()) {
+				if (input.leftClimberTrigger() > TRIGGER_DEADZONE && !peakLimitSwitchHit()) {
 					return ClimberMechFSMState.RETRACTING;
 				} else {
 					return ClimberMechFSMState.IDLE_STOP;

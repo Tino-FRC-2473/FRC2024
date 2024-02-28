@@ -193,5 +193,8 @@ public final class SwerveConstants {
 		public static final double MIN_SPEED_THRESHOLD = 0.01;
 		public static final double SOURCE_TAG_ANGLE_DEGREES = 60.0;
 		public static final double SPEAKER_TAG_ANGLE_DEGREES = 180.0;
+
+		public static final int DRIVER_CAM_WIDTH_PIXELS = 1280;
+		public static final int DRIVER_CAM_HEIGHT_PIXELS = 720;
 	}
 }

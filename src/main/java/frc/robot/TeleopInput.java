@@ -136,10 +136,18 @@ public class TeleopInput {
 		return mechController.getL1Button();
 	}
 
-
+	/**
+	 * Get the value of the left climber trigger.
+	 * @return True if button is pressed
+	 */
 	public double leftClimberTrigger() {
 		return mechController.getL2Axis();
 	}
+
+	/**
+	 * Get the value of the right climber trigger.
+	 * @return True if button is pressed
+	 */
 	public double rightClimberTrigger() {
 		return mechController.getR2Axis();
 	}
