@@ -5,7 +5,6 @@ package frc.robot;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.VideoSink;
-import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
 import edu.wpi.first.cscore.MjpegServer;
 import edu.wpi.first.cscore.UsbCamera;
 // WPILib Imports
@@ -58,10 +57,10 @@ public class Robot extends TimedRobot {
 		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
 
 		driverCam = CameraServer.startAutomaticCapture(0);
-		//chainCam = CameraServer.startAutomaticCapture(2);
+		chainCam = CameraServer.startAutomaticCapture(1);
 
-		driverCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
-		//chainCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+		// driverCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+		// chainCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
 
 		videoSink = CameraServer.getServer();
 
@@ -114,8 +113,7 @@ public class Robot extends TimedRobot {
 		}
 
 		if (chainCamToggled) {
-			System.out.println("Chain mech is toggled");
-			//videoSink.setSource(chainCam);
+			videoSink.setSource(chainCam);
 		} else {
 			videoSink.setSource(driverCam);
 		}

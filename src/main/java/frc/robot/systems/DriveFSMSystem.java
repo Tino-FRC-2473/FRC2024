@@ -835,6 +835,9 @@ public class DriveFSMSystem {
 			drive(xSpeedField, ySpeedField, aSpeed, true, false);
 		} else {
 			drive(0, 0, aSpeed, true, false);
+			if (aSpeed == 0) {
+				isSpeakerAligned = true;
+			}
 		}
 	}
 
