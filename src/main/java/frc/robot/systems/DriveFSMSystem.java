@@ -108,6 +108,7 @@ public class DriveFSMSystem {
 	private int lockedSourceId;
 	private int lockedSpeakerId;
 	private boolean isSourceAligned;
+	private boolean isSpeakerAligned;
 	private boolean isSpeakerPositionAligned;
 	private boolean isSourcePositionAligned;
 	/* ======================== Constructor ======================== */
@@ -195,6 +196,7 @@ public class DriveFSMSystem {
 		lockedSourceId = -1;
 		lockedSpeakerId = -1;
 		isSourceAligned = false;
+		isSpeakerAligned = false;
 		isSourcePositionAligned = false;
 		isSpeakerPositionAligned = false;
 		// Call one tick of update to ensure outputs reflect start state
@@ -425,6 +427,7 @@ public class DriveFSMSystem {
 		}
 		SmartDashboard.putString("Drive State", getCurrentState().toString());
 		SmartDashboard.putBoolean("Is Source Aligned", isSourceAligned);
+		SmartDashboard.putBoolean("Is Speaker Aligned", isSpeakerAligned);
 		if (blueAlliance) {
 			if (!(rpi.getAprilTagZInv(VisionConstants.BLUE_SOURCE_TAG1_ID)
 						== VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
@@ -517,23 +520,23 @@ public class DriveFSMSystem {
 				break;
 
 			case ALIGN_TO_SPEAKER_STATE:
-				// if (lockedSpeakerId == -1) {
-				// 	if (blueAlliance) {
-				// 		//id 7
-				// 		if (rpi.getAprilTagZInv(VisionConstants.BLUE_SPEAKER_TAG_ID)
-				// 			!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
-				// 			lockedSpeakerId = VisionConstants.BLUE_SPEAKER_TAG_ID;
-				// 		}
-				// 	} else {
-				// 		//id 4
-				// 		if (rpi.getAprilTagZInv(VisionConstants.RED_SPEAKER_TAG_ID)
-				// 			!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
-				// 			lockedSpeakerId = VisionConstants.RED_SPEAKER_TAG_ID;
-				// 		}
-				// 	}
-				// } else {
-				// 	alignToSpeaker(lockedSpeakerId);
-				// }
+				if (lockedSpeakerId == -1) {
+					if (blueAlliance) {
+						//id 7
+						if (rpi.getAprilTagZInv(VisionConstants.BLUE_SPEAKER_TAG_ID)
+							!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+							lockedSpeakerId = VisionConstants.BLUE_SPEAKER_TAG_ID;
+						}
+					} else {
+						//id 4
+						if (rpi.getAprilTagZInv(VisionConstants.RED_SPEAKER_TAG_ID)
+							!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+							lockedSpeakerId = VisionConstants.RED_SPEAKER_TAG_ID;
+						}
+					}
+				} else {
+					alignToSpeaker(lockedSpeakerId);
+				}
 
 				break;
 			default:
@@ -574,6 +577,7 @@ public class DriveFSMSystem {
 			case ALIGN_TO_SPEAKER_STATE:
 				if (input.isCircleButtonReleased()) {
 					lockedSpeakerId = -1;
+					isSpeakerAligned = false;
 					isSpeakerPositionAligned = false;
 					return FSMState.TELEOP_STATE;
 				}
@@ -762,12 +766,8 @@ public class DriveFSMSystem {
 				new Rotation2d(rpi.getAprilTagXInv(id))));
 		}
 		double yDiff = odometry.getPoseMeters().getY();
-		double xDiff = odometry.getPoseMeters().getX();
 		double aDiff = odometry.getPoseMeters().getRotation().getRadians();
-		// double xSpeed = clamp(xDiff
-		// 	/ VisionConstants.SOURCE_TRANSLATIONAL_ACCEL_CONSTANT,
-		// 	-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
-		// 	VisionConstants.MAX_SPEED_METERS_PER_SECOND);
+
 		double xSpeed = 0;
 		double ySpeed = Math.abs(yDiff) > VisionConstants.Y_MARGIN_TO_SOURCE ? clamp(yDiff
 			/ VisionConstants.SOURCE_TRANSLATIONAL_ACCEL_CONSTANT,
