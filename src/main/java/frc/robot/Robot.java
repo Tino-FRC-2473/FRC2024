@@ -8,7 +8,6 @@ import edu.wpi.first.cscore.VideoSink;
 import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
 import edu.wpi.first.cscore.MjpegServer;
 import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.wpilibj.Joystick;
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
 // Systems
