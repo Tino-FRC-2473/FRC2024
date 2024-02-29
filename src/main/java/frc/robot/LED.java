@@ -14,6 +14,10 @@ public class LED {
 	private static final int ONE_HUNDRED_EIGHTY = 180;
 	private static final int RAINBOW_PIXEL_INCREASE = 3;
 
+	private static final int GREEN_RGB_RED = 135;
+	private static final int GREEN_RGB_GREEN = 255;
+	private static final int GREEN_RGB_BLUE = 8;
+
 	/**
 	 * Constructs LED object.
 	 */
@@ -29,7 +33,7 @@ public class LED {
 	 */
 	public void greenLight() {
 		for (var i = 0; i < ledBuffer.getLength(); i++) {
-			ledBuffer.setRGB(i, 135, 255, 8);
+			ledBuffer.setRGB(i, GREEN_RGB_RED, GREEN_RGB_GREEN, GREEN_RGB_BLUE);
 		}
 		led.setData(ledBuffer);
 	}
