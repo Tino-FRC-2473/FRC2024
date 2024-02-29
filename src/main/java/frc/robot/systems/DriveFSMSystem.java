@@ -515,24 +515,24 @@ public class DriveFSMSystem {
 				break;
 
 			case ALIGN_TO_SPEAKER_STATE:
-				led.greenLight();
-				if (lockedSpeakerId == -1) {
-					if (blueAlliance) {
-						//id 7
-						if (rpi.getAprilTagZInv(VisionConstants.BLUE_SPEAKER_TAG_ID)
-							!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
-							lockedSpeakerId = VisionConstants.BLUE_SPEAKER_TAG_ID;
-						}
-					} else {
-						//id 4
-						if (rpi.getAprilTagZInv(VisionConstants.RED_SPEAKER_TAG_ID)
-							!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
-							lockedSpeakerId = VisionConstants.RED_SPEAKER_TAG_ID;
-						}
-					}
-				} else {
-					alignToSpeaker(lockedSpeakerId);
-				}
+				// led.greenLight();
+				// if (lockedSpeakerId == -1) {
+				// 	if (blueAlliance) {
+				// 		//id 7
+				// 		if (rpi.getAprilTagZInv(VisionConstants.BLUE_SPEAKER_TAG_ID)
+				// 			!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+				// 			lockedSpeakerId = VisionConstants.BLUE_SPEAKER_TAG_ID;
+				// 		}
+				// 	} else {
+				// 		//id 4
+				// 		if (rpi.getAprilTagZInv(VisionConstants.RED_SPEAKER_TAG_ID)
+				// 			!= VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT) {
+				// 			lockedSpeakerId = VisionConstants.RED_SPEAKER_TAG_ID;
+				// 		}
+				// 	}
+				// } else {
+				// 	alignToSpeaker(lockedSpeakerId);
+				// }
 
 				break;
 			default:
@@ -761,13 +761,13 @@ public class DriveFSMSystem {
 				new Rotation2d(rpi.getAprilTagXInv(id))));
 		}
 		double yDiff = odometry.getPoseMeters().getY();
-		double xDiff = odometry.getPoseMeters().getX() - VisionConstants.SPEAKER_TARGET_DISTANCE;
+		double xDiff = odometry.getPoseMeters().getX();
 		double aDiff = odometry.getPoseMeters().getRotation().getRadians();
 
 		SmartDashboard.putNumber("x diff", xDiff);
 		SmartDashboard.putNumber("y diff", yDiff);
 		SmartDashboard.putNumber("a diff", aDiff);
-
+		SmartDashboard.putBoolean("is position aligned", isSourcePositionAligned);
 		// double xSpeed = clamp(xDiff
 		// 	/ VisionConstants.SOURCE_TRANSLATIONAL_ACCEL_CONSTANT,
 		// 	-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
@@ -781,7 +781,6 @@ public class DriveFSMSystem {
 			? -clamp(aDiff / VisionConstants.SOURCE_ROTATIONAL_ACCEL_CONSTANT,
 			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND) : 0;
-
 		double xSpeedField = (xSpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
 			+ (ySpeed * Math.sin(Math.toRadians(tagOrientationAngles[id])));
 		double ySpeedField = (ySpeed * Math.cos(Math.toRadians(tagOrientationAngles[id])))
@@ -790,13 +789,13 @@ public class DriveFSMSystem {
 			if (xSpeedField == 0 && ySpeedField == 0) {
 				isSourcePositionAligned = true;
 			}
+			if (isSourcePositionAligned && Math.abs(aSpeed) == 0) {
+				isSourceAligned = true;
+			}
 			if (!isSourcePositionAligned) {
 				drive(xSpeedField, ySpeedField, aSpeed, true, false);
 			} else {
 				drive(0, 0, aSpeed, true, false);
-			}
-			if (isSourcePositionAligned && Math.abs(aSpeed) < VisionConstants.MIN_SPEED_THRESHOLD) {
-				isSourceAligned = true;
 			}
 		} else {
 			drive(VisionConstants.SOURCE_DRIVE_FORWARD_POWER, 0, 0, false, false);
@@ -815,6 +814,10 @@ public class DriveFSMSystem {
 		double yDiff = odometry.getPoseMeters().getY();
 		double xDiff = odometry.getPoseMeters().getX() - VisionConstants.SPEAKER_TARGET_DISTANCE;
 		double aDiff = odometry.getPoseMeters().getRotation().getRadians();
+
+		SmartDashboard.putNumber("x diff", xDiff);
+		SmartDashboard.putNumber("y diff", yDiff);
+		SmartDashboard.putNumber("a diff", aDiff);
 
 		double xSpeed = Math.abs(xDiff) > VisionConstants.X_MARGIN_TO_SPEAKER
 			? clamp(xDiff / VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,
