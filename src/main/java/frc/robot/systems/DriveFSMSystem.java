@@ -448,9 +448,31 @@ public class DriveFSMSystem {
 		if (input == null) {
 			return;
 		}
+		if (blueAlliance) {
+			if (!(rpi.getAprilTagZInv(VisionConstants.BLUE_SOURCE_TAG1_ID)
+						== VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
+						&& rpi.getAprilTagZInv(VisionConstants.BLUE_SOURCE_TAG2_ID)
+						== VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
+						&& rpi.getAprilTagZInv(VisionConstants.BLUE_SPEAKER_TAG_ID)
+						== VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT)) {
+				led.greenLight();
+			} else {
+				led.orangeLight();
+			}
+		} else {
+			if (!(rpi.getAprilTagZInv(VisionConstants.RED_SOURCE_TAG1_ID)
+						== VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
+						&& rpi.getAprilTagZInv(VisionConstants.RED_SOURCE_TAG2_ID)
+						== VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
+						&& rpi.getAprilTagZInv(VisionConstants.RED_SPEAKER_TAG_ID)
+						== VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT)) {
+				led.greenLight();
+			} else {
+				led.orangeLight();
+			}
+		}
 		switch (currentState) {
 			case TELEOP_STATE:
-				led.orangeLight();
 				drive(-MathUtil.applyDeadband((input.getControllerLeftJoystickY()
 					* Math.abs(input.getControllerLeftJoystickY()) * ((input.getLeftTrigger() / 2)
 					+ DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT) / 2), OIConstants.DRIVE_DEADBAND),
@@ -469,7 +491,6 @@ public class DriveFSMSystem {
 				break;
 
 			case ALIGN_TO_SOURCE_STATE:
-				led.greenLight();
 				if (lockedSourceId == -1) {
 					if (blueAlliance) {
 						//id 1 and 2
@@ -515,7 +536,6 @@ public class DriveFSMSystem {
 				break;
 
 			case ALIGN_TO_SPEAKER_STATE:
-				// led.greenLight();
 				// if (lockedSpeakerId == -1) {
 				// 	if (blueAlliance) {
 				// 		//id 7
