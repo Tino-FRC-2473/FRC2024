@@ -100,13 +100,10 @@ public class ClimberMechFSMLeft {
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-		SmartDashboard.putString("Current State Left", currentState.toString());
-		SmartDashboard.putBoolean("Bottom Limit Left Switch Pressed", peakLimitSwitchHit());
-		SmartDashboard.putNumber("L Encder vals", motor.getEncoder().getPosition());
+		SmartDashboard.putString("Left Climber State", currentState.toString());
+		SmartDashboard.putBoolean("Left Climber Limit Pressed", peakLimitSwitchHit());
 
 		currentState = nextState(input);
-		SmartDashboard.putNumber("left output", motor.getAppliedOutput());
-		SmartDashboard.putNumber("left motor applied", motor.get());
 	}
 
 	/**

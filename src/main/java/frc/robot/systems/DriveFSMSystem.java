@@ -269,8 +269,8 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
 		SmartDashboard.putNumber("Heading", getPose().getRotation().getDegrees());
-		SmartDashboard.putNumber("Auto point #", currentPointInPath);
-
+		SmartDashboard.putString("Drive State", getCurrentState().toString());
+		SmartDashboard.putBoolean("Is Source Aligned", isSourceAligned);
 		switch (autoState) {
 			case LEAVE:
 				ArrayList<Pose2d> leave = new ArrayList<Pose2d>();
@@ -440,10 +440,6 @@ public class DriveFSMSystem {
 		// 		frontRight.getPosition(),
 		// 		rearLeft.getPosition(),
 		// 		rearRight.getPosition()});
-
-		SmartDashboard.putNumber("X Pos", getPose().getX());
-		SmartDashboard.putNumber("Y Pos", getPose().getY());
-		SmartDashboard.putNumber("Heading", getPose().getRotation().getDegrees());
 
 		if (input == null) {
 			return;
@@ -834,10 +830,6 @@ public class DriveFSMSystem {
 		double yDiff = odometry.getPoseMeters().getY();
 		double xDiff = odometry.getPoseMeters().getX() - VisionConstants.SPEAKER_TARGET_DISTANCE;
 		double aDiff = odometry.getPoseMeters().getRotation().getRadians();
-
-		SmartDashboard.putNumber("x diff", xDiff);
-		SmartDashboard.putNumber("y diff", yDiff);
-		SmartDashboard.putNumber("a diff", aDiff);
 
 		double xSpeed = Math.abs(xDiff) > VisionConstants.X_MARGIN_TO_SPEAKER
 			? clamp(xDiff / VisionConstants.SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT,

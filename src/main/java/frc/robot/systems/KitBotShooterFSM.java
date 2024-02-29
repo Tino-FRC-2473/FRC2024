@@ -118,11 +118,8 @@ public class KitBotShooterFSM {
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-		SmartDashboard.putString("Current State", currentState.toString());
-		SmartDashboard.putBoolean("Bottom Limit Switch Pressed", bottomLimitSwitch.isPressed());
-		SmartDashboard.putBoolean("Intake Button Pressed", input.isIntakeButtonPressed());
-		SmartDashboard.putNumber("Motor Speed", highMotor.get());
-		SmartDashboard.putNumber("Get applied output", highMotor.getAppliedOutput());
+		SmartDashboard.putString("Shooter State", currentState.toString());
+		SmartDashboard.putBoolean("Shooter Limit Pressed", bottomLimitSwitch.isPressed());
 		currentState = nextState(input);
 	}
 
