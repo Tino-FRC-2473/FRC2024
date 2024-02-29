@@ -40,7 +40,6 @@ public class Robot extends TimedRobot {
 	private MjpegServer driverStream;
 	private MjpegServer chainStream;
 
-	private Joystick joy1;
 	private boolean chainCamToggled;
 
 	/**
