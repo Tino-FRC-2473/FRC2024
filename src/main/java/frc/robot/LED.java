@@ -9,13 +9,17 @@ public class LED {
 	private int rainbowFirstPixelHue = 0;
 	private int greenVal = 0;
 	private boolean forward = true;
+	private static final int LED_PORT = 9;
+	private static final int LED_BUFFER_LENGTH = 30;
+	private static final int ONE_HUNDRED_EIGHTY = 180;
+	private static final int RAINBOW_PIXEL_INCREASE = 3;
 
 	/**
 	 * Constructs LED object.
 	 */
 	public LED() {
-		led = new AddressableLED(9);
-		ledBuffer = new AddressableLEDBuffer(30);
+		led = new AddressableLED(LED_PORT);
+		ledBuffer = new AddressableLEDBuffer(LED_BUFFER_LENGTH);
 		led.setLength(ledBuffer.getLength());
 		led.start();
 	}
@@ -88,23 +92,33 @@ public class LED {
 		// led.setData(ledBuffer);
 	}
 
+	/**
+	 * Sets the LED color to rainbow.
+	 */
 	public void rainbow() {
 		// For every pixel
 		for (var i = 0; i < ledBuffer.getLength(); i++) {
 			// Calculate the hue - hue is easier for rainbows because the color
 			// shape is a circle so only one value needs to precess
-			final var hue = (rainbowFirstPixelHue + (i * 180 / ledBuffer.getLength())) % 180;
+			final var hue = (rainbowFirstPixelHue + (i * ONE_HUNDRED_EIGHTY
+				/ ledBuffer.getLength())) % ONE_HUNDRED_EIGHTY;
 			// Set the value
 			ledBuffer.setHSV(i, hue, 255, 128);
 		}
 		// Increase by to make the rainbow "move"
-		rainbowFirstPixelHue += 3;
+		rainbowFirstPixelHue += RAINBOW_PIXEL_INCREASE;
 
 		// Check bounds
-		rainbowFirstPixelHue %= 180;
+		rainbowFirstPixelHue %= ONE_HUNDRED_EIGHTY;
 		led.setData(ledBuffer);
 	}
 
+	/**
+	 * Sets RGB value of LED.
+	 * @param r
+	 * @param g
+	 * @param b
+	 */
 	public void setRGBVals(int r, int g, int b) {
 		for (var i = 0; i < ledBuffer.getLength(); i++) {
 			// Sets the specified LED to the RGB values for red
@@ -113,6 +127,12 @@ public class LED {
 		led.setData(ledBuffer);
 	}
 
+	/**
+	 * Sets HSV value of LED.
+	 * @param hue
+	 * @param saturation
+	 * @param val
+	 */
 	public void setHSVVals(int hue, int saturation, int val) {
 		for (var i = 0; i < ledBuffer.getLength(); i++) {
 			// Sets the specified LED to the HSV values for red

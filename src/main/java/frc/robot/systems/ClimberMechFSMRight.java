@@ -82,8 +82,6 @@ public class ClimberMechFSMRight {
 	 */
 	public void update(TeleopInput input) {
 
-
-
 		if (input == null) {
 			return;
 		}
