@@ -21,6 +21,7 @@ public class ClimberMechFSMLeft {
 	}
 
 	private static final float MOTOR_RUN_POWER = -0.3f;
+	private static final float SYNCH_MOTOR_POWER = 0.25f;
 	public static final double TRIGGER_DEADZONE = 0.05;
 
 	private boolean limitPressed = false;
@@ -131,13 +132,15 @@ public class ClimberMechFSMLeft {
 	private ClimberMechFSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case IDLE_STOP:
-				if (input.leftClimberTrigger() > TRIGGER_DEADZONE && !peakLimitSwitchHit()) {
+				if ((input.rightClimberTrigger() > TRIGGER_DEADZONE
+					|| input.synchClimberTrigger()) && !peakLimitSwitchHit()) {
 					return ClimberMechFSMState.RETRACTING;
 				} else {
 					return ClimberMechFSMState.IDLE_STOP;
 				}
 			case RETRACTING:
-				if (input.leftClimberTrigger() > TRIGGER_DEADZONE && !peakLimitSwitchHit()) {
+				if ((input.rightClimberTrigger() > TRIGGER_DEADZONE
+					|| input.synchClimberTrigger()) && !peakLimitSwitchHit()) {
 					return ClimberMechFSMState.RETRACTING;
 				} else {
 					return ClimberMechFSMState.IDLE_STOP;
@@ -162,7 +165,11 @@ public class ClimberMechFSMLeft {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleRetractingState(TeleopInput input) {
-		motor.set(-MOTOR_RUN_POWER * input.leftClimberTrigger());
+		if (input.synchClimberTrigger()) {
+			motor.set(SYNCH_MOTOR_POWER);
+		} else {
+			motor.set(-MOTOR_RUN_POWER * input.leftClimberTrigger());
+		}
 	}
 
 	private boolean peakLimitSwitchHit() {

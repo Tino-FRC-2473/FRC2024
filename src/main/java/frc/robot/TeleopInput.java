@@ -151,4 +151,20 @@ public class TeleopInput {
 	public double rightClimberTrigger() {
 		return mechController.getR2Axis();
 	}
+
+	/**
+	 * Get the value of the toggle cam button.
+	 * @return True if button is pressed
+	 */
+	public boolean chainChamToggleButton() {
+		return driverController.getR1ButtonPressed();
+	}
+
+	/**
+	 * Get the value of the synched climber button.
+	 * @return True if button is pressed
+	 */
+	public boolean synchClimberTrigger() {
+		return mechController.getCrossButton();
+	}
 }

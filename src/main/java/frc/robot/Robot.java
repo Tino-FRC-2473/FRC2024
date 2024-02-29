@@ -4,14 +4,16 @@
 package frc.robot;
 
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.CvSink;
-import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.cscore.VideoSink;
+import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
+import edu.wpi.first.cscore.MjpegServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.Joystick;
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
 // Systems
 import frc.robot.systems.DriveFSMSystem;
 import frc.robot.systems.KitBotShooterFSM;
-import frc.robot.SwerveConstants.VisionConstants;
 import frc.robot.systems.AutoHandlerSystem;
 import frc.robot.systems.ClimberMechFSMLeft;
 import frc.robot.systems.ClimberMechFSMRight;
@@ -32,9 +34,15 @@ public class Robot extends TimedRobot {
 	private AutoHandlerSystem autoHandler;
 	private AutoPathChooser autoPathChooser;
 
-	private CameraServer cam;
-	private CvSink cvSink;
-	private CvSource outputStrem;
+	private UsbCamera driverCam;
+	private UsbCamera chainCam;
+	private VideoSink videoSink;
+	private MjpegServer driverStream;
+	private MjpegServer chainStream;
+
+	private Joystick joy1;
+	private boolean chainCamToggled;
+
 	/**
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
@@ -51,12 +59,25 @@ public class Robot extends TimedRobot {
 		climberMechRightFSM = new ClimberMechFSMRight();
 		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
 
-		CameraServer.startAutomaticCapture();
-		// Creates the CvSink and connects it to the UsbCamera
-		cvSink = CameraServer.getVideo();
+		driverCam = CameraServer.startAutomaticCapture(0);
+		//chainCam = CameraServer.startAutomaticCapture(2);
+
+		driverCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+		//chainCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+
+		videoSink = CameraServer.getServer();
+
+		chainCamToggled = false;
+
+
 		// Creates the CvSource and MjpegServer [2] and connects them
-		outputStrem = CameraServer.putVideo("Driver Camera",
+		/*driverStream = CameraServer.putVideo("Driver Camera",
 			VisionConstants.DRIVER_CAM_WIDTH_PIXELS, VisionConstants.DRIVER_CAM_HEIGHT_PIXELS);
+
+		chainStream = CameraServer.putVideo("Chain Camera",
+			VisionConstants.DRIVER_CAM_WIDTH_PIXELS, VisionConstants.DRIVER_CAM_HEIGHT_PIXELS);*/
+
+
 	}
 
 	@Override
@@ -89,6 +110,18 @@ public class Robot extends TimedRobot {
 		climberMechLeftFSM.update(input);
 		climberMechRightFSM.update(input);
 		shooterFSM.update(input);
+
+		if (input.chainChamToggleButton()) {
+			chainCamToggled = !chainCamToggled;
+		}
+
+		if (chainCamToggled) {
+			System.out.println("Chain mech is toggled");
+			//videoSink.setSource(chainCam);
+		} else {
+			videoSink.setSource(driverCam);
+		}
+
 	}
 
 	@Override
