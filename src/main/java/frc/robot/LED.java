@@ -12,11 +12,21 @@ public class LED {
 	private static final int LED_PORT = 9;
 	private static final int LED_BUFFER_LENGTH = 30;
 	private static final int ONE_HUNDRED_EIGHTY = 180;
+	private static final int ONE_HUNDRED = 100;
 	private static final int RAINBOW_PIXEL_INCREASE = 3;
 
-	private static final int GREEN_RGB_RED = 135;
-	private static final int GREEN_RGB_GREEN = 255;
-	private static final int GREEN_RGB_BLUE = 8;
+	private static final int GREEN_RGB_R = 135;
+	private static final int GREEN_RGB_G = 255;
+	private static final int GREEN_RGB_B = 8;
+
+	private static final int ORANGE_RGB_R = 255;
+	private static final int ORANGE_RGB_G = 92;
+	private static final int ORANGE_RGB_B = 5;
+
+	private static final int CR_RGB_R = 255;
+
+	private static final int RAINBOW_S = 255;
+	private static final int RAIBOW_V = 128;
 
 	/**
 	 * Constructs LED object.
@@ -33,7 +43,7 @@ public class LED {
 	 */
 	public void greenLight() {
 		for (var i = 0; i < ledBuffer.getLength(); i++) {
-			ledBuffer.setRGB(i, GREEN_RGB_RED, GREEN_RGB_GREEN, GREEN_RGB_BLUE);
+			ledBuffer.setRGB(i, GREEN_RGB_R, GREEN_RGB_G, GREEN_RGB_B);
 		}
 		led.setData(ledBuffer);
 	}
@@ -43,7 +53,7 @@ public class LED {
 	 */
 	public void orangeLight() {
 		for (var i = 0; i < ledBuffer.getLength(); i++) {
-			ledBuffer.setRGB(i, 255, 92, 5);
+			ledBuffer.setRGB(i, ORANGE_RGB_R, ORANGE_RGB_G, ORANGE_RGB_B);
 		}
 		led.setData(ledBuffer);
 	}
@@ -58,12 +68,15 @@ public class LED {
 		led.setData(ledBuffer);
 	}
 
+	/**
+	 * Lights are Green when moving forward and red moving back.
+	 */
 	public void cr() {
 		for (var i = 0; i < ledBuffer.getLength(); i++) {
-			ledBuffer.setRGB(i, 199, greenVal, 0);
+			ledBuffer.setRGB(i, CR_RGB_R, greenVal, 0);
 		}
 
-		if (greenVal >= 100) {
+		if (greenVal >= ONE_HUNDRED) {
 			forward = false;
 		} else if (greenVal <= 0) {
 			forward = true;
@@ -107,7 +120,7 @@ public class LED {
 			final var hue = (rainbowFirstPixelHue + (i * ONE_HUNDRED_EIGHTY
 				/ ledBuffer.getLength())) % ONE_HUNDRED_EIGHTY;
 			// Set the value
-			ledBuffer.setHSV(i, hue, 255, 128);
+			ledBuffer.setHSV(i, hue, RAINBOW_S, RAIBOW_V);
 		}
 		// Increase by to make the rainbow "move"
 		rainbowFirstPixelHue += RAINBOW_PIXEL_INCREASE;
