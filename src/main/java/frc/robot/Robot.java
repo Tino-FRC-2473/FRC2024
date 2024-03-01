@@ -7,6 +7,8 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.VideoSink;
 import edu.wpi.first.cscore.MjpegServer;
 import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
+
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
 // Systems
@@ -59,14 +61,11 @@ public class Robot extends TimedRobot {
 		driverCam = CameraServer.startAutomaticCapture(0);
 		chainCam = CameraServer.startAutomaticCapture(1);
 
-		// driverCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
-		// chainCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+		driverCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+		chainCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
 
-		videoSink = CameraServer.getServer();
-
-		chainCamToggled = false;
-
-
+		// videoSink = CameraServer.getServer();
+		// chainCamToggled = false;
 		// Creates the CvSource and MjpegServer [2] and connects them
 		/*driverStream = CameraServer.putVideo("Driver Camera",
 			VisionConstants.DRIVER_CAM_WIDTH_PIXELS, VisionConstants.DRIVER_CAM_HEIGHT_PIXELS);
@@ -108,15 +107,15 @@ public class Robot extends TimedRobot {
 		climberMechRightFSM.update(input);
 		shooterFSM.update(input);
 
-		if (input.chainChamToggleButton()) {
-			chainCamToggled = !chainCamToggled;
-		}
+		// if (input.chainChamToggleButton()) {
+		// 	chainCamToggled = !chainCamToggled;
+		// }
 
-		if (chainCamToggled) {
-			videoSink.setSource(chainCam);
-		} else {
-			videoSink.setSource(driverCam);
-		}
+		// if (chainCamToggled) {
+		// 	videoSink.setSource(chainCam);
+		// } else {
+		// 	videoSink.setSource(driverCam);
+		// }
 
 	}
 

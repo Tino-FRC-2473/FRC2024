@@ -683,7 +683,7 @@ public class DriveFSMSystem {
 	public boolean driveToPose(Pose2d pose) {
 		double x = pose.getX();
 		double y = (blueAlliance ? pose.getY() : -pose.getY());
-		double angle = pose.getRotation().getDegrees();
+		double angle = (blueAlliance ? pose.getRotation().getDegrees() : -pose.getRotation().getDegrees());
 
 		double xDiff = x - getPose().getX();
 		double yDiff = y - getPose().getY();
