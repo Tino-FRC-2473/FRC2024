@@ -167,4 +167,7 @@ public class TeleopInput {
 	public boolean synchClimberTrigger() {
 		return mechController.getCrossButton();
 	}
+	public boolean overrideIntakeButton() {
+		return mechController.getSquareButton();
+	}
 }

@@ -43,7 +43,8 @@ public class AutoHandlerSystem {
 		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_3,
 		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_4};
 
-	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{AutoFSMState.SHOOTER_STATE};
+	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{AutoFSMState.DRIVE_TO_SCORE,
+		AutoFSMState.SHOOTER_STATE};
 
 	/* ======================== Constructor ======================== */
 	/**
