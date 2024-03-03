@@ -386,16 +386,16 @@ public class DriveFSMSystem {
 			case RUN_OVER_NOTES:
 				ArrayList<Pose2d> hitNotes = new ArrayList<Pose2d>();
 				if (startingPos == 1) {
-					hitNotes.add(new Pose2d(-AutoConstants.N_7, AutoConstants.N_4,
+					hitNotes.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_4,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					hitNotes.add(new Pose2d(-AutoConstants.N_7, AutoConstants.N_4,
+					hitNotes.add(new Pose2d(-AutoConstants.N_7_5, AutoConstants.N_4,
 						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
-					hitNotes.add(new Pose2d(-AutoConstants.N_7, 1,
+					hitNotes.add(new Pose2d(-AutoConstants.N_7_5, 1,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				} else if (startingPos == 2) {
-					hitNotes.add(new Pose2d(-AutoConstants.N_7, -1,
+					hitNotes.add(new Pose2d(-AutoConstants.N_7_5, -1,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					hitNotes.add(new Pose2d(-AutoConstants.N_7, AutoConstants.N_3,
+					hitNotes.add(new Pose2d(-AutoConstants.N_7_5, AutoConstants.N_3,
 						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
 				}
 				return driveAlongPathFast(hitNotes);
