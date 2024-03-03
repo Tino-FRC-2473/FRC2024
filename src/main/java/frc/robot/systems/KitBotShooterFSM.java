@@ -137,6 +137,8 @@ public class KitBotShooterFSM {
 		switch (autoState) {
 			case SHOOTER_STATE:
 				return handleAutoOuttakingState();
+			case SHOOTER_STATE_FAST:
+				return handleAutoOuttakeFastState();
 			default:
 				return true;
 		}
@@ -244,6 +246,31 @@ public class KitBotShooterFSM {
 			&& !timer.hasElapsed(outtakingTimerStart + OUTTAKING_TIME)) {
 			highMotor.set(SPEAKER_U_MOTOR_RUN_POWER);
 			if (timer.hasElapsed(outtakingTimerStart + REV_OUTTAKING_TIME)) {
+				lowMotor.set(SPEAKER_L_MOTOR_RUN_POWER);
+			} else {
+				lowMotor.set(0);
+			}
+
+		} else {
+			lowMotor.set(0);
+			highMotor.set(0);
+
+			autoOuttakingTimerStarted = false;
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean handleAutoOuttakeFastState() {
+		if (!autoOuttakingTimerStarted) {
+			autoOuttakingTimerStarted = true;
+			outtakingTimerStart = timer.get();
+		}
+		if (autoOuttakingTimerStarted
+			&& !timer.hasElapsed(outtakingTimerStart + 1.5)) {
+			highMotor.set(SPEAKER_U_MOTOR_RUN_POWER);
+			if (timer.hasElapsed(outtakingTimerStart + 0.75)) {
 				lowMotor.set(SPEAKER_L_MOTOR_RUN_POWER);
 			} else {
 				lowMotor.set(0);

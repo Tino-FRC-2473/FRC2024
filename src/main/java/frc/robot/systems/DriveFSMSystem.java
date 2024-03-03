@@ -383,6 +383,23 @@ public class DriveFSMSystem {
 					pickUp4.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
 				}
 				return driveAlongPath(pickUp4);
+			case RUN_OVER_NOTES:
+				ArrayList<Pose2d> hitNotes = new ArrayList<Pose2d>();
+				if (startingPos == 1) {
+					hitNotes.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_4,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+					hitNotes.add(new Pose2d(-AutoConstants.N_6_5, AutoConstants.N_4,
+						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
+					hitNotes.add(new Pose2d(-AutoConstants.N_6_5, 0,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
+				} else if (startingPos == 2 || startingPos == 3) {
+					hitNotes.add(new Pose2d(-AutoConstants.N_7, -0.5,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
+					hitNotes.add(new Pose2d(-AutoConstants.N_7, AutoConstants.N_5,
+						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
+				}
+				return driveAlongPathFast(hitNotes);
+
 			case PENDING:
 				timer.start();
 				return pause(AutoConstants.WAIT_TIME);
@@ -738,6 +755,64 @@ public class DriveFSMSystem {
 		return false;
 	}
 
+	public boolean driveToPoseFast(Pose2d pose) {
+		double x = pose.getX();
+		double y = (blueAlliance ? pose.getY() : -pose.getY());
+		double angle = (blueAlliance ? pose.getRotation().getDegrees() : -pose.getRotation().getDegrees());
+
+		double xDiff = x - getPose().getX();
+		double yDiff = y - getPose().getY();
+		double aDiff = angle - getPose().getRotation().getDegrees();
+
+		if (aDiff > AutoConstants.DEG_180) {
+			aDiff -= AutoConstants.DEG_360;
+		} else if (aDiff < -AutoConstants.DEG_180) {
+			aDiff += AutoConstants.DEG_360;
+		}
+
+		System.out.println(aDiff);
+
+		double xSpeed;
+		double ySpeed;
+		if (Math.abs(xDiff) > Math.abs(yDiff)) {
+			xSpeed = clamp(xDiff / AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT,
+			-AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST, AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST);
+			ySpeed = xSpeed * (yDiff / xDiff);
+			if (Math.abs(xDiff) < AutoConstants.CONSTANT_SPEED_THRESHOLD && Math.abs(yDiff)
+				< AutoConstants.CONSTANT_SPEED_THRESHOLD) {
+				xSpeed = (AutoConstants.CONSTANT_SPEED_THRESHOLD * xDiff / Math.abs(xDiff))
+					/ AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT;
+				ySpeed = xSpeed * (yDiff / xDiff);
+			}
+		} else {
+			ySpeed = clamp(yDiff / AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT,
+			-AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST, AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST);
+			xSpeed = ySpeed * (xDiff / yDiff);
+			if (Math.abs(xDiff) < AutoConstants.CONSTANT_SPEED_THRESHOLD && Math.abs(yDiff)
+				< AutoConstants.CONSTANT_SPEED_THRESHOLD) {
+				ySpeed = (AutoConstants.CONSTANT_SPEED_THRESHOLD * yDiff / Math.abs(yDiff))
+					/ AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT;
+				xSpeed = ySpeed * (xDiff / yDiff);
+			}
+		}
+
+		xSpeed = Math.abs(xDiff) > AutoConstants.AUTO_DRIVE_METERS_MARGIN_OF_ERROR_FAST
+			? xSpeed : 0;
+		ySpeed = Math.abs(yDiff) > AutoConstants.AUTO_DRIVE_METERS_MARGIN_OF_ERROR_FAST
+			? ySpeed : 0;
+		double aSpeed = Math.abs(aDiff) > AutoConstants.AUTO_DRIVE_DEGREES_MARGIN_OF_ERROR
+			? (aDiff > 0 ? Math.min(AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff
+			/ AutoConstants.AUTO_DRIVE_ANGULAR_SPEED_ACCEL_CONSTANT) : Math.max(
+			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff
+			/ AutoConstants.AUTO_DRIVE_ANGULAR_SPEED_ACCEL_CONSTANT)) : 0;
+
+		drive(xSpeed, ySpeed, aSpeed, true, false);
+		if (xSpeed == 0 && ySpeed == 0 && aSpeed == 0) {
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Drives the robot through a series of points.
 	 * @param points arraylist of points to drive to
@@ -749,6 +824,17 @@ public class DriveFSMSystem {
 			return true;
 		}
 		if (driveToPose(points.get(currentPointInPath))) {
+			currentPointInPath++;
+		}
+		return false;
+	}
+
+	public boolean driveAlongPathFast(ArrayList<Pose2d> points) {
+		if (currentPointInPath >= points.size()) {
+			drive(0, 0, 0, true, false);
+			return true;
+		}
+		if (driveToPoseFast(points.get(currentPointInPath))) {
 			currentPointInPath++;
 		}
 		return false;
