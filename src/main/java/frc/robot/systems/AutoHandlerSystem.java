@@ -21,7 +21,8 @@ public class AutoHandlerSystem {
 		PATH1, // score and leave
 		PATH2, // score multiple times
 		PATH3, // tbd emergency path
-		PATH4
+		PATH4,
+		PATH5
 	}
 
 	/* ======================== Private variables ======================== */
@@ -51,6 +52,8 @@ public class AutoHandlerSystem {
 
 	private static final AutoFSMState[] PATH4 = new AutoFSMState[]{AutoFSMState.DRIVE_TO_SCORE,
 		AutoFSMState.SHOOTER_STATE_FAST, AutoFSMState.RUN_OVER_NOTES};
+
+	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{AutoFSMState.RUN_OVER_NOTES};
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -94,6 +97,8 @@ public class AutoHandlerSystem {
 			currentStateList = PATH3;
 		} else if (path == AutoPath.PATH4) {
 			currentStateList = PATH4;
+		} else if (path == AutoPath.PATH5) {
+			currentStateList = PATH5;
 		}
 		currentStateIndex = 0;
 	}

@@ -21,6 +21,7 @@ public class AutoPathChooser {
 		autoPathChooser.addOption("MBR ONLY: Score Multiple Times", AutoPath.PATH2);
 		autoPathChooser.addOption("Score Only", AutoPath.PATH3);
 		autoPathChooser.addOption("Auto Destroyer", AutoPath.PATH4);
+		autoPathChooser.addOption("No Shoot Auto Destroyer", AutoPath.PATH5);
 		SmartDashboard.putData("Auto Path", autoPathChooser);
 
 		allianceChooser = new SendableChooser<>();
