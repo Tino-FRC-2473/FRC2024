@@ -94,6 +94,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
+		input.setControllerTypes(AutoPathChooser.getSelectedDriveController(), AutoPathChooser.getSelectedMechController());
 		driveFSMSystem.reset();
 		climberMechLeftFSM.reset();
 		climberMechRightFSM.reset();

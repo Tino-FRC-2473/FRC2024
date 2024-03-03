@@ -457,6 +457,7 @@ public class DriveFSMSystem {
 		}
 		switch (currentState) {
 			case TELEOP_STATE:
+				SmartDashboard.putNumber("Left Trigger", input.getLeftTrigger());
 				drive(-MathUtil.applyDeadband((input.getControllerLeftJoystickY()
 					* Math.abs(input.getControllerLeftJoystickY()) * ((input.getLeftTrigger() / 2)
 					+ DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT) / 2), OIConstants.DRIVE_DEADBAND),
@@ -660,7 +661,7 @@ public class DriveFSMSystem {
 		double xSpeedDelivered = xSpeedCommanded * DriveConstants.MAX_SPEED_METERS_PER_SECOND;
 		double ySpeedDelivered = ySpeedCommanded * DriveConstants.MAX_SPEED_METERS_PER_SECOND;
 		double rotDelivered = currentRotation * DriveConstants.MAX_ANGULAR_SPEED;
-
+		SmartDashboard.putNumber("delivered y speed", ySpeedDelivered);
 		var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
 			fieldRelative
 				? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered,

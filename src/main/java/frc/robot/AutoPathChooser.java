@@ -9,6 +9,9 @@ public class AutoPathChooser {
 	private static SendableChooser<Boolean> allianceChooser;
 	private static SendableChooser<Integer> startingPosChooser;
 	private static SendableChooser<Boolean> mechChooser;
+	private static SendableChooser<Boolean> driveControllerChooser;
+	private static SendableChooser<Boolean> mechControllerChooser;
+
 
 
 	/**
@@ -39,6 +42,16 @@ public class AutoPathChooser {
 		mechChooser.setDefaultOption("SVR Mech", true);
 		mechChooser.addOption("MBR Mech", false);
 		SmartDashboard.putData("Mech", mechChooser);
+		
+		driveControllerChooser = new SendableChooser<>();
+		driveControllerChooser.setDefaultOption("PS4", false);
+		driveControllerChooser.addOption("Xbox", true);
+		SmartDashboard.putData("Drive Controller", driveControllerChooser);
+
+		mechControllerChooser = new SendableChooser<>();
+		mechControllerChooser.setDefaultOption("PS4", false);
+		mechControllerChooser.addOption("Xbox", true);
+		SmartDashboard.putData("Mech Controller", mechControllerChooser);
 	}
 
 	/**
@@ -103,5 +116,12 @@ public class AutoPathChooser {
 	 */
 	public static boolean getSelectedMech() {
 		return mechChooser.getSelected();
+	}
+
+	public static boolean getSelectedDriveController() {
+		return driveControllerChooser.getSelected();
+	}
+	public static boolean getSelectedMechController() {
+		return mechControllerChooser.getSelected();
 	}
 }

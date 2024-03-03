@@ -2,6 +2,7 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.XboxController;
 
 /**
  * Common class for providing driver inputs during Teleop.
@@ -19,6 +20,10 @@ public class TeleopInput {
 	// Input objects
 	private PS4Controller mechController;
 	private PS4Controller driverController;
+	private XboxController altMechController;
+	private XboxController altDriveController;
+	private boolean usingAltDrive = false;
+	private boolean usingAltMech = false;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -29,7 +34,13 @@ public class TeleopInput {
 	public TeleopInput() {
 		mechController = new PS4Controller(MECH_CONTROLLER_PORT);
 		driverController = new PS4Controller(DRIVER_CONTROLLER_PORT);
+		altMechController = new XboxController(MECH_CONTROLLER_PORT);
+		altDriveController = new XboxController(DRIVER_CONTROLLER_PORT);
+	}
 
+	public void setControllerTypes(boolean usingDriveAlternate, boolean usingMechAlternate) {
+		usingAltDrive = usingDriveAlternate;
+		usingAltMech = usingMechAlternate;
 	}
 
 	/* ------------------------ Driver Controller ------------------------ */
@@ -38,78 +49,121 @@ public class TeleopInput {
 	 * @return Axis value
 	 */
 	public double getControllerLeftJoystickY() {
-		return driverController.getLeftY();
+		if (!usingAltDrive) {
+			return driverController.getLeftY();
+		} else {
+			return altDriveController.getLeftY();
+		}
 	}
 	/**
 	 * Get Y axis of Left Joystick.
 	 * @return Axis value
 	 */
 	public double getControllerLeftJoystickX() {
-		return driverController.getLeftX();
+		if (!usingAltDrive) {
+			return driverController.getLeftX();
+		} else {
+			return altDriveController.getLeftX();
+		}
 	}
 	/**
 	 * Get Y axis of Left Joystick.
 	 * @return Axis value
 	 */
 	public double getControllerRightJoystickY() {
-		return driverController.getRightY();
+		if (!usingAltDrive) {
+			return driverController.getRightY();
+		} else {
+			return altDriveController.getRightY();
+		}
 	}
 	/**
 	 * Get Y axis of Left Joystick.
 	 * @return Axis value
 	 */
 	public double getControllerRightJoystickX() {
-		return driverController.getRightX();
+		if (!usingAltDrive) {
+			return driverController.getRightX();
+		} else {
+			return altDriveController.getRightX();
+		}
 	}
 	/**
 	 * Get the value of the Share button.
 	 * @return True if button is pressed
 	 */
 	public boolean isBackButtonPressed() {
-		return driverController.getShareButton();
+		if (!usingAltDrive) {
+			return driverController.getShareButton();
+		} else {
+			return altDriveController.getBackButton();
+		}
 	}
 	/**
 	 * Get the value of the Circle button.
 	 * @return True if button is pressed
 	 */
 	public boolean isCircleButtonPressed() {
-		return driverController.getCircleButtonPressed();
+		if (!usingAltDrive) {
+			return driverController.getCircleButtonPressed();
+		} else {
+			return altDriveController.getBButtonPressed();
+		}
 	}
 	/**
 	 * Get the value of the Circle button.
 	 * @return True if button is released
 	 */
 	public boolean isCircleButtonReleased() {
-		return driverController.getCircleButtonReleased();
+		if (!usingAltDrive) {
+			return driverController.getCircleButtonReleased();
+		} else {
+			return altDriveController.getBButtonReleased();
+		}
 	}
 	/**
 	 * Get the value of the Triangle button.
 	 * @return True if button is pressed
 	 */
 	public boolean isTriangleButtonPressed() {
-		return driverController.getTriangleButtonPressed();
+		if (!usingAltDrive) {
+			return driverController.getTriangleButtonPressed();
+		} else {
+			return altDriveController.getYButtonPressed();
+		}
 	}
 	/**
 	 * Get the value of the Circle button.
 	 * @return True if button is released
 	 */
 	public boolean isTriangleButtonReleased() {
-		return driverController.getTriangleButtonReleased();
+		if (!usingAltDrive) {
+			return driverController.getTriangleButtonReleased();
+		} else {
+			return altDriveController.getYButtonReleased();
+		}
 	}
 	/**
 	 * Get the value of the left trigger.
 	 * @return value of the left trigger.
 	 */
 	public double getLeftTrigger() {
-		return driverController.getL2Axis();
+		if (!usingAltDrive) {
+			return driverController.getL2Axis();
+		} else {
+			return altDriveController.getLeftTriggerAxis();
+		}
 	}
 	/**
 	 * Get the value of the right trigger.
 	 * @return value of the right trigger.
 	 */
 	public double getRightTrigger() {
-		return driverController.getR2Axis();
-	}
+		if (!usingAltDrive) {
+			return driverController.getR2Axis();
+		} else {
+			return altDriveController.getRightTriggerAxis();
+		}	}
 
 	/* ------------------------ Mech Controller ------------------------ */
 	/**
@@ -117,7 +171,11 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isIntakeButtonPressed() {
-		return mechController.getCircleButton();
+		if (!usingAltMech) {
+			return mechController.getCircleButton();
+		} else {
+			return altMechController.getBButton();
+		}
 	}
 
 	/**
@@ -125,7 +183,11 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isShootButtonPressed() {
-		return mechController.getTriangleButton();
+		if (!usingAltMech) {
+			return mechController.getTriangleButton();
+		} else {
+			return altMechController.getYButton();
+		}
 	}
 
 	/**
@@ -133,7 +195,11 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isRevOuttakeButtonPressed() {
-		return mechController.getL1Button();
+		if (!usingAltMech) {
+			return mechController.getL1Button();
+		} else {
+			return altMechController.getLeftBumper();
+		}
 	}
 
 	/**
@@ -141,7 +207,11 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public double leftClimberTrigger() {
-		return mechController.getL2Axis();
+		if (!usingAltMech) {
+			return mechController.getL2Axis();
+		} else {
+			return altMechController.getLeftTriggerAxis();
+		}
 	}
 
 	/**
@@ -149,7 +219,11 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public double rightClimberTrigger() {
-		return mechController.getR2Axis();
+		if (!usingAltMech) {
+			return mechController.getR2Axis();
+		} else {
+			return altMechController.getRightTriggerAxis();
+		}
 	}
 
 	/**
@@ -157,7 +231,11 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean chainChamToggleButton() {
-		return driverController.getR1ButtonPressed();
+		if (!usingAltDrive) {
+			return driverController.getR1ButtonPressed();
+		} else {
+			return altDriveController.getRightBumper();
+		}
 	}
 
 	/**
@@ -165,9 +243,17 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean synchClimberTrigger() {
-		return mechController.getCrossButton();
+		if (!usingAltMech) {
+			return mechController.getCrossButton();
+		} else {
+			return altMechController.getAButton();
+		}
 	}
 	public boolean overrideIntakeButton() {
-		return mechController.getSquareButton();
+		if (!usingAltMech) {
+			return mechController.getSquareButton();
+		} else {
+			return altMechController.getXButton();
+		}
 	}
 }
