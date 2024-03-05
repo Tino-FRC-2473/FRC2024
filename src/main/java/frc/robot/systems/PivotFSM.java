@@ -281,7 +281,9 @@ public class PivotFSM {
 					&& !inRange(currentEncoder, SOURCE_ENCODER_ROTATIONS)) {
 					return PivotFSMState.SOURCE;
 				} else if (input.isShooterArmButtonPressed()
-					&& !inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)) {
+					&& !inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)
+					&& !input.isAbortButtonPressed()
+					&& !input.isGroundArmButtonPressed() && !input.isAmpArmButtonPressed()) {
 					return PivotFSMState.SHOOTER;
 				} else if (!zeroed && !lastLimitHit) {
 					return PivotFSMState.IDLE_STOP;
@@ -322,7 +324,9 @@ public class PivotFSM {
 
 			case AMP:
 				if (!input.isAbortButtonPressed()
-					&& !inRange(currentEncoder, AMP_ENCODER_ROTATIONS)) {
+					&& !inRange(currentEncoder, AMP_ENCODER_ROTATIONS)
+					&& input.isAmpArmButtonPressed() && !input.isShootButtonPressed()
+					&& !input.isGroundArmButtonPressed()) {
 					return PivotFSMState.AMP;
 				} else {
 					return PivotFSMState.IDLE_STOP;

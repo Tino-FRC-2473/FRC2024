@@ -20,7 +20,7 @@ public class MBRShooterFSM {
 		SHOOTING
 	}
 
-	private static final float SHOOTING_POWER = 0.2f;
+	private static final float SHOOTING_POWER = 0.7f;
 	private static final float SHOOTING_TIME = 2.0f;
 	private boolean buttonToggle = false;
 	private boolean buttonPressedLastFrame = false;
@@ -99,6 +99,11 @@ public class MBRShooterFSM {
 		} else if (!input.isShootButtonPressed()) {
 			buttonPressedLastFrame = false;
 		}
+
+		SmartDashboard.putBoolean("SHOOT BUTTON", input.isShootButtonPressed());
+		SmartDashboard.putString("Current State", currentState.toString());
+		SmartDashboard.putNumber("Left Motor Power", leftMotor.get());
+		SmartDashboard.putNumber("Right Motor Power", rightMotor.get());
 
 		switch (currentState) {
 			case IDLE_STOP:
