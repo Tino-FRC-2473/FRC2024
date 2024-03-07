@@ -32,6 +32,34 @@ public class LED extends TimedRobot{
       led.setData(ledBuffer);
     }
 
+    public void purpleLight() {
+      for (var i = 0; i < ledBuffer.getLength(); i++) {
+        ledBuffer.setRGB(i, 166, 99, 255);
+      }
+      led.setData(ledBuffer);
+    }
+
+    public void pinkLight() {
+      for (var i = 0; i < ledBuffer.getLength(); i++) {
+        ledBuffer.setRGB(i, 255, 0, 90);
+      }
+      led.setData(ledBuffer);
+    }
+
+    public void redLight() {
+      for (var i = 0; i < ledBuffer.getLength(); i++) {
+        ledBuffer.setRGB(i, 255, 0, 0);
+      }
+      led.setData(ledBuffer);
+    }
+
+    public void blueLight() {
+      for (var i = 0; i < ledBuffer.getLength(); i++) {
+        ledBuffer.setRGB(i, 134, 225, 255);
+      }
+      led.setData(ledBuffer);
+    }
+
     public void turnOff() {
       for (var i = 0; i < ledBuffer.getLength(); i++) {
         ledBuffer.setRGB(i, 0, 0, 0);
@@ -39,7 +67,7 @@ public class LED extends TimedRobot{
       led.setData(ledBuffer);
     }
 
-    public void cr() {
+    public void cr() { //gradiation of red and yellow light
       for (var i = 0; i < ledBuffer.getLength(); i++) {
         ledBuffer.setRGB(i, 199, greenVal, 0);
       }
