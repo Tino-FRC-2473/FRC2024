@@ -3,11 +3,11 @@ import numpy as np
 from detector import Detector
 from vision_input import VisionInput
 import time
-# import ntcore
+import ntcore
 
-# inst = ntcore.NetworkTableInstance.getDefault()
-# inst.startClient4("python")
-# inst.setServerTeam(2473)
+inst = ntcore.NetworkTableInstance.getDefault()
+inst.startClient4("python")
+inst.setServerTeam(2473)
 
 FOV = (50.28, 29.16)
 RES = (640, 480)
@@ -21,9 +21,12 @@ while True:
     try:
         #print("here1")
         frame = input.getFrame()
-        # table = inst.getTable("datatable")
+        table = inst.getTable("datatable")
         # xPub = table.getDoubleTopic("fps_incremented_value").publish()
         # xPub.set(frame.sum())
+
+        noteY = table.getDoubleTopic("note_yaw").publish()
+        noteD = table.getDoubleTopic("note_distance").publish()
 
         # coneY = table.getDoubleTopic("cone_yaw").publish()
         # coneD = table.getDoubleTopic("cone_distance").publish()
@@ -45,6 +48,8 @@ while True:
                 print("distance: ", distance)
                 print("pitch: ", pitch)
 
+                noteY.set(yaw)
+                noteD.set(distance)
                 #print("detection: ", time.time() - curr)
                 curr = time.time()
 
@@ -57,7 +62,7 @@ while True:
                 # elif target.getType() == "CUBE":
                 #     cubeY.set(yaw)
                 #     cubeD.set(distance)
-        #print("here")
+        # print("here")
         # cnt = cnt + 1
         time.sleep(0.02)
     except KeyboardInterrupt:
