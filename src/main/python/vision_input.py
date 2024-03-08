@@ -34,3 +34,6 @@ class VisionInput:
 
     def getGrayFrame(self):
         return cv2.cvtColor(self.getFrame(self), cv2.COLOR_BGR2GRAY)
+    
+    def close(self):
+        self.cap.close()
