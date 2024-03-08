@@ -1,17 +1,28 @@
 package frc.robot.systems;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AutoHandlerSystem {
 	/* ======================== Constants ======================== */
 	// Auto FSM state definitions
 	public enum AutoFSMState {
-		STATE1,
-		STATE2,
-		STATE3
+		LEAVE,
+		DRIVE_TO_SCORE,
+		PICK_UP_1,
+		PICK_UP_2,
+		PICK_UP_3,
+		PICK_UP_4,
+		SHOOTER_STATE,
+		PENDING,
+		SHOOTER_STATE_FAST,
+		RUN_OVER_NOTES
 	}
+
 	public enum AutoPath {
-		PATH1,
-		PATH2,
-		PATH3
+		PATH1, // score and leave
+		PATH2, // score multiple times
+		PATH3, // tbd emergency path
+		PATH4,
+		PATH5
 	}
 
 	/* ======================== Private variables ======================== */
@@ -22,31 +33,38 @@ public class AutoHandlerSystem {
 	private int currentStateIndex;
 
 	//FSM Systems that the autoHandlerFSM uses
-	private FSMSystem subsystem1;
-	private FSMSystem subsystem2;
-	private FSMSystem subsystem3;
+	private DriveFSMSystem driveSystem;
+	private KitBotShooterFSM shooterFSM;
 
 	//Predefined auto paths
+
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
-		AutoFSMState.STATE1, AutoFSMState.STATE2, AutoFSMState.STATE3};
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.LEAVE};
 
 	private static final AutoFSMState[] PATH2 = new AutoFSMState[]{
-		AutoFSMState.STATE3, AutoFSMState.STATE2, AutoFSMState.STATE1};
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_1,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_2,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_3,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_4};
 
-	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{
-		AutoFSMState.STATE1, AutoFSMState.STATE3, AutoFSMState.STATE2};
+	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{AutoFSMState.DRIVE_TO_SCORE,
+		AutoFSMState.SHOOTER_STATE};
+
+	private static final AutoFSMState[] PATH4 = new AutoFSMState[]{AutoFSMState.DRIVE_TO_SCORE,
+		AutoFSMState.SHOOTER_STATE_FAST, AutoFSMState.RUN_OVER_NOTES};
+
+	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{AutoFSMState.RUN_OVER_NOTES};
+
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state.
 	 * Initializes any subsystems such as driveFSM, armFSM, ect.
 	 * @param fsm1 the first subsystem that the auto handler will call functions on
 	 * @param fsm2 the second subsystem that the auto handler will call functions on
-	 * @param fsm3 the third subsystem that the auto handler will call functions on
 	 */
-	public AutoHandlerSystem(FSMSystem fsm1, FSMSystem fsm2, FSMSystem fsm3) {
-		subsystem1 = fsm1;
-		subsystem2 = fsm2;
-		subsystem3 = fsm3;
+	public AutoHandlerSystem(DriveFSMSystem fsm1, KitBotShooterFSM fsm2) {
+		driveSystem = fsm1;
+		shooterFSM = fsm2;
 	}
 
 	/* ======================== Public methods ======================== */
@@ -68,18 +86,21 @@ public class AutoHandlerSystem {
 	 * @param path the auto path to be executed
 	 */
 	public void reset(AutoPath path) {
-		subsystem1.reset();
-		subsystem2.reset();
-		subsystem3.reset();
+		driveSystem.resetAutonomus();
+		shooterFSM.reset();
 
-		currentStateIndex = 0;
 		if (path == AutoPath.PATH1) {
 			currentStateList = PATH1;
 		} else if (path == AutoPath.PATH2) {
 			currentStateList = PATH2;
 		} else if (path == AutoPath.PATH3) {
 			currentStateList = PATH3;
+		} else if (path == AutoPath.PATH4) {
+			currentStateList = PATH4;
+		} else if (path == AutoPath.PATH5) {
+			currentStateList = PATH5;
 		}
+		currentStateIndex = 0;
 	}
 
 	/**
@@ -89,30 +110,52 @@ public class AutoHandlerSystem {
 		if (currentStateIndex >= currentStateList.length) {
 			return;
 		}
-
 		boolean isCurrentStateFinished;
-		System.out.println("In State: " + getCurrentState());
+		SmartDashboard.putString("In Auto State: ", "" + getCurrentState());
 		switch (getCurrentState()) {
-			case STATE1:
-				isCurrentStateFinished = subsystem1.updateAutonomous(AutoFSMState.STATE1)
-					&& subsystem2.updateAutonomous(AutoFSMState.STATE1)
-					&& subsystem3.updateAutonomous(AutoFSMState.STATE1);
+			case LEAVE:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.LEAVE);
 				break;
-			case STATE2:
-				isCurrentStateFinished = subsystem1.updateAutonomous(AutoFSMState.STATE2)
-					&& subsystem2.updateAutonomous(AutoFSMState.STATE2)
-					&& subsystem3.updateAutonomous(AutoFSMState.STATE2);
+			case PICK_UP_1:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.PICK_UP_1);
 				break;
-			case STATE3:
-				isCurrentStateFinished = subsystem1.updateAutonomous(AutoFSMState.STATE3)
-					&& subsystem2.updateAutonomous(AutoFSMState.STATE3)
-					&& subsystem3.updateAutonomous(AutoFSMState.STATE3);
+			case DRIVE_TO_SCORE:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.DRIVE_TO_SCORE);
+				break;
+			case PICK_UP_2:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.PICK_UP_2);
+				break;
+			case PICK_UP_3:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.PICK_UP_3);
+				break;
+			case PICK_UP_4:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.PICK_UP_4);
+				break;
+			case SHOOTER_STATE:
+				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE);
+				break;
+			case PENDING:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.PENDING);
+				break;
+			case SHOOTER_STATE_FAST:
+				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_FAST);
+				break;
+			case RUN_OVER_NOTES:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.RUN_OVER_NOTES);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());
 		}
+
 		if (isCurrentStateFinished) {
 			currentStateIndex++;
+			driveSystem.setCurrentPointInPath(0);
 		}
 	}
 }

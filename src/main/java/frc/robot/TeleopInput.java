@@ -1,7 +1,7 @@
 package frc.robot;
 
 // WPILib Imports
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PS4Controller;
 
 /**
  * Common class for providing driver inputs during Teleop.
@@ -12,13 +12,13 @@ import edu.wpi.first.wpilibj.Joystick;
  */
 public class TeleopInput {
 	/* ======================== Constants ======================== */
-	private static final int LEFT_JOYSTICK_PORT = 0;
-	private static final int RIGHT_JOYSTICK_PORT = 1;
+	private static final int MECH_CONTROLLER_PORT = 1;
+	private static final int DRIVER_CONTROLLER_PORT = 0;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
-	private Joystick leftJoystick;
-	private Joystick rightJoystick;
+	private PS4Controller mechController;
+	private PS4Controller driverController;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -27,62 +27,138 @@ public class TeleopInput {
 	 * by WPILib until teleop mode.
 	 */
 	public TeleopInput() {
-		leftJoystick = new Joystick(LEFT_JOYSTICK_PORT);
+		mechController = new PS4Controller(MECH_CONTROLLER_PORT);
+		driverController = new PS4Controller(DRIVER_CONTROLLER_PORT);
 
-		rightJoystick = new Joystick(RIGHT_JOYSTICK_PORT);
 	}
 
-	/* ======================== Public methods ======================== */
-	// Getter methods for fetch input values should be defined here.
-	// Method names should be descriptive of the behavior, so the
-	// control mapping is hidden from other classes.
-
-	/* ------------------------ Left Joystick ------------------------ */
+	/* ------------------------ Driver Controller ------------------------ */
 	/**
 	 * Get X axis of Left Joystick.
 	 * @return Axis value
 	 */
-	public double getLeftJoystickX() {
-		return leftJoystick.getX();
+	public double getControllerLeftJoystickY() {
+		return driverController.getLeftY();
 	}
 	/**
 	 * Get Y axis of Left Joystick.
 	 * @return Axis value
 	 */
-	public double getLeftJoystickY() {
-		return leftJoystick.getY();
+	public double getControllerLeftJoystickX() {
+		return driverController.getLeftX();
 	}
 	/**
-	 * Get the value of the shooter button.
+	 * Get Y axis of Left Joystick.
+	 * @return Axis value
+	 */
+	public double getControllerRightJoystickY() {
+		return driverController.getRightY();
+	}
+	/**
+	 * Get Y axis of Left Joystick.
+	 * @return Axis value
+	 */
+	public double getControllerRightJoystickX() {
+		return driverController.getRightX();
+	}
+	/**
+	 * Get the value of the Share button.
 	 * @return True if button is pressed
 	 */
-	public boolean isShooterButtonPressed() {
-		return leftJoystick.getRawButton(1);
+	public boolean isBackButtonPressed() {
+		return driverController.getShareButton();
 	}
+	/**
+	 * Get the value of the Circle button.
+	 * @return True if button is pressed
+	 */
+	public boolean isCircleButtonPressed() {
+		return driverController.getCircleButtonPressed();
+	}
+	/**
+	 * Get the value of the Circle button.
+	 * @return True if button is released
+	 */
+	public boolean isCircleButtonReleased() {
+		return driverController.getCircleButtonReleased();
+	}
+	/**
+	 * Get the value of the Triangle button.
+	 * @return True if button is pressed
+	 */
+	public boolean isTriangleButtonPressed() {
+		return driverController.getTriangleButtonPressed();
+	}
+	/**
+	 * Get the value of the Circle button.
+	 * @return True if button is released
+	 */
+	public boolean isTriangleButtonReleased() {
+		return driverController.getTriangleButtonReleased();
+	}
+
+	/**
+	 * Get the value of the Cross button.
+	 * @return True if button is released
+	 */
+	public boolean isCrossButtonPressed() {
+		return driverController.getCrossButtonPressed();
+	}
+
+	/**
+	 * Get the value of the Cross button.
+	 * @return True if button is released
+	 */
+	public boolean isCrossButtonReleased() {
+		return driverController.getCrossButtonReleased();
+	}
+
+	/**
+	 * Get the value of the left trigger.
+	 * @return value of the left trigger.
+	 */
+	public double getLeftTrigger() {
+		return driverController.getL2Axis();
+	}
+	/**
+	 * Get the value of the right trigger.
+	 * @return value of the right trigger.
+	 */
+	public double getRightTrigger() {
+		return driverController.getR2Axis();
+	}
+
+	/* ------------------------ Mech Controller ------------------------ */
 	/**
 	 * Get the value of the intake button.
 	 * @return True if button is pressed
 	 */
 	public boolean isIntakeButtonPressed() {
-		return leftJoystick.getRawButton(2);
+		return mechController.getCircleButton();
 	}
 
-	/* ------------------------ Right Joystick ------------------------ */
 	/**
-	 * Get X axis of Right Joystick.
-	 * @return Axis value
+	 * Get the value of the shoot button.
+	 * @return True if button is pressed
 	 */
-	public double getRightJoystickX() {
-		return rightJoystick.getX();
-	}
-	/**
-	 * Get Y axis of Right Joystick.
-	 * @return Axis value
-	 */
-	public double getRightJoystickY() {
-		return rightJoystick.getY();
+	public boolean isShootButtonPressed() {
+		return mechController.getR2Button();
 	}
 
-	/* ======================== Private methods ======================== */
+	/**
+	 * Get the value of the rev button for the shooter.
+	 * @return True if button is pressed
+	 */
+	public boolean isRevOuttakeButtonPressed() {
+		return mechController.getL2Button();
+	}
+
+	/**
+	 * Get the value of the retract button.
+	 * @return True if button is pressed
+	 */
+	public boolean isRetractClimberButtonPressed() {
+		return mechController.getCrossButton();
+	}
 
 }
