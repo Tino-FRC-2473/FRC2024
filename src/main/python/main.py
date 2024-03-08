@@ -10,7 +10,7 @@ inst.startClient4("python")
 inst.setServerTeam(2473)
 
 FOV = (50.28, 29.16)
-RES = (640, 480)
+RES = (640, 480) 
 CAM_HEIGHT = 0.7493
 CAM_ANGLE = 50
 d = Detector()
