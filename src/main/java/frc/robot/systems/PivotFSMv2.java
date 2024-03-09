@@ -26,7 +26,7 @@ public class PivotFSMv2 {
         SHOOTING,
         OUTTAKING,
         MOVE_TO_AMP,
-        FEED_SHOOTER,
+    	FEED_SHOOTER,
         MOVE_TO_SHOOTER,
         INTAKING,
         MOVE_TO_GROUND

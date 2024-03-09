@@ -20,6 +20,11 @@ public class MBRShooterFSM {
 		SHOOTING
 	}
 
+	public enum AutoFSMState {
+		IDLE_STOP,
+		SHOOTING
+	}
+
 	private static final float SHOOTING_POWER = 0.7f;
 	private static final float SHOOTING_TIME = 2.0f;
 	private boolean buttonToggle = false;
@@ -128,11 +133,9 @@ public class MBRShooterFSM {
 	 */
 	public boolean updateAutonomous(AutoFSMState autoState) {
 		switch (autoState) {
-			case STATE1:
+			case SHOOTING:
 				return handleAutoState1();
-			case STATE2:
-				return handleAutoState2();
-			case STATE3:
+			case IDLE_STOP:
 				return handleAutoState3();
 			default:
 				return true;

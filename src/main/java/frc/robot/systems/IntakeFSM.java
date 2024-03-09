@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
 import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
+import frc.robot.systems.FSMSystem.FSMState;
 
 public class IntakeFSM {
 	/* ======================== Constants ======================== */
@@ -22,10 +23,20 @@ public class IntakeFSM {
 		OUTTAKING
 	}
 
+	public enum AutoIntakeFSMState {
+		IDLE_STOP,
+		INTAKING,
+		OUTTAKING
+	}
+
 	private static final float INTAKE_POWER = 0.1f;
 	private static final float OUTTAKE_POWER = -INTAKE_POWER;
 	private static final float AUTO_INTAKING_TIME = 2.0f;
 	private static final float AUTO_OUTTAKING_TIME = 2.0f;
+	private static final int AVERAGE_SIZE = 7;
+	private static final float CURRENT_THRESHOLD = 15.0f;
+	private static final double TIME_RESET_CURRENT = 0.5;
+
 
 	/* ======================== Private variables ======================== */
 	private IntakeFSMState currentState;
@@ -39,8 +50,11 @@ public class IntakeFSM {
 	private double autoIntakingTimerStart;
 	private boolean autoOuttakingTimerStarted;
 	private double autoOuttakingTimerStart;
-
+	private double[] currLogs;
 	private Timer intakeTimer;
+	private int tick;
+	private boolean holding = false;
+
 
 
 	/* ======================== Constructor ======================== */
@@ -60,7 +74,7 @@ public class IntakeFSM {
 
 		breakBeamSwitch = new DigitalInput(HardwareMap.INPUT_BREAK_BEAM_PORT);
 
-
+		currLogs = new double[AVERAGE_SIZE];
 		// Reset state machine
 		reset();
 	}
@@ -100,7 +114,8 @@ public class IntakeFSM {
 			return;
 		}
 
-		SmartDashboard.putBoolean("Brake Beam Switch DIO PORT 0", hasNote());
+		SmartDashboard.putBoolean("Current value surpassed / hasNote", hasNote());
+		SmartDashboard.putNumberArray("Current array values", currLogs);
 
 		switch (currentState) {
 			case IDLE_STOP:
@@ -171,6 +186,22 @@ public class IntakeFSM {
 			case INTAKING:
 				if (input.isIntakeButtonPressed() && !input.isOuttakeButtonPressed()
 					&& !hasNote()) {
+					if (intakeTimer.hasElapsed(TIME_RESET_CURRENT)) {
+						currLogs[tick % AVERAGE_SIZE] = intakeMotor.getOutputCurrent();
+						tick++;
+	
+						double avgcone = 0;
+						for (int i = 0; i < AVERAGE_SIZE; i++) {
+							avgcone += currLogs[i];
+						}
+						avgcone /= AVERAGE_SIZE;
+						if (avgcone > CURRENT_THRESHOLD) {
+							holding = true;
+							return IntakeFSMState.IDLE_STOP;
+						} else {
+							holding = false;
+						}
+					}
 					return IntakeFSMState.INTAKING;
 				}
 
@@ -216,6 +247,10 @@ public class IntakeFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleOuttakingState(TeleopInput input) {
+		for (int i = 0; i < AVERAGE_SIZE; i++) {
+			currLogs[i] = 0;
+		}
+
 		intakeMotor.set(OUTTAKE_POWER);
 	}
 
@@ -297,6 +332,6 @@ public class IntakeFSM {
 	}
 
 	private boolean hasNote() {
-		return !breakBeamSwitch.get();
+		return holding;
 	}
 }

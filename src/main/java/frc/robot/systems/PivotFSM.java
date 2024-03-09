@@ -4,8 +4,11 @@ package frc.robot.systems;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkLimitSwitch;
+import com.revrobotics.SparkMaxAlternateEncoder;
 //import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -81,6 +84,11 @@ public class PivotFSM {
 	private SparkLimitSwitch lastLimitSwitch;
 	private final ArmFeedforward pivotFeedforward;
 
+	private static final SparkMaxAlternateEncoder.Type K_TYPE
+		= SparkMaxAlternateEncoder.Type.kQuadrature;
+	private static final int K_CPR = 8192;
+	private RelativeEncoder mAlternateEncoder;
+
 	private boolean hasTimerStarted = false;
 
 
@@ -109,6 +117,8 @@ public class PivotFSM {
 		pidPivotController.setI(PID_CONSTANT_PIVOT_I);
 		pidPivotController.setD(PID_CONSTANT_PIVOT_D);
 		pidPivotController.setOutputRange(MIN_TURN_SPEED, MAX_TURN_SPEED);*/
+
+		mAlternateEncoder = pivotMotor.getAlternateEncoder(K_TYPE, K_CPR);
 
 		pidPivotController = new ProfiledPIDController(PID_CONSTANT_PIVOT_P,
 			PID_CONSTANT_PIVOT_I, PID_CONSTANT_PIVOT_D,
@@ -173,20 +183,21 @@ public class PivotFSM {
 
 		SmartDashboard.putString("Current State", currentState.toString());
 		SmartDashboard.putNumber("Motor Power", pivotMotor.get());
-		SmartDashboard.putNumber("Encoder Value", currentEncoder);
+		//SmartDashboard.putNumber("Encoder Value", currentEncoder);
 		SmartDashboard.putBoolean("Zeroed", zeroed);
 		SmartDashboard.putBoolean("GROUND BUTTON", input.isGroundArmButtonPressed());
 		SmartDashboard.putBoolean("SHOOTER BUTTON", input.isShooterArmButtonPressed());
 		SmartDashboard.putBoolean("SOURCE BUTTON", input.isSourceArmButtonPressed());
 		SmartDashboard.putBoolean("AMP BUTTON", input.isAmpArmButtonPressed());
 		SmartDashboard.putBoolean("ABORT BUTTON", input.isAbortButtonPressed());
-		SmartDashboard.putNumber("PidVAL", pidVal);
-		SmartDashboard.putNumber("Accel", acceleration);
-		SmartDashboard.putNumber("Velocity", pidPivotController.getSetpoint().velocity);
+		//SmartDashboard.putNumber("PidVAL", pidVal);
+		//SmartDashboard.putNumber("Accel", acceleration);
+		//SmartDashboard.putNumber("Velocity", pidPivotController.getSetpoint().velocity);
 		SmartDashboard.putNumber(" velocity dif ",
 			pidPivotController.getSetpoint().velocity - lastSpeed);
 		SmartDashboard.putNumber("time diff", currentTime - lastLoopTime);
-		SmartDashboard.putNumber("voltage", pivotMotor.getAppliedOutput());
+		//SmartDashboard.putNumber("voltage", pivotMotor.getAppliedOutput());
+		SmartDashboard.putNumber("Thru Bore Encoder values", mAlternateEncoder.getPosition());
 
 		switch (currentState) {
 			case IDLE_STOP:
@@ -502,5 +513,11 @@ public class PivotFSM {
 		pivotMotor.setVoltage(clamp((pidVal
 			+ pivotFeedforward.calculate(pidPivotController.getSetpoint().velocity,
 			acceleration))));
+	}
+
+
+	private double pid(double currentEncoderPID, double targetEncoder) {
+		double correction = PID_CONSTANT_PIVOT_P * (targetEncoder - currentEncoder);
+		return Math.min(MAX_TURN_SPEED, Math.max(MIN_TURN_SPEED, correction));
 	}
 }
