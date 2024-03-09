@@ -12,6 +12,7 @@ import frc.robot.systems.AutoHandlerSystem;
 import frc.robot.systems.ClimberMechFSMLeft;
 import frc.robot.systems.ClimberMechFSMRight;
 import frc.robot.systems.AutoHandlerSystem.AutoPath;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -19,14 +20,8 @@ import frc.robot.systems.AutoHandlerSystem.AutoPath;
  */
 public class Robot extends TimedRobot {
 	private TeleopInput input;
+	private TalonFX motor;
 	// Systems
-	private KitBotShooterFSM shooterFSM;
-	private ClimberMechFSMLeft climberMechLeftFSM;
-	private ClimberMechFSMRight climberMechRightFSM;
-	private DriveFSMSystem driveFSMSystem;
-
-	private AutoHandlerSystem autoHandler;
-	private AutoPathChooser autoPathChooser;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -36,45 +31,27 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		System.out.println("robotInit");
 		input = new TeleopInput();
-		// Instantiate all systems here
-		autoPathChooser = new AutoPathChooser();
-		driveFSMSystem = new DriveFSMSystem();
-		shooterFSM = new KitBotShooterFSM();
-		climberMechLeftFSM = new ClimberMechFSMLeft();
-		climberMechRightFSM = new ClimberMechFSMRight();
-		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
+		motor = new TalonFX(0, "rio");
 	}
 
 	@Override
 	public void autonomousInit() {
-		System.out.println("-------- Autonomous Init --------");
-		AutoPath path = AutoPath.PATH1;
-		if (AutoPathChooser.getSelectedPath() != null) {
-			path = AutoPathChooser.getSelectedPath();
-		}
-		autoHandler.reset(path);
+
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		autoHandler.update();
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		driveFSMSystem.reset();
-		climberMechLeftFSM.reset();
-		climberMechRightFSM.reset();
-		shooterFSM.reset();
+
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		driveFSMSystem.update(input);
-		climberMechLeftFSM.update(input);
-		climberMechRightFSM.update(input);
-		shooterFSM.update(input);
+		motor.set(0.1);
 	}
 
 	@Override
