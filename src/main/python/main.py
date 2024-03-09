@@ -38,30 +38,32 @@ while True:
 
         results = d.detectGameElement(np.asarray(frame), ["RING"])
 
-        for type, target in results.items():
-            
-            if target is not None:
-                yaw = target.get_yaw_degrees()
-                distance = target.get_distance_meters()
-                pitch = target.get_pitch_degrees()
-                print("yaw: ", yaw)
-                print("distance: ", distance)
-                print("pitch: ", pitch)
+        if results is not None:
+            for type, target in results.items():
+                if target is not None:
+                    yaw = target.get_yaw_degrees()
+                    distance = target.get_distance_meters()
+                    pitch = target.get_pitch_degrees()
+                    print("yaw: ", yaw)
+                    print("distance: ", distance)
+                    print("pitch: ", pitch)
 
-                noteY.set(yaw)
-                noteD.set(distance)
-                #print("detection: ", time.time() - curr)
-                curr = time.time()
+                    noteY.set(yaw)
+                    noteD.set(distance)
+                    #print("detection: ", time.time() - curr)
+                    curr = time.time()
+        else:
+            print("no targets")
 
-                # if target.getType() == "CONE":
-                #     coneY.set(yaw)
-                #     coneD.set(distance)
-                #     if cnt % 50 == 0:
-                #         print(coneYSub.get())
-                #         print(coneDSub.get())
-                # elif target.getType() == "CUBE":
-                #     cubeY.set(yaw)
-                #     cubeD.set(distance)
+                    # if target.getType() == "CONE":
+                    #     coneY.set(yaw)
+                    #     coneD.set(distance)
+                    #     if cnt % 50 == 0:
+                    #         print(coneYSub.get())
+                    #         print(coneDSub.get())
+                    # elif target.getType() == "CUBE":
+                    #     cubeY.set(yaw)
+                    #     cubeD.set(distance)
         # print("here")
         # cnt = cnt + 1
         time.sleep(0.02)

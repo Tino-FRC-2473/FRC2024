@@ -50,11 +50,13 @@ class Detector:
             if (object == "RING"):
                 contours, hier = cv2.findContours(morph, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
                 contours = sorted(contours, key=cv2.contourArea)
+                contours = [contour for contour in contours if contour.size > 50]
                 # cnt = None
                 # contour = contours[len(contours) -1]
                 #last detection is supposed be the biggest because of the sorting function above
-                tx,ty,tw,th = cv2.boundingRect(contours[len(contours) -1])
-                cv2.rectangle(frame, (tx, ty), (tx + tw, ty + th),
+                if (len(contours) > 0):
+                    tx,ty,tw,th = cv2.boundingRect(contours[len(contours) -1])
+                    cv2.rectangle(frame, (tx, ty), (tx + tw, ty + th),
                                          (0, 0, 255), 2)
 
         while True:
@@ -64,9 +66,11 @@ class Detector:
 
         cv2.destroyAllWindows()
 
-        results[object] = Target(contours[0], object)
-
-        return results
+        if (len(contours) > 0):
+            results[object] = Target(contours[len(contours) -1], object)
+            return results
+        return None
+        
 
     def detectColoredShape(self, array, rgb_col):
         color_dict_HSV = {'black': [[180, 255, 30], [0, 0, 0]],
