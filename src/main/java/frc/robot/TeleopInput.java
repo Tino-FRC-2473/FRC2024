@@ -41,6 +41,7 @@ public class TeleopInput {
 	 * Manual Control for PivotFSM
 	 * @return Axis value
 	 */
+
 	public double getMechControllerLeftY() {
 		return mechController.getLeftY();
 	}
@@ -109,20 +110,8 @@ public class TeleopInput {
 		return mechController.getPSButton();
 	}
 
-	/**
-	 * Get the value of the L2 Button.
-	 * @return if L2 is pressed
-	 */
-	public boolean isRetractButtonPressed() {
-		return mechController.getL2Button();
-	}
-
-	/**
-	 * Get the value of the R2 Button.
-	 * @return if R2 is pressed
-	 */
-	public boolean isExtendButtonPressed() {
-		return mechController.getR2Button();
+	public boolean isZeroingButtonPressed() {
+		return mechController.getOptionsButton();
 	}
 	/* ======================== Private methods ======================== */
 

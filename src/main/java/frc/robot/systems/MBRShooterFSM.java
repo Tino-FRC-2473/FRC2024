@@ -21,7 +21,7 @@ public class MBRShooterFSM {
 	}
 
 	private static final float SHOOTING_POWER = 0.7f;
-	private static final float SHOOTING_TIME = 2.0f;
+	private static final float SHOOTING_TIME = 1.0f;
 	private boolean buttonToggle = false;
 	private boolean buttonPressedLastFrame = false;
 
@@ -34,10 +34,10 @@ public class MBRShooterFSM {
 	private CANSparkMax leftMotor;
 	private CANSparkMax rightMotor;
 
-	private boolean autoShootingTimerStarted;
+	private boolean autoShootingTimerStarted = false;
 	private double autoShootingTimerStart;
 
-	private Timer shootingTimer;
+	private Timer shootingTimer = new Timer();
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -47,8 +47,6 @@ public class MBRShooterFSM {
 	 */
 	public MBRShooterFSM() {
 		// Perform hardware init
-		shootingTimer = new Timer();
-
 		leftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LSHOOTER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 
@@ -76,7 +74,9 @@ public class MBRShooterFSM {
 	 */
 	public void reset() {
 		currentState = FSMState.IDLE_STOP;
-
+		shootingTimer = new Timer();
+		shootingTimer.start();
+		autoShootingTimerStarted = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -118,7 +118,6 @@ public class MBRShooterFSM {
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		currentState = nextState(input);
-		SmartDashboard.putBoolean("Shoot Button", input.isShootButtonPressed());
 	}
 
 	/**
@@ -128,10 +127,12 @@ public class MBRShooterFSM {
 	 */
 	public boolean updateAutonomous(AutoFSMState autoState) {
 		switch (autoState) {
-			case STATE1:
-				return handleAutoState1();
-			case STATE2:
-				return handleAutoState3();
+			case SHOOT:
+				return handleAutoShootingState();
+			case DRIVE_TO_NOTE:
+				return handleAutoIdleState();
+			case DRIVE_TO_SPEAKER:
+				return handleAutoRevShootingState();
 			default:
 				return true;
 		}
@@ -188,34 +189,11 @@ public class MBRShooterFSM {
 	}
 
 	/**
-	 * Performs action for auto STATE1.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState1() {
-		return true;
-	}
-
-	/**
-	 * Performs action for auto STATE2.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState2() {
-		return true;
-	}
-
-	/**
-	 * Performs action for auto STATE3.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState3() {
-		return true;
-	}
-
-	/**
 	 * Performs action for auto Shooting.
 	 * @return if the action carried out has finished executing
 	 */
 	private boolean handleAutoShootingState() {
+		//run shooter motor for 1 second and once finished, return true
 		if (!autoShootingTimerStarted) {
 			autoShootingTimerStarted = true;
 			autoShootingTimerStart = shootingTimer.get();
@@ -235,5 +213,17 @@ public class MBRShooterFSM {
 		}
 
 		return false;
+	}
+
+	private boolean handleAutoRevShootingState() {
+		leftMotor.set(SHOOTING_POWER);
+		rightMotor.set(SHOOTING_POWER);
+		return true;
+	}
+
+	private boolean handleAutoIdleState() {
+		leftMotor.set(0);
+		rightMotor.set(0);
+		return true;
 	}
 }

@@ -4,9 +4,9 @@ public class AutoHandlerSystem {
 	/* ======================== Constants ======================== */
 	// Auto FSM state definitions
 	public enum AutoFSMState {
-		STATE1,
-		STATE2,
-		STATE3
+		SHOOT,
+		DRIVE_TO_NOTE,
+		DRIVE_TO_SPEAKER
 	}
 	public enum AutoPath {
 		PATH1,
@@ -28,13 +28,8 @@ public class AutoHandlerSystem {
 
 	//Predefined auto paths
 	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
-		AutoFSMState.STATE1, AutoFSMState.STATE2, AutoFSMState.STATE3};
+		AutoFSMState.DRIVE_TO_NOTE, AutoFSMState.DRIVE_TO_SPEAKER, AutoFSMState.SHOOT};
 
-	private static final AutoFSMState[] PATH2 = new AutoFSMState[]{
-		AutoFSMState.STATE3, AutoFSMState.STATE2, AutoFSMState.STATE1};
-
-	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{
-		AutoFSMState.STATE1, AutoFSMState.STATE3, AutoFSMState.STATE2};
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state.
@@ -71,14 +66,10 @@ public class AutoHandlerSystem {
 		intakeFSM.reset();
 		shooterFSM.reset();
 		pivotFSM.reset();
-
+		currentStateList = PATH1; //default
 		currentStateIndex = 0;
 		if (path == AutoPath.PATH1) {
 			currentStateList = PATH1;
-		} else if (path == AutoPath.PATH2) {
-			currentStateList = PATH2;
-		} else if (path == AutoPath.PATH3) {
-			currentStateList = PATH3;
 		}
 	}
 
@@ -93,20 +84,22 @@ public class AutoHandlerSystem {
 		boolean isCurrentStateFinished;
 		System.out.println("In State: " + getCurrentState());
 		switch (getCurrentState()) {
-			case STATE1:
-				isCurrentStateFinished = intakeFSM.updateAutonomous(AutoFSMState.STATE1)
-					&& shooterFSM.updateAutonomous(AutoFSMState.STATE1)
-					&& pivotFSM.updateAutonomous(AutoFSMState.STATE1);
+			case SHOOT:
+				isCurrentStateFinished = intakeFSM.updateAutonomous(AutoFSMState.SHOOT)
+					& shooterFSM.updateAutonomous(AutoFSMState.SHOOT)
+					& pivotFSM.updateAutonomous(AutoFSMState.SHOOT);
 				break;
-			case STATE2:
-				isCurrentStateFinished = intakeFSM.updateAutonomous(AutoFSMState.STATE2)
-					&& shooterFSM.updateAutonomous(AutoFSMState.STATE2)
-					&& pivotFSM.updateAutonomous(AutoFSMState.STATE2);
+			case DRIVE_TO_NOTE:
+				//add driveFSM.updateAutonomous() & to the front of the bottom expression
+				isCurrentStateFinished = (pivotFSM.updateAutonomous(AutoFSMState.DRIVE_TO_NOTE)
+					&& intakeFSM.updateAutonomous(AutoFSMState.DRIVE_TO_NOTE))
+					& shooterFSM.updateAutonomous(AutoFSMState.DRIVE_TO_NOTE);
 				break;
-			case STATE3:
-				isCurrentStateFinished = intakeFSM.updateAutonomous(AutoFSMState.STATE3)
-					&& shooterFSM.updateAutonomous(AutoFSMState.STATE3)
-					&& pivotFSM.updateAutonomous(AutoFSMState.STATE3);
+			case DRIVE_TO_SPEAKER:
+				//add driveFSM.updateAutonomous() & to the front of the bottom expression
+				isCurrentStateFinished = (pivotFSM.updateAutonomous(AutoFSMState.DRIVE_TO_SPEAKER)
+					&& shooterFSM.updateAutonomous(AutoFSMState.DRIVE_TO_SPEAKER))
+					& intakeFSM.updateAutonomous(AutoFSMState.DRIVE_TO_SPEAKER);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());

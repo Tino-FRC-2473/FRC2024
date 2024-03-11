@@ -5,7 +5,6 @@ package frc.robot.systems;
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Robot Imports
@@ -22,14 +21,10 @@ public class IntakeFSM {
 		OUTTAKING
 	}
 
-	public enum AutoIntakeFSMState {
-		IDLE_STOP,
-		INTAKING,
-		OUTTAKING
-	}
 
 	private static final float INTAKE_POWER = 0.1f;
-	private static final float OUTTAKE_POWER = -INTAKE_POWER;
+	private static final float OUTTAKE_POWER = -0.1f;
+	private static final float HOLDING_POWER = 0.03f;
 	private static final float AUTO_INTAKING_TIME = 2.0f;
 	private static final float AUTO_OUTTAKING_TIME = 2.0f;
 	private static final int AVERAGE_SIZE = 7;
@@ -43,7 +38,6 @@ public class IntakeFSM {
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax intakeMotor;
-	private DigitalInput breakBeamSwitch;
 
 	private boolean autoIntakingTimerStarted;
 	private double autoIntakingTimerStart;
@@ -70,8 +64,6 @@ public class IntakeFSM {
 										CANSparkMax.MotorType.kBrushless);
 
 		intakeMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-
-		breakBeamSwitch = new DigitalInput(HardwareMap.INPUT_BREAK_BEAM_PORT);
 
 		currLogs = new double[AVERAGE_SIZE];
 		// Reset state machine
@@ -142,12 +134,12 @@ public class IntakeFSM {
 	 */
 	public boolean updateAutonomous(AutoFSMState autoState) {
 		switch (autoState) {
-			case STATE1:
-				return handleAutoState1();
-			case STATE2:
-				return handleAutoState2();
-			case STATE3:
-				return handleAutoState3();
+			case DRIVE_TO_SPEAKER:
+				return handleAutoIdleState();
+			case DRIVE_TO_NOTE:
+				return handleAutoIntakingState();
+			case SHOOT:
+				return handleAutoOuttakingState();
 			default:
 				return true;
 		}
@@ -169,7 +161,7 @@ public class IntakeFSM {
 		}
 		switch (currentState) {
 			case IDLE_STOP:
-				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed() && hasNote()) {
+				if (input.isOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
 					return IntakeFSMState.OUTTAKING;
 				}
 
@@ -178,44 +170,34 @@ public class IntakeFSM {
 					return IntakeFSMState.INTAKING;
 				}
 
-				if (input.isIntakeButtonPressed() == input.isOuttakeButtonPressed()) {
-					return IntakeFSMState.IDLE_STOP;
-				}
+				return IntakeFSMState.IDLE_STOP;
 
 			case INTAKING:
 				if (input.isIntakeButtonPressed() && !input.isOuttakeButtonPressed()
 					&& !hasNote()) {
-					if (intakeTimer.hasElapsed(TIME_RESET_CURRENT)) {
-						currLogs[tick % AVERAGE_SIZE] = intakeMotor.getOutputCurrent();
-						tick++;
-	
-						double avgcone = 0;
-						for (int i = 0; i < AVERAGE_SIZE; i++) {
-							avgcone += currLogs[i];
-						}
-						avgcone /= AVERAGE_SIZE;
-						if (avgcone > CURRENT_THRESHOLD) {
-							holding = true;
-							return IntakeFSMState.IDLE_STOP;
-						} else {
-							holding = false;
-						}
+					currLogs[tick % AVERAGE_SIZE] = intakeMotor.getOutputCurrent();
+					tick++;
+					double avgcone = 0;
+					for (int i = 0; i < AVERAGE_SIZE; i++) {
+						avgcone += currLogs[i];
+					}
+					avgcone /= AVERAGE_SIZE;
+					if (avgcone > CURRENT_THRESHOLD) {
+						holding = true;
+						return IntakeFSMState.IDLE_STOP;
+					} else {
+						holding = false;
 					}
 					return IntakeFSMState.INTAKING;
 				}
 
-				if (!input.isIntakeButtonPressed() || input.isOuttakeButtonPressed()
-					|| hasNote()) {
-					return IntakeFSMState.IDLE_STOP;
-				}
+				return IntakeFSMState.IDLE_STOP;
 			case OUTTAKING:
 				if (!input.isIntakeButtonPressed() && input.isOuttakeButtonPressed()) {
 					return IntakeFSMState.OUTTAKING;
 				}
 
-				if (!input.isOuttakeButtonPressed() || input.isIntakeButtonPressed()) {
-					return IntakeFSMState.IDLE_STOP;
-				}
+				return IntakeFSMState.IDLE_STOP;
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -229,7 +211,11 @@ public class IntakeFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleIdleState(TeleopInput input) {
-		intakeMotor.set(0);
+		if (holding) {
+			intakeMotor.set(HOLDING_POWER);
+		} else {
+			intakeMotor.set(0);
+		}
 	}
 	/**
 	 * Handle behavior in INTAKING.
@@ -249,59 +235,22 @@ public class IntakeFSM {
 		for (int i = 0; i < AVERAGE_SIZE; i++) {
 			currLogs[i] = 0;
 		}
-
+		holding = false;
 		intakeMotor.set(OUTTAKE_POWER);
 	}
 
-	/**
-	 * Performs action for auto STATE1.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState1() {
-		return true;
-	}
-
-	/**
-	 * Performs action for auto STATE2.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState2() {
-		return true;
-	}
-
-	/**
-	 * Performs action for auto STATE3.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState3() {
-		return true;
-	}
 
 	/**
 	 * Performs action for auto Outtaking.
 	 * @return if the action carried out has finished executing
 	 */
 	private boolean handleAutoOuttakingState() {
-
-		if (!autoOuttakingTimerStarted) {
-			autoOuttakingTimerStarted = true;
-			autoOuttakingTimerStart = intakeTimer.get();
+		for (int i = 0; i < AVERAGE_SIZE; i++) {
+			currLogs[i] = 0;
 		}
-
-		if ((autoOuttakingTimerStarted
-			&& !intakeTimer.hasElapsed(autoOuttakingTimerStart + AUTO_OUTTAKING_TIME))
-			|| !breakBeamSwitch.get()) {
-
-			intakeMotor.set(OUTTAKE_POWER);
-		} else {
-			intakeMotor.set(0);
-
-			autoOuttakingTimerStarted = false;
-
-			return true;
-		}
-
-		return false;
+		holding = false;
+		intakeMotor.set(OUTTAKE_POWER);
+		return true;
 	}
 
 	/**
@@ -309,25 +258,18 @@ public class IntakeFSM {
 	 * @return if the action carried out has finished executing
 	 */
 	private boolean handleAutoIntakingState() {
+		intakeMotor.set(INTAKE_POWER);
+		holding = true;
+		return true;
+	}
 
-		if (!autoIntakingTimerStarted) {
-			autoIntakingTimerStarted = true;
-			autoIntakingTimerStart = intakeTimer.get();
-		}
-
-		if ((autoIntakingTimerStarted
-			&& !intakeTimer.hasElapsed(autoIntakingTimerStart + AUTO_INTAKING_TIME))
-			|| !breakBeamSwitch.get()) {
-			intakeMotor.set(INTAKE_POWER);
+	private boolean handleAutoIdleState() {
+		if (holding) {
+			intakeMotor.set(HOLDING_POWER);
 		} else {
 			intakeMotor.set(0);
-
-			autoIntakingTimerStarted = false;
-
-			return true;
 		}
-
-		return false;
+		return true;
 	}
 
 	private boolean hasNote() {
