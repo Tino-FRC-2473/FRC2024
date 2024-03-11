@@ -1,5 +1,7 @@
 package frc.robot.systems;
 
+import java.util.spi.CurrencyNameProvider;
+
 // WPILib Imports
 
 // Third party Hardware Imports
@@ -13,6 +15,8 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Robot Imports
@@ -35,13 +39,13 @@ public class PivotFSM {
 	}
 
 	private static final float MANUAL_POWER = 0.25f;
-	private static final double MIN_TURN_SPEED = -5.0;
-	private static final double MAX_TURN_SPEED = 5.0;
+	private static final double MIN_TURN_SPEED = -0.5;
+	private static final double MAX_TURN_SPEED = 0.5;
 
 	private static final double MAX_VELOCITY = 5;
 	private static final double MAX_ACCEL = 10;
 
-	private static final double PID_CONSTANT_PIVOT_P = 0.001;
+	private static final double PID_CONSTANT_PIVOT_P = 1;
 	private static final double PID_CONSTANT_PIVOT_I = 0.001;
 	private static final double PID_CONSTANT_PIVOT_D = 0.001;
 
@@ -52,14 +56,14 @@ public class PivotFSM {
 	private static final double PID_GRAVITY_CONSTANT = 0.25;
 
 
-	private static final double JOYSTICK_DEAD_ZONE = 0.15;
-	private static final double MIN_ENCODER_ROTATIONS = -1;
-	private static final double MAX_ENCODER_ROTATIONS = 80;
-	private static final double GROUND_ENCODER_ROTATIONS = 50;
-	private static final double AMP_ENCODER_ROTATIONS = 30;
-	private static final double SOURCE_ENCODER_ROTATIONS = 25;
-	private static final double SHOOTER_ENCODER_ROTATIONS = 5;
-	private static final double INRANGE_VALUE = 0.5;
+	private static final double JOYSTICK_DEAD_ZONE = 0.05;
+	private static final double MIN_ENCODER_ROTATIONS = -0.7;
+	private static final double MAX_ENCODER_ROTATIONS = 0;
+	private static final double GROUND_ENCODER_ROTATIONS = -0.7;
+	private static final double AMP_ENCODER_ROTATIONS = -0.3;
+	private static final double SOURCE_ENCODER_ROTATIONS = -0.2;
+	private static final double SHOOTER_ENCODER_ROTATIONS = -0.05;
+	private static final double INRANGE_VALUE = 0.005;
 	private static final double JOYSTICK_SCALING_CONSTANT = 0.4;
 
 
@@ -91,7 +95,8 @@ public class PivotFSM {
 
 	private boolean hasTimerStarted = false;
 
-
+	private DutyCycleEncoder throughBore;
+	private double correction;
 
 
 	/* ======================== Constructor ======================== */
@@ -118,16 +123,17 @@ public class PivotFSM {
 		pidPivotController.setD(PID_CONSTANT_PIVOT_D);
 		pidPivotController.setOutputRange(MIN_TURN_SPEED, MAX_TURN_SPEED);*/
 
-		mAlternateEncoder = pivotMotor.getAlternateEncoder(K_TYPE, K_CPR);
+		//mAlternateEncoder = pivotMotor.getAlternateEncoder(K_TYPE, K_CPR);
 
+		throughBore = new DutyCycleEncoder(0);
+		throughBore.reset();
+	
 		pidPivotController = new ProfiledPIDController(PID_CONSTANT_PIVOT_P,
 			PID_CONSTANT_PIVOT_I, PID_CONSTANT_PIVOT_D,
 			new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL));
 
 		pivotFeedforward = new ArmFeedforward(PID_STATIC_CONSTANT,
 			PID_GRAVITY_CONSTANT, PID_VOLTAGE_CONSTANT);
-
-		pivotMotor.getEncoder().setPosition(0);
 
 		currentEncoder = 0;
 
@@ -174,7 +180,7 @@ public class PivotFSM {
 		}
 
 		if (currentState != PivotFSMState.IDLE_STOP) {
-			currentEncoder = pivotMotor.getEncoder().getPosition();
+			currentEncoder = throughBore.getDistance();
 		}
 
 		if (input == null) {
@@ -197,7 +203,9 @@ public class PivotFSM {
 			pidPivotController.getSetpoint().velocity - lastSpeed);
 		SmartDashboard.putNumber("time diff", currentTime - lastLoopTime);
 		//SmartDashboard.putNumber("voltage", pivotMotor.getAppliedOutput());
-		SmartDashboard.putNumber("Thru Bore Encoder values", mAlternateEncoder.getPosition());
+		SmartDashboard.putNumber("Thru Bore Encoder values", throughBore.getDistance());
+		SmartDashboard.putNumber("CURRENTENCODER", currentEncoder);
+		SmartDashboard.putNumber("sssss", correction);
 
 		switch (currentState) {
 			case IDLE_STOP:
@@ -277,10 +285,16 @@ public class PivotFSM {
 				if (!zeroed && !lastLimitHit && !input.isAbortButtonPressed()) {
 					return PivotFSMState.ZEROING;
 				} else if (currentEncoder > MIN_ENCODER_ROTATIONS
-					&& input.getMechControllerLeftY() < -JOYSTICK_DEAD_ZONE) {
+					&& input.getMechControllerLeftY() > JOYSTICK_DEAD_ZONE) {
+					throughBore.reset();
+					throughBore.setPositionOffset(currentEncoder);
+
 					return PivotFSMState.MANUAL_IN;
 				} else if (currentEncoder <= MAX_ENCODER_ROTATIONS
 					&& input.getMechControllerLeftY() > JOYSTICK_DEAD_ZONE) {
+					throughBore.reset();
+					throughBore.setPositionOffset(currentEncoder);
+
 					return PivotFSMState.MANUAL_OUT;
 				} else if (input.isGroundArmButtonPressed()
 					&& !inRange(currentEncoder, GROUND_ENCODER_ROTATIONS)) {
@@ -371,7 +385,8 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleIdleState(TeleopInput input) {
-		pivotMotor.set(0);
+		pivotMotor.set(pid(throughBore.getDistance(), currentEncoder));
+
 		lastLoopTime = currentTime;
 	}
 	/**
@@ -380,7 +395,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleShooterState(TeleopInput input) {
-		pidToPosition(SHOOTER_ENCODER_ROTATIONS);
+		pid(currentEncoder, SHOOTER_ENCODER_ROTATIONS);
 	}
 
 	/**
@@ -389,7 +404,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleAmpState(TeleopInput input) {
-		pidToPosition(AMP_ENCODER_ROTATIONS);
+		pid(currentEncoder, AMP_ENCODER_ROTATIONS);
 	}
 
 	/**
@@ -398,7 +413,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleGroundState(TeleopInput input) {
-		pidToPosition(GROUND_ENCODER_ROTATIONS);
+		pid(currentEncoder, GROUND_ENCODER_ROTATIONS);
 	}
 
 	/**
@@ -407,7 +422,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleSourceState(TeleopInput input) {
-		pidToPosition(SOURCE_ENCODER_ROTATIONS);
+		pid(currentEncoder, SOURCE_ENCODER_ROTATIONS);
 	}
 
 	/**
@@ -421,7 +436,8 @@ public class PivotFSM {
 		if (lastLimitHit && !zeroed) {
 			zeroed = true;
 			currentEncoder = 0;
-			pivotMotor.getEncoder().setPosition(0);
+			throughBore.reset();
+			pivotMotor.set(0);
 		}
 	}
 
@@ -517,7 +533,7 @@ public class PivotFSM {
 
 
 	private double pid(double currentEncoderPID, double targetEncoder) {
-		double correction = PID_CONSTANT_PIVOT_P * (targetEncoder - currentEncoder);
-		return Math.min(MAX_TURN_SPEED, Math.max(MIN_TURN_SPEED, correction));
+		correction = PID_CONSTANT_PIVOT_P * (targetEncoder - currentEncoderPID);
+		return -Math.min(MAX_TURN_SPEED, Math.max(MIN_TURN_SPEED, correction));
 	}
 }

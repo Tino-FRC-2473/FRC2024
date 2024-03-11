@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
 import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
-import frc.robot.systems.FSMSystem.FSMState;
 
 public class IntakeFSM {
 	/* ======================== Constants ======================== */
