@@ -18,10 +18,11 @@ public class AutoPathChooser {
 	public AutoPathChooser() {
 		autoPathChooser = new SendableChooser<>();
 		autoPathChooser.setDefaultOption("Score and Leave", AutoPath.PATH1);
-		autoPathChooser.addOption("MBR ONLY: Score Multiple Times", AutoPath.PATH2);
-		autoPathChooser.addOption("Score Only", AutoPath.PATH3);
-		autoPathChooser.addOption("Auto Destroyer", AutoPath.PATH4);
-		autoPathChooser.addOption("No Shoot Auto Destroyer", AutoPath.PATH5);
+		autoPathChooser.addOption("3 Close, 1 Far", AutoPath.PATH2);
+		autoPathChooser.addOption("2 Close and 2 Far", AutoPath.PATH3);
+		autoPathChooser.addOption("1 Close and 3 Far", AutoPath.PATH4);
+		autoPathChooser.addOption("Auto Destroyer (source side)", AutoPath.PATH5);
+		autoPathChooser.addOption("Nothing", AutoPath.PATH6);
 		SmartDashboard.putData("Auto Path", autoPathChooser);
 
 		allianceChooser = new SendableChooser<>();
@@ -30,11 +31,9 @@ public class AutoPathChooser {
 		SmartDashboard.putData("Alliance", allianceChooser);
 
 		startingPosChooser = new SendableChooser<>();
-		startingPosChooser.setDefaultOption("Speaker (center)", 0);
-		startingPosChooser.addOption("Speaker (source side)", 1);
-		startingPosChooser.addOption("Speaker (amp side)", 2);
-		startingPosChooser.addOption("Amp", 2 + 1);
-		startingPosChooser.addOption("Other", 2 + 2);
+		startingPosChooser.setDefaultOption("Center Speaker", 0);
+		startingPosChooser.addOption("Source Side Speaker", 1);
+		startingPosChooser.addOption("Amp Side Speaker", 2);
 		SmartDashboard.putData("Starting Position", startingPosChooser);
 
 		mechChooser = new SendableChooser<>();

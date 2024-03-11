@@ -11,6 +11,8 @@ public class AutoHandlerSystem {
 		PICK_UP_2,
 		PICK_UP_3,
 		PICK_UP_4,
+		PICK_UP_5,
+		PICK_UP_6,
 		SHOOTER_STATE,
 		PENDING,
 		SHOOTER_STATE_FAST,
@@ -19,10 +21,11 @@ public class AutoHandlerSystem {
 
 	public enum AutoPath {
 		PATH1, // score and leave
-		PATH2, // score multiple times
-		PATH3, // tbd emergency path
+		PATH2,
+		PATH3,
 		PATH4,
-		PATH5
+		PATH5,
+		PATH6
 	}
 
 	/* ======================== Private variables ======================== */
@@ -47,13 +50,22 @@ public class AutoHandlerSystem {
 		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_3,
 		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_4};
 
-	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{AutoFSMState.DRIVE_TO_SCORE,
-		AutoFSMState.SHOOTER_STATE};
+	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_1,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_2,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_4,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_5};
 
-	private static final AutoFSMState[] PATH4 = new AutoFSMState[]{AutoFSMState.DRIVE_TO_SCORE,
+	private static final AutoFSMState[] PATH4 = new AutoFSMState[]{
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_1,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_4,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_5,
+		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_6};
+
+	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{AutoFSMState.DRIVE_TO_SCORE,
 		AutoFSMState.SHOOTER_STATE_FAST, AutoFSMState.RUN_OVER_NOTES};
 
-	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{AutoFSMState.RUN_OVER_NOTES};
+	private static final AutoFSMState[] PATH6 = new AutoFSMState[]{};
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -99,6 +111,8 @@ public class AutoHandlerSystem {
 			currentStateList = PATH4;
 		} else if (path == AutoPath.PATH5) {
 			currentStateList = PATH5;
+		} else if (path == AutoPath.PATH6) {
+			currentStateList = PATH6;
 		}
 		currentStateIndex = 0;
 	}
@@ -136,6 +150,14 @@ public class AutoHandlerSystem {
 			case PICK_UP_4:
 				isCurrentStateFinished = driveSystem.updateAutonomous(
 					AutoFSMState.PICK_UP_4);
+				break;
+			case PICK_UP_5:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.PICK_UP_5);
+				break;
+			case PICK_UP_6:
+				isCurrentStateFinished = driveSystem.updateAutonomous(
+					AutoFSMState.PICK_UP_6);
 				break;
 			case SHOOTER_STATE:
 				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE);
