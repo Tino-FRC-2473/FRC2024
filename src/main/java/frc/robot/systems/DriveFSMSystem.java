@@ -700,7 +700,8 @@ public class DriveFSMSystem {
 	public boolean driveToPose(Pose2d pose) {
 		double x = pose.getX();
 		double y = (blueAlliance ? pose.getY() : -pose.getY());
-		double angle = (blueAlliance ? pose.getRotation().getDegrees() : -pose.getRotation().getDegrees());
+		double angle = (blueAlliance ? pose.getRotation().getDegrees()
+			: -pose.getRotation().getDegrees());
 
 		double xDiff = x - getPose().getX();
 		double yDiff = y - getPose().getY();
@@ -755,10 +756,17 @@ public class DriveFSMSystem {
 		return false;
 	}
 
+	/**
+	 * Drives the robot to a final odometry state faster than driveToPose(),
+	 * and possibly less precise.
+	 * @param pose final odometry position for the robot
+	 * @return if the robot has driven to the current position
+	 */
 	public boolean driveToPoseFast(Pose2d pose) {
 		double x = pose.getX();
 		double y = (blueAlliance ? pose.getY() : -pose.getY());
-		double angle = (blueAlliance ? pose.getRotation().getDegrees() : -pose.getRotation().getDegrees());
+		double angle = (blueAlliance ? pose.getRotation().getDegrees()
+			: -pose.getRotation().getDegrees());
 
 		double xDiff = x - getPose().getX();
 		double yDiff = y - getPose().getY();
@@ -776,7 +784,8 @@ public class DriveFSMSystem {
 		double ySpeed;
 		if (Math.abs(xDiff) > Math.abs(yDiff)) {
 			xSpeed = clamp(xDiff / AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT,
-			-AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST, AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST);
+			-AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST,
+			AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST);
 			ySpeed = xSpeed * (yDiff / xDiff);
 			if (Math.abs(xDiff) < AutoConstants.CONSTANT_SPEED_THRESHOLD && Math.abs(yDiff)
 				< AutoConstants.CONSTANT_SPEED_THRESHOLD) {
@@ -786,7 +795,8 @@ public class DriveFSMSystem {
 			}
 		} else {
 			ySpeed = clamp(yDiff / AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT,
-			-AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST, AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST);
+			-AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST,
+			AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST);
 			xSpeed = ySpeed * (xDiff / yDiff);
 			if (Math.abs(xDiff) < AutoConstants.CONSTANT_SPEED_THRESHOLD && Math.abs(yDiff)
 				< AutoConstants.CONSTANT_SPEED_THRESHOLD) {
@@ -829,6 +839,12 @@ public class DriveFSMSystem {
 		return false;
 	}
 
+	/**
+	 * Drives the robot through a series of points faster than driveToPose(),
+	 * and possibly less precise.
+	 * @param points arraylist of points to drive to
+	 * @return if the robot has driven to the next position
+	 */
 	public boolean driveAlongPathFast(ArrayList<Pose2d> points) {
 		if (currentPointInPath >= points.size()) {
 			drive(0, 0, 0, true, false);

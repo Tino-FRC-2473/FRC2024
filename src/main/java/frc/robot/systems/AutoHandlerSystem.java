@@ -144,7 +144,8 @@ public class AutoHandlerSystem {
 				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.PENDING);
 				break;
 			case SHOOTER_STATE_FAST:
-				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_FAST);
+				isCurrentStateFinished =
+					shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_FAST);
 				break;
 			case RUN_OVER_NOTES:
 				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.RUN_OVER_NOTES);

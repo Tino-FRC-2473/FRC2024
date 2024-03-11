@@ -167,6 +167,12 @@ public class TeleopInput {
 	public boolean synchClimberTrigger() {
 		return mechController.getCrossButton();
 	}
+
+	/**
+	 * Get the value of the override intake button.
+	 * Use with CAUTION. This should only be used when the normal intake button doesn't work.
+	 * @return True if button is pressed
+	 */
 	public boolean overrideIntakeButton() {
 		return mechController.getSquareButton();
 	}

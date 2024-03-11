@@ -29,6 +29,8 @@ public class KitBotShooterFSM {
 	private static final float INTAKING_SPEED = -0.4f;
 	private static final float OUTTAKING_TIME = 2.5f;
 	private static final float REV_OUTTAKING_TIME = 1.5f;
+	private static final float OUTTAKING_TIME_FAST = 1.5f;
+	private static final float REV_OUTTAKING_TIME_FAST = 0.75f;
 
 	/* ======================== Private variables ======================== */
 	private ShooterFSMState currentState;
@@ -169,7 +171,8 @@ public class KitBotShooterFSM {
 					&& !input.isRevOuttakeButtonPressed() && !input.overrideIntakeButton()) {
 					return ShooterFSMState.INTAKING;
 				}
-				if (input.overrideIntakeButton() && !input.isShootButtonPressed() && !input.isRevOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+				if (input.overrideIntakeButton() && !input.isShootButtonPressed()
+					&& !input.isRevOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
 					return ShooterFSMState.OVERRIDE_INTAKE;
 				}
 				return ShooterFSMState.IDLE_STOP;
@@ -189,7 +192,8 @@ public class KitBotShooterFSM {
 					return ShooterFSMState.IDLE_STOP;
 				}
 			case OVERRIDE_INTAKE:
-				if (input.overrideIntakeButton() && !input.isShootButtonPressed() && !input.isRevOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+				if (input.overrideIntakeButton() && !input.isShootButtonPressed()
+					&& !input.isRevOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
 					return ShooterFSMState.OVERRIDE_INTAKE;
 				} else {
 					return ShooterFSMState.IDLE_STOP;
@@ -268,9 +272,9 @@ public class KitBotShooterFSM {
 			outtakingTimerStart = timer.get();
 		}
 		if (autoOuttakingTimerStarted
-			&& !timer.hasElapsed(outtakingTimerStart + 1.5)) {
+			&& !timer.hasElapsed(outtakingTimerStart + OUTTAKING_TIME_FAST)) {
 			highMotor.set(SPEAKER_U_MOTOR_RUN_POWER);
-			if (timer.hasElapsed(outtakingTimerStart + 0.75)) {
+			if (timer.hasElapsed(outtakingTimerStart + REV_OUTTAKING_TIME_FAST)) {
 				lowMotor.set(SPEAKER_L_MOTOR_RUN_POWER);
 			} else {
 				lowMotor.set(0);
