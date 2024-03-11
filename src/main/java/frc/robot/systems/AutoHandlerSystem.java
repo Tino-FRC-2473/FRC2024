@@ -12,13 +12,17 @@ public class AutoHandlerSystem {
 		PICK_UP_3,
 		PICK_UP_4,
 		SHOOTER_STATE,
-		PENDING
+		PENDING,
+		SHOOTER_STATE_FAST,
+		RUN_OVER_NOTES
 	}
 
 	public enum AutoPath {
 		PATH1, // score and leave
 		PATH2, // score multiple times
-		PATH3 // tbd emergency path
+		PATH3, // tbd emergency path
+		PATH4,
+		PATH5
 	}
 
 	/* ======================== Private variables ======================== */
@@ -43,7 +47,13 @@ public class AutoHandlerSystem {
 		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_3,
 		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_4};
 
-	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{AutoFSMState.SHOOTER_STATE};
+	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{AutoFSMState.DRIVE_TO_SCORE,
+		AutoFSMState.SHOOTER_STATE};
+
+	private static final AutoFSMState[] PATH4 = new AutoFSMState[]{AutoFSMState.DRIVE_TO_SCORE,
+		AutoFSMState.SHOOTER_STATE_FAST, AutoFSMState.RUN_OVER_NOTES};
+
+	private static final AutoFSMState[] PATH5 = new AutoFSMState[]{AutoFSMState.RUN_OVER_NOTES};
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -85,6 +95,10 @@ public class AutoHandlerSystem {
 			currentStateList = PATH2;
 		} else if (path == AutoPath.PATH3) {
 			currentStateList = PATH3;
+		} else if (path == AutoPath.PATH4) {
+			currentStateList = PATH4;
+		} else if (path == AutoPath.PATH5) {
+			currentStateList = PATH5;
 		}
 		currentStateIndex = 0;
 	}
@@ -128,6 +142,13 @@ public class AutoHandlerSystem {
 				break;
 			case PENDING:
 				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.PENDING);
+				break;
+			case SHOOTER_STATE_FAST:
+				isCurrentStateFinished =
+					shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_FAST);
+				break;
+			case RUN_OVER_NOTES:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.RUN_OVER_NOTES);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());

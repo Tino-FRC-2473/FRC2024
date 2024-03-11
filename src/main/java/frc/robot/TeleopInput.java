@@ -125,7 +125,7 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isShootButtonPressed() {
-		return mechController.getR2Button();
+		return mechController.getTriangleButton();
 	}
 
 	/**
@@ -133,15 +133,47 @@ public class TeleopInput {
 	 * @return True if button is pressed
 	 */
 	public boolean isRevOuttakeButtonPressed() {
-		return mechController.getL2Button();
+		return mechController.getL1Button();
 	}
 
 	/**
-	 * Get the value of the retract button.
+	 * Get the value of the left climber trigger.
 	 * @return True if button is pressed
 	 */
-	public boolean isRetractClimberButtonPressed() {
+	public double leftClimberTrigger() {
+		return mechController.getL2Axis();
+	}
+
+	/**
+	 * Get the value of the right climber trigger.
+	 * @return True if button is pressed
+	 */
+	public double rightClimberTrigger() {
+		return mechController.getR2Axis();
+	}
+
+	/**
+	 * Get the value of the toggle cam button.
+	 * @return True if button is pressed
+	 */
+	public boolean chainChamToggleButton() {
+		return driverController.getR1ButtonPressed();
+	}
+
+	/**
+	 * Get the value of the synched climber button.
+	 * @return True if button is pressed
+	 */
+	public boolean synchClimberTrigger() {
 		return mechController.getCrossButton();
 	}
 
+	/**
+	 * Get the value of the override intake button.
+	 * Use with CAUTION. This should only be used when the normal intake button doesn't work.
+	 * @return True if button is pressed
+	 */
+	public boolean overrideIntakeButton() {
+		return mechController.getSquareButton();
+	}
 }

@@ -21,12 +21,17 @@ public class KitBotShooterFSM {
 		IDLE_STOP,
 		INTAKING,
 		OUTTAKING_SPEAKER,
+		OVERRIDE_INTAKE
+
 	}
 
 	private static final float SPEAKER_L_MOTOR_RUN_POWER = 0.8f;
 	private static final float SPEAKER_U_MOTOR_RUN_POWER = -1.0f;
 	private static final float INTAKING_SPEED = -0.4f;
-	private static final float OUTTAKING_TIME = 2.0f;
+	private static final float OUTTAKING_TIME = 2.5f;
+	private static final float REV_OUTTAKING_TIME = 1.5f;
+	private static final float OUTTAKING_TIME_FAST = 1.5f;
+	private static final float REV_OUTTAKING_TIME_FAST = 0.75f;
 
 	/* ======================== Private variables ======================== */
 	private ShooterFSMState currentState;
@@ -115,14 +120,14 @@ public class KitBotShooterFSM {
 			case OUTTAKING_SPEAKER:
 				handleShootSpeakerState(input);
 				break;
+			case OVERRIDE_INTAKE:
+				handleOverrideIntakingState(input);
+				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-		SmartDashboard.putString("Current State", currentState.toString());
-		SmartDashboard.putBoolean("Bottom Limit Switch Pressed", bottomLimitSwitch.isPressed());
-		SmartDashboard.putBoolean("Intake Button Pressed", input.isIntakeButtonPressed());
-		SmartDashboard.putNumber("Motor Speed", highMotor.get());
-		SmartDashboard.putNumber("Get applied output", highMotor.getAppliedOutput());
+		SmartDashboard.putString("Shooter State", currentState.toString());
+		SmartDashboard.putBoolean("Shooter Limit Pressed", bottomLimitSwitch.isPressed());
 		currentState = nextState(input);
 	}
 
@@ -135,6 +140,8 @@ public class KitBotShooterFSM {
 		switch (autoState) {
 			case SHOOTER_STATE:
 				return handleAutoOuttakingState();
+			case SHOOTER_STATE_FAST:
+				return handleAutoOuttakeFastState();
 			default:
 				return true;
 		}
@@ -157,27 +164,38 @@ public class KitBotShooterFSM {
 		switch (currentState) {
 			case IDLE_STOP:
 				if ((input.isShootButtonPressed() || input.isRevOuttakeButtonPressed())
-					&& !input.isIntakeButtonPressed()) {
+					&& !input.isIntakeButtonPressed() && !input.overrideIntakeButton()) {
 					return ShooterFSMState.OUTTAKING_SPEAKER;
 				}
 				if (input.isIntakeButtonPressed() && !hasNote()
 					&& !input.isShootButtonPressed()
-					&& !input.isRevOuttakeButtonPressed()) {
+					&& !input.isRevOuttakeButtonPressed() && !input.overrideIntakeButton()) {
 					return ShooterFSMState.INTAKING;
+				}
+				if (input.overrideIntakeButton() && !input.isShootButtonPressed()
+					&& !input.isRevOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+					return ShooterFSMState.OVERRIDE_INTAKE;
 				}
 				return ShooterFSMState.IDLE_STOP;
 			case INTAKING:
 				if (input.isIntakeButtonPressed() && !hasNote()
 					&& !input.isShootButtonPressed()
-					&& !input.isRevOuttakeButtonPressed()) {
+					&& !input.isRevOuttakeButtonPressed() && !input.overrideIntakeButton()) {
 					return ShooterFSMState.INTAKING;
 				} else {
 					return ShooterFSMState.IDLE_STOP;
 				}
 			case OUTTAKING_SPEAKER:
 				if ((input.isShootButtonPressed() || input.isRevOuttakeButtonPressed())
-					&& !input.isIntakeButtonPressed()) {
+					&& !input.isIntakeButtonPressed() && !input.overrideIntakeButton()) {
 					return ShooterFSMState.OUTTAKING_SPEAKER;
+				} else {
+					return ShooterFSMState.IDLE_STOP;
+				}
+			case OVERRIDE_INTAKE:
+				if (input.overrideIntakeButton() && !input.isShootButtonPressed()
+					&& !input.isRevOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+					return ShooterFSMState.OVERRIDE_INTAKE;
 				} else {
 					return ShooterFSMState.IDLE_STOP;
 				}
@@ -232,7 +250,32 @@ public class KitBotShooterFSM {
 		if (autoOuttakingTimerStarted
 			&& !timer.hasElapsed(outtakingTimerStart + OUTTAKING_TIME)) {
 			highMotor.set(SPEAKER_U_MOTOR_RUN_POWER);
-			if (timer.hasElapsed(outtakingTimerStart + (OUTTAKING_TIME / 2))) {
+			if (timer.hasElapsed(outtakingTimerStart + REV_OUTTAKING_TIME)) {
+				lowMotor.set(SPEAKER_L_MOTOR_RUN_POWER);
+			} else {
+				lowMotor.set(0);
+			}
+
+		} else {
+			lowMotor.set(0);
+			highMotor.set(0);
+
+			autoOuttakingTimerStarted = false;
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean handleAutoOuttakeFastState() {
+		if (!autoOuttakingTimerStarted) {
+			autoOuttakingTimerStarted = true;
+			outtakingTimerStart = timer.get();
+		}
+		if (autoOuttakingTimerStarted
+			&& !timer.hasElapsed(outtakingTimerStart + OUTTAKING_TIME_FAST)) {
+			highMotor.set(SPEAKER_U_MOTOR_RUN_POWER);
+			if (timer.hasElapsed(outtakingTimerStart + REV_OUTTAKING_TIME_FAST)) {
 				lowMotor.set(SPEAKER_L_MOTOR_RUN_POWER);
 			} else {
 				lowMotor.set(0);
@@ -253,4 +296,8 @@ public class KitBotShooterFSM {
 		return bottomLimitSwitch.isPressed();
 	}
 
+	private void handleOverrideIntakingState(TeleopInput input) {
+		lowMotor.set(INTAKING_SPEED);
+		highMotor.set(-INTAKING_SPEED);
+	}
 }

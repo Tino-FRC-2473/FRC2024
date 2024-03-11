@@ -9,6 +9,7 @@ import frc.robot.SwerveConstants.VisionConstants;
 
 public class RaspberryPI {
 	private double fps = 0;
+	private NetworkTableInstance inst;
 	private NetworkTable table;
 
 	private DoubleSubscriber fpsCounter;
@@ -21,7 +22,9 @@ public class RaspberryPI {
 	/**Updates the FPS each iteration of the robot.*/
 	public RaspberryPI() {
 		timer.start();
-		table = NetworkTableInstance.getDefault().getTable("datatable");
+		inst = NetworkTableInstance.getDefault();
+		//inst.startServer();
+		table = inst.getTable("datatable");
 		fpsCounter = table.getDoubleTopic("x").subscribe(-1);
 		tagSubscriber = table.getDoubleArrayTopic("april_tag_data").subscribe(null);
 	}
