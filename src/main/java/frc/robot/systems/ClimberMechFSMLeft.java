@@ -105,6 +105,8 @@ public class ClimberMechFSMLeft {
 		SmartDashboard.putBoolean("Left Climber Limit Pressed", peakLimitSwitchHit());
 
 		currentState = nextState(input);
+		SmartDashboard.putNumber("left output", motor.getAppliedOutput());
+		SmartDashboard.putNumber("left motor applied", motor.get());
 	}
 
 	/**

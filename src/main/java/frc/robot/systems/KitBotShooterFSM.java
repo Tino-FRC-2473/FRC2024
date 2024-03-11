@@ -22,6 +22,7 @@ public class KitBotShooterFSM {
 		INTAKING,
 		OUTTAKING_SPEAKER,
 		OVERRIDE_INTAKE
+
 	}
 
 	private static final float SPEAKER_L_MOTOR_RUN_POWER = 0.8f;

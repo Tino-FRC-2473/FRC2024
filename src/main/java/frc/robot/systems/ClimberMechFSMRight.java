@@ -23,6 +23,7 @@ public class ClimberMechFSMRight {
 	private static final float MOTOR_RUN_POWER = 0.3f;
 	private static final float SYNCH_MOTOR_POWER = 0.25f;
 	public static final double TRIGGER_DEADZONE = 0.05;
+
 	private boolean limitPressed = false;
 
 	/* ======================== Private variables ======================== */
