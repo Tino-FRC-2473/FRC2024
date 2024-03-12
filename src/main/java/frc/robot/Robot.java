@@ -11,13 +11,14 @@ import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Systems
 import frc.robot.systems.DriveFSMSystem;
 import frc.robot.systems.KitBotShooterFSM;
+import frc.robot.SwerveConstants.AutoConstants;
 import frc.robot.systems.AutoHandlerSystem;
 import frc.robot.systems.ClimberMechFSMLeft;
 import frc.robot.systems.ClimberMechFSMRight;
-import frc.robot.systems.AutoHandlerSystem.AutoPath;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -79,10 +80,22 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		AutoPath path = AutoPath.PATH1;
+		String path = "PROT";
 		if (AutoPathChooser.getSelectedPath() != null) {
 			path = AutoPathChooser.getSelectedPath();
 		}
+		String placement = "SWCT";
+		if (AutoPathChooser.getSelectedPlacement() != null) {
+			placement = AutoPathChooser.getSelectedPlacement();
+		}
+		String notes = "";
+		for (int i = 0; i < AutoConstants.N_5; i++) {
+			if (AutoPathChooser.getSelectedNote(i) != 0) {
+				notes += AutoPathChooser.getSelectedNote(i);
+			}
+		}
+		path += "_" + placement + "_" + notes;
+		SmartDashboard.putString("AUTO PATH", path);
 		autoHandler.reset(path);
 	}
 

@@ -4,6 +4,7 @@ package frc.robot.systems;
 import com.kauailabs.navx.frc.AHRS;
 import java.util.ArrayList;
 //import com.revrobotics.CANSparkMax;
+import java.util.HashMap;
 
 // WPILib Imports
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -46,10 +47,18 @@ public class DriveFSMSystem {
 	/* ======================== Private variables ======================== */
 	private FSMState currentState;
 	private int currentPointInPath;
-	private boolean blueAlliance;
 	private Double[] tagOrientationAngles;
-	private int startingPos;
-	private boolean svrMech;
+	// private int startingPos;
+	// private boolean svrMech;
+
+	private boolean blueAlliance;
+	private int multiplyer;
+	private String path;
+	private String placement;
+	private ArrayList<Integer> notes;
+
+	private HashMap<String, Double> xOffsets;
+	private HashMap<String, Double> yOffsets;
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -118,6 +127,15 @@ public class DriveFSMSystem {
 	 * the constructor is called only once when the robot boots.
 	 */
 	public DriveFSMSystem() {
+		notes = new ArrayList<>();
+		xOffsets = new HashMap<>();
+		xOffsets.put("SWSR", -AutoConstants.N_0_5);
+		xOffsets.put("SWCT", (double) 0);
+		xOffsets.put("SWAM", -AutoConstants.N_0_5);
+		yOffsets = new HashMap<>();
+		yOffsets.put("SWSR", (double) 1);
+		yOffsets.put("SWCT", (double) 0);
+		yOffsets.put("SWAM", (double) -1);
 		gyro = new AHRS(SPI.Port.kMXP);
 		// Reset state machine
 		reset();
@@ -175,6 +193,7 @@ public class DriveFSMSystem {
 		resetOdometry(new Pose2d());
 		if (AutoPathChooser.getAllianceChooser() != null) {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
+
 		} else {
 			blueAlliance = true;
 		}
@@ -216,21 +235,48 @@ public class DriveFSMSystem {
 		led.turnOff();
 		currentPointInPath = 0;
 		gyro.reset();
-		resetOdometry(new Pose2d());
-		if (AutoPathChooser.getMechChooser() != null) {
-			svrMech = AutoPathChooser.getSelectedMech();
-		} else {
-			svrMech = true;
+		if (placement.equals("SWCT")) {
+			resetOdometry(new Pose2d());
+		} else if (placement.equals("SWSR")) {
+			resetOdometry(new Pose2d(0, 0,
+				new Rotation2d(Math.toRadians(AutoConstants.DEG_55 * multiplyer))));
+		} else if (placement.equals("SWAM")) {
+			resetOdometry(new Pose2d(0, 0,
+				new Rotation2d(Math.toRadians(-AutoConstants.DEG_55 * multiplyer))));
 		}
+		/* --------------------------- SVR --------------------------- */
+		// if (AutoPathChooser.getMechChooser() != null) {
+		// 	svrMech = AutoPathChooser.getSelectedMech();
+		// } else {
+		// 	svrMech = true;
+		// }
+		// if (AutoPathChooser.getStartPosChooser() != null) {
+		// 	startingPos = AutoPathChooser.getStartingPos();
+		// } else {
+		// 	startingPos = 1;
+		// }
+		/* --------------------------- SVR --------------------------- */
 		if (AutoPathChooser.getAllianceChooser() != null) {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
+			multiplyer = (blueAlliance ? -1 : 1);
 		} else {
 			blueAlliance = true;
+			multiplyer = -1;
 		}
-		if (AutoPathChooser.getStartPosChooser() != null) {
-			startingPos = AutoPathChooser.getStartingPos();
+		if (AutoPathChooser.getPathChooser() != null) {
+			path = AutoPathChooser.getSelectedPath();
 		} else {
-			startingPos = 1;
+			path = null;
+		}
+		if (AutoPathChooser.getPlacementChooser() != null) {
+			placement = AutoPathChooser.getSelectedPlacement();
+		} else {
+			placement = null;
+		}
+		for (int i = 0; i < AutoConstants.N_5; i++) {
+			if (AutoPathChooser.getNoteChooser(i) != null) {
+				notes.add(AutoPathChooser.getSelectedNote(i));
+			}
 		}
 		if (blueAlliance) {
 			tagOrientationAngles = new Double[]
@@ -273,136 +319,230 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("Heading", getPose().getRotation().getDegrees());
 
 		switch (autoState) {
-			case LEAVE:
-				ArrayList<Pose2d> leave = new ArrayList<Pose2d>();
-				if (startingPos == 0) { // center
-					leave.add(new Pose2d(-1, AutoConstants.N_3,
-						new Rotation2d(Math.toRadians(0))));
-					leave.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_5,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					leave.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
-				} else if (startingPos == 1) { // source side speaker
-					leave.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_4,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					leave.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_4,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
-				} else if (startingPos == 2 || startingPos == 2 + 1) { // amp side speaker
-					leave.add(new Pose2d(-AutoConstants.N_5_5, 0,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					leave.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
-				} else if (startingPos == 2 + 2) { // other (leave in a straight line)
-					leave.add(new Pose2d(-AutoConstants.N_6, 0,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
-				} else {
-					leave.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-				}
-				return driveAlongPath(leave);
-			case DRIVE_TO_SCORE:
-				ArrayList<Pose2d> toScore = new ArrayList<Pose2d>();
-				if (startingPos == 1) {
-					toScore.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
-				} else if (startingPos == 2) {
-					toScore.add(new Pose2d(0, 0,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
-				} else if (startingPos == 2 + 1) {
-					toScore.add(new Pose2d(-AutoConstants.N_0_5, -1,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-				} else {
-					toScore.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-				}
-				return driveAlongPath(toScore);
-			case PICK_UP_1:
-				ArrayList<Pose2d> pickUp1 = new ArrayList<Pose2d>();
-				if (startingPos == 0) {
-					pickUp1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
-				} else if (startingPos == 1) {
-					pickUp1.add(new Pose2d(-1, AutoConstants.N_0_5, new Rotation2d(
-						Math.toRadians(0))));
-				} else if (startingPos == 2) {
-					pickUp1.add(new Pose2d(-1, -AutoConstants.N_0_5, new Rotation2d(
-						Math.toRadians(0))));
-				} else if (startingPos == 2 + 1) {
-					pickUp1.add(new Pose2d(-AutoConstants.N_0_5, 0,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-				} else {
-					pickUp1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-				}
-				return driveAlongPath(pickUp1);
-			case PICK_UP_2:
-				ArrayList<Pose2d> pickUp2 = new ArrayList<Pose2d>();
-				if (startingPos == 0) {
-					pickUp2.add(new Pose2d(-1, AutoConstants.N_1_5,
-						new Rotation2d(Math.toRadians(0))));
-				} else if (startingPos == 1) {
-					pickUp2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
-				} else if (startingPos == 2) {
-					pickUp2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
-				} else if (startingPos == 2 + 1) {
-					pickUp2.add(new Pose2d(-AutoConstants.N_0_5, AutoConstants.N_1_5,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-				} else {
-					pickUp2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-				}
-				return driveAlongPath(pickUp2);
-			case PICK_UP_3:
-				ArrayList<Pose2d> pickUp3 = new ArrayList<Pose2d>();
-				if (startingPos == 0) {
-					pickUp3.add(new Pose2d(-1, -AutoConstants.N_1_5,
-						new Rotation2d(Math.toRadians(0))));
-				} else if (startingPos == 1) {
-					pickUp3.add(new Pose2d(-1, -AutoConstants.N_2_5,
-						new Rotation2d(Math.toRadians(0))));
-				} else if (startingPos == 2) {
-					pickUp3.add(new Pose2d(-1, AutoConstants.N_2_5,
-						new Rotation2d(Math.toRadians(0))));
-				} else if (startingPos == 2 + 1) {
-					pickUp3.add(new Pose2d(-AutoConstants.N_0_5, AutoConstants.N_2_5,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-				} else {
-					pickUp3.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-				}
-				return driveAlongPath(pickUp3);
-			case PICK_UP_4:
-				ArrayList<Pose2d> pickUp4 = new ArrayList<Pose2d>();
-				if (startingPos == 0) {
-					pickUp4.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_2,
-						new Rotation2d(Math.toRadians(0))));
-				} else if (startingPos == 1) {
-					pickUp4.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_3,
-						new Rotation2d(Math.toRadians(0))));
-				} else if (startingPos == 2) {
-					pickUp4.add(new Pose2d(-AutoConstants.N_6, -1,
-						new Rotation2d(Math.toRadians(0))));
-				} else if (startingPos == 2 + 1) {
-					pickUp4.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_0_5,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-				} else {
-					pickUp4.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
-				}
-				return driveAlongPath(pickUp4);
-			case RUN_OVER_NOTES:
-				ArrayList<Pose2d> hitNotes = new ArrayList<Pose2d>();
-				if (startingPos == 1) {
-					hitNotes.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_4,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
-					hitNotes.add(new Pose2d(-AutoConstants.N_7_5, AutoConstants.N_4,
-						new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
-					hitNotes.add(new Pose2d(-AutoConstants.N_7_5, 1,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
-				} else if (startingPos == 2) {
-					hitNotes.add(new Pose2d(-AutoConstants.N_7_5, -1,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
-					hitNotes.add(new Pose2d(-AutoConstants.N_7_5, AutoConstants.N_3,
-						new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
-				}
-				return driveAlongPathFast(hitNotes);
+			/* --------------------------- SVR --------------------------- */
+			// case LEAVE:
+			// 	ArrayList<Pose2d> leave = new ArrayList<Pose2d>();
+			// 	if (startingPos == 0) { // center
+			// 		leave.add(new Pose2d(-1, AutoConstants.N_3,
+			// 			new Rotation2d(Math.toRadians(0))));
+			// 		leave.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_5,
+			// 			new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+			// 		leave.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
+			// 			new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
+			// 	} else if (startingPos == 1) { // source side speaker
+			// 		leave.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_4,
+			// 			new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+			// 		leave.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_4,
+			// 			new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
+			// 	} else if (startingPos == 2 || startingPos == 2 + 1) { // amp side speaker
+			// 		leave.add(new Pose2d(-AutoConstants.N_5_5, 0,
+			// 			new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
+			// 		leave.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_5,
+			// 			new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
+			// 	} else if (startingPos == 2 + 2) { // other (leave in a straight line)
+			// 		leave.add(new Pose2d(-AutoConstants.N_6, 0,
+			// 			new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
+			// 	} else {
+			// 		leave.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+			// 	}
+			// 	return driveAlongPath(leave);
+			// case DRIVE_TO_SCORE:
+			// 	ArrayList<Pose2d> toScore = new ArrayList<Pose2d>();
+			// 	if (startingPos == 1) {
+			// 		toScore.add(new Pose2d(0, 0,
+			// 			new Rotation2d(Math.toRadians(-AutoConstants.DEG_45))));
+			// 	} else if (startingPos == 2) {
+			// 		toScore.add(new Pose2d(0, 0,
+			// 			new Rotation2d(Math.toRadians(AutoConstants.DEG_45))));
+			// 	} else if (startingPos == 2 + 1) {
+			// 		toScore.add(new Pose2d(-AutoConstants.N_0_5, -1,
+			// 			new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
+			// 	} else {
+			// 		toScore.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+			// 	}
+			// 	return driveAlongPath(toScore);
+			// case PICK_UP_1:
+			// 	ArrayList<Pose2d> pickUp1 = new ArrayList<Pose2d>();
+			// 	if (startingPos == 0) {
+			// 		pickUp1.add(new Pose2d(-1, 0, new Rotation2d(Math.toRadians(0))));
+			// 	} else if (startingPos == 1) {
+			// 		pickUp1.add(new Pose2d(-1, AutoConstants.N_0_5, new Rotation2d(
+			// 			Math.toRadians(0))));
+			// 	} else if (startingPos == 2) {
+			// 		pickUp1.add(new Pose2d(-1, -AutoConstants.N_0_5, new Rotation2d(
+			// 			Math.toRadians(0))));
+			// 	} else if (startingPos == 2 + 1) {
+			// 		pickUp1.add(new Pose2d(-AutoConstants.N_0_5, 0,
+			// 			new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+			// 	} else {
+			// 		pickUp1.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+			// 	}
+			// 	return driveAlongPath(pickUp1);
+			// case PICK_UP_2:
+			// 	ArrayList<Pose2d> pickUp2 = new ArrayList<Pose2d>();
+			// 	if (startingPos == 0) {
+			// 		pickUp2.add(new Pose2d(-1, AutoConstants.N_1_5,
+			// 			new Rotation2d(Math.toRadians(0))));
+			// 	} else if (startingPos == 1) {
+			// 		pickUp2.add(new Pose2d(-1, -1, new Rotation2d(Math.toRadians(0))));
+			// 	} else if (startingPos == 2) {
+			// 		pickUp2.add(new Pose2d(-1, 1, new Rotation2d(Math.toRadians(0))));
+			// 	} else if (startingPos == 2 + 1) {
+			// 		pickUp2.add(new Pose2d(-AutoConstants.N_0_5, AutoConstants.N_1_5,
+			// 			new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+			// 	} else {
+			// 		pickUp2.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+			// 	}
+			// 	return driveAlongPath(pickUp2);
+			// case PICK_UP_3:
+			// 	ArrayList<Pose2d> pickUp3 = new ArrayList<Pose2d>();
+			// 	if (startingPos == 0) {
+			// 		pickUp3.add(new Pose2d(-1, -AutoConstants.N_1_5,
+			// 			new Rotation2d(Math.toRadians(0))));
+			// 	} else if (startingPos == 1) {
+			// 		pickUp3.add(new Pose2d(-1, -AutoConstants.N_2_5,
+			// 			new Rotation2d(Math.toRadians(0))));
+			// 	} else if (startingPos == 2) {
+			// 		pickUp3.add(new Pose2d(-1, AutoConstants.N_2_5,
+			// 			new Rotation2d(Math.toRadians(0))));
+			// 	} else if (startingPos == 2 + 1) {
+			// 		pickUp3.add(new Pose2d(-AutoConstants.N_0_5, AutoConstants.N_2_5,
+			// 			new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+			// 	} else {
+			// 		pickUp3.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+			// 	}
+			// 	return driveAlongPath(pickUp3);
+			// case PICK_UP_4:
+			// 	ArrayList<Pose2d> pickUp4 = new ArrayList<Pose2d>();
+			// 	if (startingPos == 0) {
+			// 		pickUp4.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_2,
+			// 			new Rotation2d(Math.toRadians(0))));
+			// 	} else if (startingPos == 1) {
+			// 		pickUp4.add(new Pose2d(-AutoConstants.N_6, AutoConstants.N_3,
+			// 			new Rotation2d(Math.toRadians(0))));
+			// 	} else if (startingPos == 2) {
+			// 		pickUp4.add(new Pose2d(-AutoConstants.N_6, -1,
+			// 			new Rotation2d(Math.toRadians(0))));
+			// 	} else if (startingPos == 2 + 1) {
+			// 		pickUp4.add(new Pose2d(-AutoConstants.N_6, -AutoConstants.N_0_5,
+			// 			new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+			// 	} else {
+			// 		pickUp4.add(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))));
+			// 	}
+			// 	return driveAlongPath(pickUp4);
+			// case RUN_OVER_NOTES:
+			// 	ArrayList<Pose2d> hitNotes = new ArrayList<Pose2d>();
+			// 	if (startingPos == 1) {
+			// 		hitNotes.add(new Pose2d(-AutoConstants.N_3_5, AutoConstants.N_4,
+			// 			new Rotation2d(Math.toRadians(-AutoConstants.DEG_90))));
+			// 		hitNotes.add(new Pose2d(-AutoConstants.N_7_5, AutoConstants.N_4,
+			// 			new Rotation2d(Math.toRadians(-AutoConstants.DEG_180))));
+			// 		hitNotes.add(new Pose2d(-AutoConstants.N_7_5, 1,
+			// 			new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
+			// 	} else if (startingPos == 2) {
+			// 		hitNotes.add(new Pose2d(-AutoConstants.N_7_5, -1,
+			// 			new Rotation2d(Math.toRadians(AutoConstants.DEG_90))));
+			// 		hitNotes.add(new Pose2d(-AutoConstants.N_7_5, AutoConstants.N_3,
+			// 			new Rotation2d(Math.toRadians(AutoConstants.DEG_180))));
+			// 	}
+			// 	return driveAlongPathFast(hitNotes);
 
-			case PENDING:
-				timer.start();
-				return pause(AutoConstants.WAIT_TIME);
+			// case PENDING:
+			// 	timer.start();
+			// 	return pause(AutoConstants.WAIT_TIME);
+			/* --------------------------- SVR --------------------------- */
+
+			case DEFAULT:
+				ArrayList<Pose2d> def = new ArrayList<>();
+				if (path.equals("MISC")) {
+					if (placement.equals("SWSR")) {
+						def.add(new Pose2d(-AutoConstants.N_0_5, multiplyer, new Rotation2d(0)));
+					} else if (placement.equals("SWAM")) {
+						def.add(new Pose2d(-AutoConstants.N_1_5, 0,
+							new Rotation2d(Math.toRadians(-AutoConstants.DEG_45 * multiplyer))));
+					}
+				} else if (path.equals("MIDF")) {
+					if (placement.equals("SWSR")) {
+						def.add(new Pose2d(-AutoConstants.N_2_5, -AutoConstants.N_2_5 * multiplyer,
+							new Rotation2d(0)));
+						def.add(new Pose2d(-AutoConstants.N_7, -AutoConstants.N_3_5 * multiplyer,
+							new Rotation2d(Math.toRadians(AutoConstants.DEG_45 * multiplyer))));
+						def.add(new Pose2d(-AutoConstants.N_2_5, -AutoConstants.N_2_5 * multiplyer,
+							new Rotation2d(0)));
+					} else if (placement.equals("SWAM")) {
+						def.add(new Pose2d(-AutoConstants.N_1_5, AutoConstants.N_1_25 * multiplyer,
+							new Rotation2d(0)));
+						def.add(new Pose2d(-AutoConstants.N_5_5, AutoConstants.N_1_25 * multiplyer,
+							new Rotation2d(0)));
+						def.add(new Pose2d(-AutoConstants.N_7, multiplyer, new Rotation2d(0)));
+					}
+				} else if (path.equals("SAFE")) {
+					if (placement.equals("SWCT")) {
+						def.add(new Pose2d(0, 1 + AutoConstants.N_1_25, new Rotation2d(0)));
+						def.add(new Pose2d(-AutoConstants.N_5, 1 + AutoConstants.N_1_25,
+							new Rotation2d(0)));
+						def.add(new Pose2d(-AutoConstants.N_6_5, 2, new Rotation2d(0)));
+					}
+				}
+				return driveAlongPath(def);
+			case SPEAKER:
+				ArrayList<Pose2d> speaker = new ArrayList<>();
+				speaker.add(new Pose2d(xOffsets.get(placement),
+					yOffsets.get(placement) * multiplyer, new Rotation2d(0)));
+				return driveAlongPath(speaker);
+			case NOTE1:
+				ArrayList<Pose2d> note1 = new ArrayList<>();
+				note1.add(new Pose2d(-1 + xOffsets.get(placement),
+					(-1 + yOffsets.get(placement)) * multiplyer,
+					new Rotation2d(AutoConstants.DEG_45 * multiplyer)));
+				return driveAlongPath(note1);
+			case NOTE2:
+				ArrayList<Pose2d> note2 = new ArrayList<>();
+				note2.add(new Pose2d(-1 + xOffsets.get(placement),
+					yOffsets.get(placement) * multiplyer, new Rotation2d(0)));
+				return driveAlongPath(note2);
+			case NOTE3:
+				ArrayList<Pose2d> note3 = new ArrayList<>();
+				note3.add(new Pose2d(-1 + xOffsets.get(placement),
+					(1 + yOffsets.get(placement)) * multiplyer,
+					new Rotation2d(-AutoConstants.DEG_45 * multiplyer)));
+				return driveAlongPath(note3);
+			case NOTE4:
+				ArrayList<Pose2d> note4 = new ArrayList<>();
+				note4.add(new Pose2d(-AutoConstants.N_2 + xOffsets.get(placement),
+					(-AutoConstants.N_3_5 + yOffsets.get(placement)) * multiplyer,
+					new Rotation2d(0)));
+				note4.add(new Pose2d(-AutoConstants.N_6_5 + xOffsets.get(placement),
+					(-AutoConstants.N_4_5 + yOffsets.get(placement)) * multiplyer,
+					new Rotation2d(AutoConstants.DEG_45 * multiplyer)));
+				note4.add(new Pose2d(-AutoConstants.N_2 + xOffsets.get(placement),
+					(-AutoConstants.N_3_5 + yOffsets.get(placement)) * multiplyer,
+					new Rotation2d(0)));
+				return driveAlongPath(note4);
+			case NOTE5:
+				ArrayList<Pose2d> note5 = new ArrayList<>();
+				note5.add(new Pose2d(-AutoConstants.N_6_5 + xOffsets.get(placement),
+					(-AutoConstants.N_3 + yOffsets.get(placement)) * multiplyer,
+					new Rotation2d(AutoConstants.DEG_30 * multiplyer)));
+				return driveAlongPath(note5);
+			case NOTE6:
+				ArrayList<Pose2d> note6 = new ArrayList<>();
+				note6.add(new Pose2d(-AutoConstants.N_6_5 + xOffsets.get(placement),
+					(-AutoConstants.N_1_5 + yOffsets.get(placement)) * multiplyer,
+					new Rotation2d(AutoConstants.DEG_15 * multiplyer)));
+				return driveAlongPath(note6);
+			case NOTE7:
+				ArrayList<Pose2d> note7 = new ArrayList<>();
+				note7.add(new Pose2d(-AutoConstants.N_6_5 + xOffsets.get(placement),
+					(AutoConstants.N_0_25 + yOffsets.get(placement)) * multiplyer,
+					new Rotation2d(AutoConstants.DEG_15 * multiplyer)));
+				return driveAlongPath(note7);
+			case NOTE8:
+				ArrayList<Pose2d> note8 = new ArrayList<>();
+				note8.add(new Pose2d(-AutoConstants.N_6_5 + xOffsets.get(placement),
+					(AutoConstants.N_1_5 + yOffsets.get(placement)) * multiplyer,
+					new Rotation2d(-AutoConstants.DEG_20 * multiplyer)));
+				return driveAlongPath(note8);
 			default:
 				return false;
 		}
@@ -490,7 +630,6 @@ public class DriveFSMSystem {
 						new Rotation2d(0)));
 				}
 				break;
-
 			case ALIGN_TO_SOURCE_STATE:
 				if (lockedSourceId == -1) {
 					if (blueAlliance) {
@@ -700,7 +839,8 @@ public class DriveFSMSystem {
 	public boolean driveToPose(Pose2d pose) {
 		double x = pose.getX();
 		double y = (blueAlliance ? pose.getY() : -pose.getY());
-		double angle = (blueAlliance ? pose.getRotation().getDegrees() : -pose.getRotation().getDegrees());
+		double angle = (blueAlliance ? pose.getRotation().getDegrees()
+			: -pose.getRotation().getDegrees());
 
 		double xDiff = x - getPose().getX();
 		double yDiff = y - getPose().getY();
@@ -755,10 +895,16 @@ public class DriveFSMSystem {
 		return false;
 	}
 
+	/**
+	 * Drives the robot to a final odometry state.
+	 * @param pose final odometry position for the robot
+	 * @return if the robot has driven to the current position
+	 */
 	public boolean driveToPoseFast(Pose2d pose) {
 		double x = pose.getX();
 		double y = (blueAlliance ? pose.getY() : -pose.getY());
-		double angle = (blueAlliance ? pose.getRotation().getDegrees() : -pose.getRotation().getDegrees());
+		double angle = (blueAlliance
+			? pose.getRotation().getDegrees() : -pose.getRotation().getDegrees());
 
 		double xDiff = x - getPose().getX();
 		double yDiff = y - getPose().getY();
@@ -776,7 +922,8 @@ public class DriveFSMSystem {
 		double ySpeed;
 		if (Math.abs(xDiff) > Math.abs(yDiff)) {
 			xSpeed = clamp(xDiff / AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT,
-			-AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST, AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST);
+			-AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST,
+			AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST);
 			ySpeed = xSpeed * (yDiff / xDiff);
 			if (Math.abs(xDiff) < AutoConstants.CONSTANT_SPEED_THRESHOLD && Math.abs(yDiff)
 				< AutoConstants.CONSTANT_SPEED_THRESHOLD) {
@@ -786,7 +933,8 @@ public class DriveFSMSystem {
 			}
 		} else {
 			ySpeed = clamp(yDiff / AutoConstants.AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT,
-			-AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST, AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST);
+			-AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST,
+			AutoConstants.MAX_SPEED_METERS_PER_SECOND_FAST);
 			xSpeed = ySpeed * (xDiff / yDiff);
 			if (Math.abs(xDiff) < AutoConstants.CONSTANT_SPEED_THRESHOLD && Math.abs(yDiff)
 				< AutoConstants.CONSTANT_SPEED_THRESHOLD) {
@@ -829,6 +977,11 @@ public class DriveFSMSystem {
 		return false;
 	}
 
+	/**
+	 * Drives the robot through a series of points.
+	 * @param points arraylist of points to drive to
+	 * @return if the robot has driven to the next position
+	 */
 	public boolean driveAlongPathFast(ArrayList<Pose2d> points) {
 		if (currentPointInPath >= points.size()) {
 			drive(0, 0, 0, true, false);

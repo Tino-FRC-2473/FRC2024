@@ -140,7 +140,10 @@ public final class SwerveConstants {
 		public static final double WAIT_TIME = 5; // seconds
 
 		// constants for auto path points
+		public static final double N_0_25 = 0.25;
 		public static final double N_0_5 = 0.5;
+		public static final double N_0_75 = 0.75;
+		public static final double N_1_25 = 1.25;
 		public static final double N_1_5 = 1.5;
 		public static final double N_2 = 2;
 		public static final double N_2_5 = 2.5;
@@ -156,7 +159,11 @@ public final class SwerveConstants {
 		public static final double N_7_5 = 7.5;
 		public static final double N_8 = 8;
 
+		public static final double DEG_15 = 15;
+		public static final double DEG_20 = 20;
+		public static final double DEG_30 = 30;
 		public static final double DEG_45 = 45;
+		public static final double DEG_55 = 55;
 		public static final double DEG_90 = 90;
 		public static final double DEG_180 = 180;
 		public static final double DEG_360 = 360;
