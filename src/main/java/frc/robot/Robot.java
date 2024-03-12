@@ -5,6 +5,7 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Systems
 import frc.robot.systems.DriveFSMSystem;
 import frc.robot.systems.KitBotShooterFSM;
@@ -13,6 +14,7 @@ import frc.robot.systems.ClimberMechFSMLeft;
 import frc.robot.systems.ClimberMechFSMRight;
 import frc.robot.systems.AutoHandlerSystem.AutoPath;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.SparkMaxAbsoluteEncoder;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -51,7 +53,9 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopPeriodic() {
-		motor.set(0.1);
+		motor.set( 0.05);
+		String KrakenEncoderValue = "" + motor.getRotorPosition();
+		SmartDashboard.putString("Encoder Value", KrakenEncoderValue);
 	}
 
 	@Override
