@@ -472,16 +472,16 @@ public class DriveFSMSystem {
 						def.add(new Pose2d(-AutoConstants.N_2_5, -AutoConstants.N_2_5 * multiplyer,
 							new Rotation2d(0)));
 					} else if (placement.equals("SWAM")) {
-						def.add(new Pose2d(-AutoConstants.N_1_5, AutoConstants.N_1_25 * multiplyer,
-							new Rotation2d(0)));
-						def.add(new Pose2d(-AutoConstants.N_5_5, AutoConstants.N_1_25 * multiplyer,
-							new Rotation2d(0)));
+						def.add(new Pose2d(-AutoConstants.N_1_5,
+							(1 + AutoConstants.N_0_25) * multiplyer, new Rotation2d(0)));
+						def.add(new Pose2d(-AutoConstants.N_5_5,
+							(1 + AutoConstants.N_0_25) * multiplyer, new Rotation2d(0)));
 						def.add(new Pose2d(-AutoConstants.N_7, multiplyer, new Rotation2d(0)));
 					}
 				} else if (path.equals("SAFE")) {
 					if (placement.equals("SWCT")) {
-						def.add(new Pose2d(0, 1 + AutoConstants.N_1_25, new Rotation2d(0)));
-						def.add(new Pose2d(-AutoConstants.N_5, 1 + AutoConstants.N_1_25,
+						def.add(new Pose2d(0, 2 + AutoConstants.N_0_25, new Rotation2d(0)));
+						def.add(new Pose2d(-AutoConstants.N_5, 2 + AutoConstants.N_0_25,
 							new Rotation2d(0)));
 						def.add(new Pose2d(-AutoConstants.N_6_5, 2, new Rotation2d(0)));
 					}
