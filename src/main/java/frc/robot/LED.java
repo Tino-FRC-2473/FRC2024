@@ -13,7 +13,7 @@ public class LED extends TimedRobot{
     
     public LED() {
       led = new AddressableLED(9);
-      ledBuffer = new AddressableLEDBuffer(30);
+      ledBuffer = new AddressableLEDBuffer(300);
 		  led.setLength(ledBuffer.getLength());
 		  led.start();
     }
