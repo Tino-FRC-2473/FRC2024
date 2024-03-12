@@ -235,15 +235,6 @@ public class DriveFSMSystem {
 		led.turnOff();
 		currentPointInPath = 0;
 		gyro.reset();
-		if (placement.equals("SWCT")) {
-			resetOdometry(new Pose2d());
-		} else if (placement.equals("SWSR")) {
-			resetOdometry(new Pose2d(0, 0,
-				new Rotation2d(Math.toRadians(AutoConstants.DEG_55 * multiplyer))));
-		} else if (placement.equals("SWAM")) {
-			resetOdometry(new Pose2d(0, 0,
-				new Rotation2d(Math.toRadians(-AutoConstants.DEG_55 * multiplyer))));
-		}
 		/* --------------------------- SVR --------------------------- */
 		// if (AutoPathChooser.getMechChooser() != null) {
 		// 	svrMech = AutoPathChooser.getSelectedMech();
@@ -266,17 +257,26 @@ public class DriveFSMSystem {
 		if (AutoPathChooser.getPathChooser() != null) {
 			path = AutoPathChooser.getSelectedPath();
 		} else {
-			path = null;
+			path = "PROT";
 		}
 		if (AutoPathChooser.getPlacementChooser() != null) {
 			placement = AutoPathChooser.getSelectedPlacement();
 		} else {
-			placement = null;
+			placement = "SWCT";
 		}
 		for (int i = 0; i < AutoConstants.N_5; i++) {
 			if (AutoPathChooser.getNoteChooser(i) != null) {
 				notes.add(AutoPathChooser.getSelectedNote(i));
 			}
+		}
+		if (placement.equals("SWCT")) {
+			resetOdometry(new Pose2d());
+		} else if (placement.equals("SWSR")) {
+			resetOdometry(new Pose2d(0, 0,
+				new Rotation2d(Math.toRadians(AutoConstants.DEG_55 * multiplyer))));
+		} else if (placement.equals("SWAM")) {
+			resetOdometry(new Pose2d(0, 0,
+				new Rotation2d(Math.toRadians(-AutoConstants.DEG_55 * multiplyer))));
 		}
 		if (blueAlliance) {
 			tagOrientationAngles = new Double[]

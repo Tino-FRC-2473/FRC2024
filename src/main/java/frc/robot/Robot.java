@@ -14,11 +14,11 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Systems
 import frc.robot.systems.DriveFSMSystem;
-import frc.robot.systems.KitBotShooterFSM;
+// import frc.robot.systems.KitBotShooterFSM;
 import frc.robot.SwerveConstants.AutoConstants;
 import frc.robot.systems.AutoHandlerSystem;
-import frc.robot.systems.ClimberMechFSMLeft;
-import frc.robot.systems.ClimberMechFSMRight;
+// import frc.robot.systems.ClimberMechFSMLeft;
+// import frc.robot.systems.ClimberMechFSMRight;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -27,9 +27,9 @@ import frc.robot.systems.ClimberMechFSMRight;
 public class Robot extends TimedRobot {
 	private TeleopInput input;
 	// Systems
-	private KitBotShooterFSM shooterFSM;
-	private ClimberMechFSMLeft climberMechLeftFSM;
-	private ClimberMechFSMRight climberMechRightFSM;
+	// private KitBotShooterFSM shooterFSM;
+	// private ClimberMechFSMLeft climberMechLeftFSM;
+	// private ClimberMechFSMRight climberMechRightFSM;
 	private DriveFSMSystem driveFSMSystem;
 
 	private AutoHandlerSystem autoHandler;
@@ -54,10 +54,10 @@ public class Robot extends TimedRobot {
 		// Instantiate all systems here
 		autoPathChooser = new AutoPathChooser();
 		driveFSMSystem = new DriveFSMSystem();
-		shooterFSM = new KitBotShooterFSM();
-		climberMechLeftFSM = new ClimberMechFSMLeft();
-		climberMechRightFSM = new ClimberMechFSMRight();
-		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
+		// shooterFSM = new KitBotShooterFSM();
+		// climberMechLeftFSM = new ClimberMechFSMLeft();
+		// climberMechRightFSM = new ClimberMechFSMRight();
+		autoHandler = new AutoHandlerSystem(driveFSMSystem);
 
 		driverCam = CameraServer.startAutomaticCapture(0);
 		chainCam = CameraServer.startAutomaticCapture(1);
@@ -108,17 +108,17 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
 		driveFSMSystem.reset();
-		climberMechLeftFSM.reset();
-		climberMechRightFSM.reset();
-		shooterFSM.reset();
+		// climberMechLeftFSM.reset();
+		// climberMechRightFSM.reset();
+		// shooterFSM.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		driveFSMSystem.update(input);
-		climberMechLeftFSM.update(input);
-		climberMechRightFSM.update(input);
-		shooterFSM.update(input);
+	//	climberMechLeftFSM.update(input);
+		// climberMechRightFSM.update(input);
+		// shooterFSM.update(input);
 
 		// if (input.chainChamToggleButton()) {
 		// 	chainCamToggled = !chainCamToggled;

@@ -56,6 +56,7 @@ public class AutoPathChooser {
 		pathChooser.addOption("Target Midfield", "MIDF");
 		pathChooser.addOption("AUTO DESTROYER", "AUTO");
 		pathChooser.addOption("Safety Path", "SAFE");
+		SmartDashboard.putData("Path Chooser", pathChooser);
 
 		placementChooser = new SendableChooser<>();
 		placementChooser.setDefaultOption("Subwoofer Center", "SWCT");
@@ -65,15 +66,18 @@ public class AutoPathChooser {
 		placementChooser.addOption("Amp", "BYAM");
 		SmartDashboard.putData("Starting Position", placementChooser);
 
+		noteChoosers = new ArrayList<>();
 		String[] key = {"First ", "Second ", "Third ", "Fourth ", "Fifth "};
 		for (int i = 0; i < AutoConstants.N_5; i++) {
 			SendableChooser<Integer> noteChooser = new SendableChooser<>();
-			noteChooser.setDefaultOption("N/A", 0);
-			for (int j = 1; j <= AutoConstants.N_8; j++) {
-				noteChooser.addOption("Note " + j, j);
+			if (noteChooser != null) {
+				noteChooser.setDefaultOption("N/A", 0);
+				for (int j = 1; j <= AutoConstants.N_8; j++) {
+					noteChooser.addOption("Note " + j, j);
+				}
+				SmartDashboard.putData(key[i] + "Note", noteChooser);
+				noteChoosers.add(noteChooser);
 			}
-			SmartDashboard.putData(key[i] + "Note", noteChooser);
-			noteChoosers.add(noteChooser);
 		}
 	}
 
