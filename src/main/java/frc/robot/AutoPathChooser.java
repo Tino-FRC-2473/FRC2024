@@ -68,7 +68,7 @@ public class AutoPathChooser {
 
 		noteChoosers = new ArrayList<>();
 		String[] key = {"First ", "Second ", "Third ", "Fourth ", "Fifth "};
-		for (int i = 0; i < AutoConstants.N_5; i++) {
+		for (int i = 0; i < key.length; i++) {
 			SendableChooser<Integer> noteChooser = new SendableChooser<>();
 			if (noteChooser != null) {
 				noteChooser.setDefaultOption("N/A", 0);

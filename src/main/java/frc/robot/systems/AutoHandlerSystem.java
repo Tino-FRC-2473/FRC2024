@@ -79,7 +79,6 @@ public class AutoHandlerSystem {
 	 * Create FSMSystem and initialize to starting state.
 	 * Initializes any subsystems such as driveFSM, armFSM, ect.
 	 * @param fsm1 the first subsystem that the auto handler will call functions on
-	 * @param fsm2 the second subsystem that the auto handler will call functions on
 	 */
 	public AutoHandlerSystem(DriveFSMSystem fsm1) {
 		driveSystem = fsm1;
@@ -124,9 +123,10 @@ public class AutoHandlerSystem {
 		/* --------------------------- SVR --------------------------- */
 
 		currentStateList.clear();
-		currentStateList.add(AutoFSMState.DEFAULT);
-		if (path.contains("PROT") || path.contains("MISC") || path.contains(path)) {
-			currentStateList.add(AutoFSMState.SPEAKER);
+		//add <Shooting into speaker> Path to currentStateList
+		// currentStateList.add(AutoFSMState.DEFAULT);
+		if (path.contains("PROT") || path.contains("MISC") || path.contains("MIDF")) {
+			// currentStateList.add(AutoFSMState.SPEAKER);
 			String notes = path.substring((int) AutoConstants.N_8 + 1 + 1); // 10
 			for (int i = 0; i < notes.length(); i++) {
 				int id = notes.charAt(i) - '0';
@@ -144,12 +144,16 @@ public class AutoHandlerSystem {
 					currentStateList.add(AutoFSMState.NOTE6);
 				} else if (id == AutoConstants.N_7) {
 					currentStateList.add(AutoFSMState.NOTE7);
-				} else {
+				} else if (id == AutoConstants.N_8) {
 					currentStateList.add(AutoFSMState.NOTE8);
 				}
+				//add <Intaking note> Path to currentStateList
 				currentStateList.add(AutoFSMState.SPEAKER);
+				//add <Shooting into speaker> Path to currentStateList
+
 			}
 		}
+		//add <LEAVE ZONE> Path to currentStateList
 		currentStateIndex = 0;
 	}
 

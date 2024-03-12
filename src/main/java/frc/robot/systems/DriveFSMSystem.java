@@ -277,6 +277,8 @@ public class DriveFSMSystem {
 		} else if (placement.equals("SWAM")) {
 			resetOdometry(new Pose2d(0, 0,
 				new Rotation2d(Math.toRadians(-AutoConstants.DEG_55 * multiplyer))));
+		} else {
+			resetOdometry(new Pose2d());
 		}
 		if (blueAlliance) {
 			tagOrientationAngles = new Double[]

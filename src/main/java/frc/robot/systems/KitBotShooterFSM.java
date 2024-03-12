@@ -20,15 +20,19 @@
 // 	public enum ShooterFSMState {
 // 		IDLE_STOP,
 // 		INTAKING,
-// 		OUTTAKING_SPEAKER,
+// 		OUTTAKING,
 // 		OVERRIDE_INTAKE
 // 	}
 
+// 	private static final float AMP_L_MOTOR_RUN_POWER = 0.13f;
+// 	private static final float AMP_U_MOTOR_RUN_POWER = -0.15f;
 // 	private static final float SPEAKER_L_MOTOR_RUN_POWER = 0.8f;
 // 	private static final float SPEAKER_U_MOTOR_RUN_POWER = -1.0f;
-// 	private static final float INTAKING_SPEED = -0.4f;
+// 	private static final float INTAKING_SPEED = -0.1f;
 // 	private static final float OUTTAKING_TIME = 2.5f;
 // 	private static final float REV_OUTTAKING_TIME = 1.5f;
+// 	private static final float OUTTAKING_TIME_FAST = 1.5f;
+// 	private static final float REV_OUTTAKING_TIME_FAST = 0.75f;
 
 // 	/* ======================== Private variables ======================== */
 // 	private ShooterFSMState currentState;
@@ -50,24 +54,24 @@
 // 	 * the constructor is called only once when the robot boots.
 // 	 */
 // 	public KitBotShooterFSM() {
-// 		// // Perform hardware init
-// 		// lowMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_LOWER,
-// 		// 				CANSparkMax.MotorType.kBrushless);
-// 		// lowMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+// 		// Perform hardware init
+// 		lowMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_LOWER,
+// 						CANSparkMax.MotorType.kBrushless);
+// 		lowMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
-// 		// bottomLimitSwitch = lowMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
-// 		// bottomLimitSwitch.enableLimitSwitch(false);
+// 		bottomLimitSwitch = lowMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
+// 		bottomLimitSwitch.enableLimitSwitch(false);
 
-// 		// highMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_UPPER,
-// 		// CANSparkMax.MotorType.kBrushless);
-// 		// highMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+// 		highMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_UPPER,
+// 		CANSparkMax.MotorType.kBrushless);
+// 		highMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
-// 		// autoOuttakingTimerStarted = false;
+// 		autoOuttakingTimerStarted = false;
 
-// 		// timer = new Timer();
+// 		timer = new Timer();
 
-// 		// // Reset state machine
-// 		// reset();
+// 		// Reset state machine
+// 		reset();
 // 	}
 
 // 	/* ======================== Public methods ======================== */
@@ -114,8 +118,8 @@
 // 			case INTAKING:
 // 				handleIntakingState(input);
 // 				break;
-// 			case OUTTAKING_SPEAKER:
-// 				handleShootSpeakerState(input);
+// 			case OUTTAKING:
+// 				handleShootState(input);
 // 				break;
 // 			case OVERRIDE_INTAKE:
 // 				handleOverrideIntakingState(input);
@@ -134,15 +138,14 @@
 // 	 * @return if the action carried out in this state has finished executing
 // 	 */
 // 	public boolean updateAutonomous(AutoFSMState autoState) {
-// 		// switch (autoState) {
-// 		// 	case SHOOTER_STATE:
-// 		// 		return handleAutoOuttakingState();
-// 		// 	case SHOOTER_STATE_FAST:
-// 		// 		return handleAutoOuttakeFastState();
-// 		// 	default:
-// 		// 		return true;
-// 		// }
-// 		return false;
+// 		switch (autoState) {
+// 			case SHOOTER_STATE:
+// 				return handleAutoOuttakingState();
+// 			case SHOOTER_STATE_FAST:
+// 				return handleAutoOuttakeFastState();
+// 			default:
+// 				return true;
+// 		}
 // 	}
 
 // 	/* ======================== Private methods ======================== */
@@ -163,14 +166,15 @@
 // 			case IDLE_STOP:
 // 				if ((input.isShootButtonPressed() || input.isRevOuttakeButtonPressed())
 // 					&& !input.isIntakeButtonPressed() && !input.overrideIntakeButton()) {
-// 					return ShooterFSMState.OUTTAKING_SPEAKER;
+// 					return ShooterFSMState.OUTTAKING;
 // 				}
 // 				if (input.isIntakeButtonPressed() && !hasNote()
 // 					&& !input.isShootButtonPressed()
 // 					&& !input.isRevOuttakeButtonPressed() && !input.overrideIntakeButton()) {
 // 					return ShooterFSMState.INTAKING;
 // 				}
-// 				if (input.overrideIntakeButton() && !input.isShootButtonPressed() && !input.isRevOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+// 				if (input.overrideIntakeButton() && !input.isShootButtonPressed()
+// 					&& !input.isRevOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
 // 					return ShooterFSMState.OVERRIDE_INTAKE;
 // 				}
 // 				return ShooterFSMState.IDLE_STOP;
@@ -182,15 +186,16 @@
 // 				} else {
 // 					return ShooterFSMState.IDLE_STOP;
 // 				}
-// 			case OUTTAKING_SPEAKER:
+// 			case OUTTAKING:
 // 				if ((input.isShootButtonPressed() || input.isRevOuttakeButtonPressed())
 // 					&& !input.isIntakeButtonPressed() && !input.overrideIntakeButton()) {
-// 					return ShooterFSMState.OUTTAKING_SPEAKER;
+// 					return ShooterFSMState.OUTTAKING;
 // 				} else {
 // 					return ShooterFSMState.IDLE_STOP;
 // 				}
 // 			case OVERRIDE_INTAKE:
-// 				if (input.overrideIntakeButton() && !input.isShootButtonPressed() && !input.isRevOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+// 				if (input.overrideIntakeButton() && !input.isShootButtonPressed()
+// 					&& !input.isRevOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
 // 					return ShooterFSMState.OVERRIDE_INTAKE;
 // 				} else {
 // 					return ShooterFSMState.IDLE_STOP;
@@ -225,7 +230,7 @@
 // 	 * @param input Global TeleopInput if robot in teleop mode or null if
 // 	 *        the robot is in autonomous mode.
 // 	 */
-// 	private void handleShootSpeakerState(TeleopInput input) {
+// 	private void handleShootState(TeleopInput input) {
 // 		if (input.isRevOuttakeButtonPressed()) {
 // 			highMotor.set(SPEAKER_U_MOTOR_RUN_POWER);
 // 		} else {
@@ -269,9 +274,9 @@
 // 			outtakingTimerStart = timer.get();
 // 		}
 // 		if (autoOuttakingTimerStarted
-// 			&& !timer.hasElapsed(outtakingTimerStart + 1.5)) {
+// 			&& !timer.hasElapsed(outtakingTimerStart + OUTTAKING_TIME_FAST)) {
 // 			highMotor.set(SPEAKER_U_MOTOR_RUN_POWER);
-// 			if (timer.hasElapsed(outtakingTimerStart + 0.75)) {
+// 			if (timer.hasElapsed(outtakingTimerStart + REV_OUTTAKING_TIME_FAST)) {
 // 				lowMotor.set(SPEAKER_L_MOTOR_RUN_POWER);
 // 			} else {
 // 				lowMotor.set(0);
