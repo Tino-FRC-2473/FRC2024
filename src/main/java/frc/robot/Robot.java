@@ -51,12 +51,12 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
-		autoPathChooser = new AutoPathChooser();
-		driveFSMSystem = new DriveFSMSystem();
+		// autoPathChooser = new AutoPathChooser();
+		// driveFSMSystem = new DriveFSMSystem();
 		shooterFSM = new KitBotShooterFSM();
-		climberMechLeftFSM = new ClimberMechFSMLeft();
-		climberMechRightFSM = new ClimberMechFSMRight();
-		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
+		// climberMechLeftFSM = new ClimberMechFSMLeft();
+		// climberMechRightFSM = new ClimberMechFSMRight();
+		// autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
 
 		driverCam = CameraServer.startAutomaticCapture(0);
 		chainCam = CameraServer.startAutomaticCapture(1);
@@ -94,17 +94,17 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		driveFSMSystem.reset();
-		climberMechLeftFSM.reset();
-		climberMechRightFSM.reset();
+		// driveFSMSystem.reset();
+		// climberMechLeftFSM.reset();
+		// climberMechRightFSM.reset();
 		shooterFSM.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		driveFSMSystem.update(input);
-		climberMechLeftFSM.update(input);
-		climberMechRightFSM.update(input);
+		// driveFSMSystem.update(input);
+		// climberMechLeftFSM.update(input);
+		// climberMechRightFSM.update(input);
 		shooterFSM.update(input);
 
 		// if (input.chainChamToggleButton()) {
