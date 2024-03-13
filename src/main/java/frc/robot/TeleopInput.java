@@ -110,6 +110,10 @@ public class TeleopInput {
 		return mechController.getPSButton();
 	}
 
+	/**
+	 * Get the Value of the Options Button.
+	 * @return if Options Button is pressed
+	 */
 	public boolean isZeroingButtonPressed() {
 		return mechController.getOptionsButton();
 	}

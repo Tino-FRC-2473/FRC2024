@@ -1,15 +1,15 @@
 package frc.robot.systems;
 
+
 // WPILib Imports
 
 // Third party Hardware Imports
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkLimitSwitch;
 //import com.revrobotics.SparkPIDController;
 
-
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.ctre.phoenix6.hardware.TalonFX;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
@@ -57,9 +57,9 @@ public class PivotFSM {
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
-	private CANSparkMax pivotMotor;
+	private TalonFX pivotMotor;
 
-	private SparkLimitSwitch lastLimitSwitch;
+	private DigitalInput lastLimitSwitch;
 
 	private DutyCycleEncoder throughBore;
 
@@ -72,15 +72,14 @@ public class PivotFSM {
 	 */
 	public PivotFSM() {
 		// Perform hardware init
-		pivotMotor = new CANSparkMax(HardwareMap.CAN_SPARK_PIVOT_MOTOR,
-										CANSparkMax.MotorType.kBrushless);
+		// pivotMotor = new CANSparkMax(HardwareMap.CAN_SPARK_PIVOT_MOTOR,
+		// 								CANSparkMax.MotorType.kBrushless);
 
-		pivotMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+		// pivotMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
-		lastLimitSwitch =
-		pivotMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
+		pivotMotor = new TalonFX(HardwareMap.DEVICE_ID_ARM_MOTOR);
 
-		lastLimitSwitch.enableLimitSwitch(false);
+		lastLimitSwitch = new DigitalInput(HardwareMap.INPUT_LIMIT_SWITCH_PORT);
 
 		currentEncoder = 0;
 		throughBore = new DutyCycleEncoder(0);
@@ -122,7 +121,7 @@ public class PivotFSM {
 	 */
 	public void update(TeleopInput input) {
 
-		if (lastLimitSwitch.isPressed()) {
+		if (lastLimitSwitch.get()) {
 			lastLimitHit = true;
 		}
 
@@ -148,7 +147,7 @@ public class PivotFSM {
 		//SmartDashboard.putNumber("Velocity", pidPivotController.getSetpoint().velocity);
 		//SmartDashboard.putNumber("voltage", pivotMotor.getAppliedOutput());
 		SmartDashboard.putNumber("Thru Bore Encoder values", throughBore.getDistance());
-		SmartDashboard.putNumber("CURRENTENCODER", currentEncoder);
+		SmartDashboard.putNumber("CURRENT ENCODER", currentEncoder);
 
 		switch (currentState) {
 			case IDLE_STOP:
@@ -196,7 +195,7 @@ public class PivotFSM {
 	 * @return if the action carried out in this state has finished executing
 	 */
 	public boolean updateAutonomous(AutoFSMState autoState) {
-		if (lastLimitSwitch.isPressed()) {
+		if (lastLimitSwitch.get()) {
 			lastLimitHit = true;
 		}
 
