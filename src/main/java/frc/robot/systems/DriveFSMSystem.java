@@ -4,7 +4,6 @@ package frc.robot.systems;
 import com.kauailabs.navx.frc.AHRS;
 import java.util.ArrayList;
 //import com.revrobotics.CANSparkMax;
-import java.util.HashMap;
 
 // WPILib Imports
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -56,9 +55,6 @@ public class DriveFSMSystem {
 	private String path;
 	private String placement;
 	private ArrayList<Integer> notes;
-
-	private HashMap<String, Double> xOffsets;
-	private HashMap<String, Double> yOffsets;
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -128,14 +124,6 @@ public class DriveFSMSystem {
 	 */
 	public DriveFSMSystem() {
 		notes = new ArrayList<>();
-		xOffsets = new HashMap<>();
-		xOffsets.put("SWSR", -AutoConstants.N_0_5);
-		xOffsets.put("SWCT", (double) 0);
-		xOffsets.put("SWAM", -AutoConstants.N_0_5);
-		yOffsets = new HashMap<>();
-		yOffsets.put("SWSR", (double) 1);
-		yOffsets.put("SWCT", (double) 0);
-		yOffsets.put("SWAM", (double) -1);
 		gyro = new AHRS(SPI.Port.kMXP);
 		// Reset state machine
 		reset();
@@ -269,14 +257,12 @@ public class DriveFSMSystem {
 				notes.add(AutoPathChooser.getSelectedNote(i));
 			}
 		}
-		if (placement.equals("SWCT")) {
-			resetOdometry(new Pose2d());
-		} else if (placement.equals("SWSR")) {
-			resetOdometry(new Pose2d(0, 0,
-				new Rotation2d(Math.toRadians(AutoConstants.DEG_55 * multiplyer))));
+		if (placement.equals("SWSR")) {
+			resetOdometry(new Pose2d(AutoConstants.N_0_5, -1 * multiplyer,
+				new Rotation2d(AutoConstants.DEG_55 * multiplyer)));
 		} else if (placement.equals("SWAM")) {
-			resetOdometry(new Pose2d(0, 0,
-				new Rotation2d(Math.toRadians(-AutoConstants.DEG_55 * multiplyer))));
+			resetOdometry(new Pose2d(AutoConstants.N_0_5, 1 * multiplyer,
+				new Rotation2d(-AutoConstants.DEG_55 * multiplyer)));
 		} else {
 			resetOdometry(new Pose2d());
 		}
@@ -489,60 +475,60 @@ public class DriveFSMSystem {
 				return driveAlongPath(def);
 			case SPEAKER:
 				ArrayList<Pose2d> speaker = new ArrayList<>();
-				speaker.add(new Pose2d(xOffsets.get(placement),
-					yOffsets.get(placement) * multiplyer, new Rotation2d(0)));
+				speaker.add(new Pose2d(0,
+					0, new Rotation2d(0)));
 				return driveAlongPath(speaker);
 			case NOTE1:
 				ArrayList<Pose2d> note1 = new ArrayList<>();
-				note1.add(new Pose2d(-1 - AutoConstants.N_0_25 + xOffsets.get(placement),
-					(-1 - AutoConstants.N_0_25 + yOffsets.get(placement)) * multiplyer,
+				note1.add(new Pose2d(-1 - AutoConstants.N_0_25,
+					(-1 - AutoConstants.N_0_25) * multiplyer,
 					new Rotation2d(AutoConstants.DEG_45 * multiplyer)));
 				return driveAlongPath(note1);
 			case NOTE2:
 				ArrayList<Pose2d> note2 = new ArrayList<>();
-				note2.add(new Pose2d(-1 - AutoConstants.N_0_25 + xOffsets.get(placement),
-					yOffsets.get(placement) * multiplyer, new Rotation2d(0)));
+				note2.add(new Pose2d(-1 - AutoConstants.N_0_25,
+					0, new Rotation2d(0)));
 				return driveAlongPath(note2);
 			case NOTE3:
 				ArrayList<Pose2d> note3 = new ArrayList<>();
-				note3.add(new Pose2d(-1 - AutoConstants.N_0_25 + xOffsets.get(placement),
-					(1 + AutoConstants.N_0_25 + yOffsets.get(placement)) * multiplyer,
+				note3.add(new Pose2d(-1 - AutoConstants.N_0_25,
+					(1 + AutoConstants.N_0_25) * multiplyer,
 					new Rotation2d(-AutoConstants.DEG_45 * multiplyer)));
 				return driveAlongPath(note3);
 			case NOTE4:
 				ArrayList<Pose2d> note4 = new ArrayList<>();
-				note4.add(new Pose2d(-AutoConstants.N_2 + xOffsets.get(placement),
-					(-AutoConstants.N_3_5 + yOffsets.get(placement)) * multiplyer,
+				note4.add(new Pose2d(-AutoConstants.N_2,
+					(-AutoConstants.N_3_5) * multiplyer,
 					new Rotation2d(0)));
-				note4.add(new Pose2d(-AutoConstants.N_6_5 + xOffsets.get(placement),
-					(-AutoConstants.N_4_5 + yOffsets.get(placement)) * multiplyer,
+				note4.add(new Pose2d(-AutoConstants.N_6_5,
+					(-AutoConstants.N_4_5) * multiplyer,
 					new Rotation2d(AutoConstants.DEG_45 * multiplyer)));
-				note4.add(new Pose2d(-AutoConstants.N_2 + xOffsets.get(placement),
-					(-AutoConstants.N_3_5 + yOffsets.get(placement)) * multiplyer,
+				note4.add(new Pose2d(-AutoConstants.N_2,
+					(-AutoConstants.N_3_5) * multiplyer,
 					new Rotation2d(0)));
 				return driveAlongPath(note4);
 			case NOTE5:
 				ArrayList<Pose2d> note5 = new ArrayList<>();
-				note5.add(new Pose2d(-AutoConstants.N_6_5 + xOffsets.get(placement),
-					(-AutoConstants.N_3 + yOffsets.get(placement)) * multiplyer,
+				note5.add(new Pose2d(-AutoConstants.N_6_5,
+					(-AutoConstants.N_3) * multiplyer,
 					new Rotation2d(AutoConstants.DEG_30 * multiplyer)));
 				return driveAlongPath(note5);
 			case NOTE6:
 				ArrayList<Pose2d> note6 = new ArrayList<>();
-				note6.add(new Pose2d(-AutoConstants.N_6_5 + xOffsets.get(placement),
-					(-AutoConstants.N_1_5 + yOffsets.get(placement)) * multiplyer,
+				note6.add(new Pose2d(-AutoConstants.N_6_5,
+					(-AutoConstants.N_1_5) * multiplyer,
 					new Rotation2d(AutoConstants.DEG_15 * multiplyer)));
 				return driveAlongPath(note6);
 			case NOTE7:
 				ArrayList<Pose2d> note7 = new ArrayList<>();
-				note7.add(new Pose2d(-AutoConstants.N_6_5 + xOffsets.get(placement),
-					(AutoConstants.N_0_25 + yOffsets.get(placement)) * multiplyer,
+				note7.add(new Pose2d(-AutoConstants.N_6_5,
+					(AutoConstants.N_0_25) * multiplyer,
 					new Rotation2d(AutoConstants.DEG_15 * multiplyer)));
 				return driveAlongPath(note7);
 			case NOTE8:
 				ArrayList<Pose2d> note8 = new ArrayList<>();
-				note8.add(new Pose2d(-AutoConstants.N_6_5 + xOffsets.get(placement),
-					(AutoConstants.N_1_5 + yOffsets.get(placement)) * multiplyer,
+				note8.add(new Pose2d(-AutoConstants.N_6_5,
+					(AutoConstants.N_1_5) * multiplyer,
 					new Rotation2d(-AutoConstants.DEG_20 * multiplyer)));
 				return driveAlongPath(note8);
 			default:

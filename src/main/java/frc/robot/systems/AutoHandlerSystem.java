@@ -126,7 +126,9 @@ public class AutoHandlerSystem {
 		// add <Shooting into speaker> Path to currentStateList
 		currentStateList.add(AutoFSMState.DEFAULT);
 		if (path.contains("PROT") || path.contains("MISC") || path.contains("MIDF")) {
-			currentStateList.add(AutoFSMState.SPEAKER);
+			if (!path.contains("PROT")) {
+				currentStateList.add(AutoFSMState.SPEAKER);
+			}
 			String notes = path.substring((int) AutoConstants.N_8 + 1 + 1); // 10
 			for (int i = 0; i < notes.length(); i++) {
 				int id = notes.charAt(i) - '0';
