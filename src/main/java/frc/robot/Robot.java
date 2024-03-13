@@ -22,6 +22,10 @@ import frc.robot.systems.AutoHandlerSystem.AutoPath;
 public class Robot extends TimedRobot {
 	private TeleopInput input;
 	// Systems
+	private KitBotShooterFSM shooterFSM;
+	private ClimberMechFSMLeft climberMechLeftFSM;
+	private ClimberMechFSMRight climberMechRightFSM;
+	private DriveFSMSystem driveFSMSystem;
 
 	private AutoHandlerSystem autoHandler;
 	private AutoPathChooser autoPathChooser;
@@ -54,11 +58,11 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 
-		if (input.isServoNinety()) {
+		if (input.isRevOuttakeButtonPressed()) {
 			testServo.setAngle(90);
-		} else if (input.isServoOneEighty()) {
+		} else if (input.isShootButtonPressed()) {
 			testServo.setAngle(180);
-		} else if (input.isServoZeroPressed()) {
+		} else if (input.isIntakeButtonPressed()) {
 			testServo.setAngle(0);
 		}
 
