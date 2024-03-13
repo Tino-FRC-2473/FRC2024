@@ -159,14 +159,15 @@ public final class SwerveConstants {
 		public static final double N_7_5 = 7.5;
 		public static final double N_8 = 8;
 
-		public static final double DEG_15 = 15;
-		public static final double DEG_20 = 20;
-		public static final double DEG_30 = 30;
-		public static final double DEG_45 = 45;
-		public static final double DEG_55 = 55;
-		public static final double DEG_90 = 90;
-		public static final double DEG_180 = 180;
-		public static final double DEG_360 = 360;
+		// Angles in radians
+		public static final double DEG_15 = Math.toRadians(15);
+		public static final double DEG_20 = Math.toRadians(20);
+		public static final double DEG_30 = Math.toRadians(30);
+		public static final double DEG_45 = Math.toRadians(45);
+		public static final double DEG_55 = Math.toRadians(55);
+		public static final double DEG_90 = Math.toRadians(90);
+		public static final double DEG_180 = Math.toRadians(180);
+		public static final double DEG_360 = Math.toRadians(360);
 
 		// Constraint for the motion profiled robot angle controller
 		public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS

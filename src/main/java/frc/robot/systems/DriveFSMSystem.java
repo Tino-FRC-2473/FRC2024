@@ -461,14 +461,14 @@ public class DriveFSMSystem {
 						def.add(new Pose2d(-AutoConstants.N_0_5, multiplyer, new Rotation2d(0)));
 					} else if (placement.equals("SWAM")) {
 						def.add(new Pose2d(-AutoConstants.N_1_5, 0,
-							new Rotation2d(Math.toRadians(-AutoConstants.DEG_45 * multiplyer))));
+							new Rotation2d(-AutoConstants.DEG_45 * multiplyer)));
 					}
 				} else if (path.equals("MIDF")) {
 					if (placement.equals("SWSR")) {
 						def.add(new Pose2d(-AutoConstants.N_2_5, -AutoConstants.N_2_5 * multiplyer,
 							new Rotation2d(0)));
 						def.add(new Pose2d(-AutoConstants.N_7, -AutoConstants.N_3_5 * multiplyer,
-							new Rotation2d(Math.toRadians(AutoConstants.DEG_45 * multiplyer))));
+							new Rotation2d(AutoConstants.DEG_45 * multiplyer)));
 						def.add(new Pose2d(-AutoConstants.N_2_5, -AutoConstants.N_2_5 * multiplyer,
 							new Rotation2d(0)));
 					} else if (placement.equals("SWAM")) {
@@ -494,19 +494,19 @@ public class DriveFSMSystem {
 				return driveAlongPath(speaker);
 			case NOTE1:
 				ArrayList<Pose2d> note1 = new ArrayList<>();
-				note1.add(new Pose2d(-1 + xOffsets.get(placement),
-					(-1 + yOffsets.get(placement)) * multiplyer,
+				note1.add(new Pose2d(-1 - AutoConstants.N_0_25 + xOffsets.get(placement),
+					(-1 - AutoConstants.N_0_25 + yOffsets.get(placement)) * multiplyer,
 					new Rotation2d(AutoConstants.DEG_45 * multiplyer)));
 				return driveAlongPath(note1);
 			case NOTE2:
 				ArrayList<Pose2d> note2 = new ArrayList<>();
-				note2.add(new Pose2d(-1 + xOffsets.get(placement),
+				note2.add(new Pose2d(-1 - AutoConstants.N_0_25 + xOffsets.get(placement),
 					yOffsets.get(placement) * multiplyer, new Rotation2d(0)));
 				return driveAlongPath(note2);
 			case NOTE3:
 				ArrayList<Pose2d> note3 = new ArrayList<>();
-				note3.add(new Pose2d(-1 + xOffsets.get(placement),
-					(1 + yOffsets.get(placement)) * multiplyer,
+				note3.add(new Pose2d(-1 - AutoConstants.N_0_25 + xOffsets.get(placement),
+					(1 + AutoConstants.N_0_25 + yOffsets.get(placement)) * multiplyer,
 					new Rotation2d(-AutoConstants.DEG_45 * multiplyer)));
 				return driveAlongPath(note3);
 			case NOTE4:
@@ -840,9 +840,9 @@ public class DriveFSMSystem {
 	 */
 	public boolean driveToPose(Pose2d pose) {
 		double x = pose.getX();
-		double y = (blueAlliance ? pose.getY() : -pose.getY());
-		double angle = (blueAlliance ? pose.getRotation().getDegrees()
-			: -pose.getRotation().getDegrees());
+		double y = pose.getY();
+		double angle = pose.getRotation().getDegrees();
+		SmartDashboard.putString("Curr Point", pose.toString());
 
 		double xDiff = x - getPose().getX();
 		double yDiff = y - getPose().getY();
