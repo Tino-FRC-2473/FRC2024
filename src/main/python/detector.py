@@ -50,7 +50,7 @@ class Detector:
             if (object == "RING"):
                 contours, hier = cv2.findContours(morph, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
                 contours = sorted(contours, key=cv2.contourArea)
-                contours = [contour for contour in contours if contour.size > 50]
+                contours = [contour for contour in contours if contour.size > 1000]
                 # cnt = None
                 # contour = contours[len(contours) -1]
                 #last detection is supposed be the biggest because of the sorting function above
@@ -59,12 +59,12 @@ class Detector:
                     cv2.rectangle(frame, (tx, ty), (tx + tw, ty + th),
                                          (0, 0, 255), 2)
 
-        while True:
-            cv2.imshow("o", frame)
-            if cv2.waitKey(0):
-                break
+        # while True:
+        #     cv2.imshow("o", frame)
+        #     if cv2.waitKey(0):
+        #         break
 
-        cv2.destroyAllWindows()
+        #cv2.destroyAllWindows()
 
         if (len(contours) > 0):
             results[object] = Target(contours[len(contours) -1], object)
