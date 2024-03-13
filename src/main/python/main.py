@@ -15,7 +15,7 @@ CAM_HEIGHT = 0.7493
 CAM_ANGLE = 50
 d = Detector()
 input = VisionInput(FOV, RES, CAM_HEIGHT, CAM_ANGLE)
-curr = 0
+p = 0
 cnt = 0
 while True:
     curr = time.time()
