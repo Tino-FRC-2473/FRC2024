@@ -116,7 +116,7 @@ public class TeleopInput {
 	 * Get the value of the intake button.
 	 * @return True if button is pressed
 	 */
-	public boolean isIntakeButtonPressed() {
+	public boolean isServoZeroPressed() {
 		return mechController.getCircleButton();
 	}
 
@@ -124,16 +124,16 @@ public class TeleopInput {
 	 * Get the value of the shoot button.
 	 * @return True if button is pressed
 	 */
-	public boolean isShootButtonPressed() {
-		return mechController.getR2Button();
+	public boolean isServoNinety() {
+		return mechController.getTriangleButton();
 	}
 
 	/**
 	 * Get the value of the rev button for the shooter.
 	 * @return True if button is pressed
 	 */
-	public boolean isRevOuttakeButtonPressed() {
-		return mechController.getL2Button();
+	public boolean isServoOneEighty() {
+		return mechController.getSquareButton();
 	}
 
 	/**

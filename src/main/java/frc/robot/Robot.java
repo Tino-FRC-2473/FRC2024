@@ -3,8 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Servo;
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Systems
 import frc.robot.systems.DriveFSMSystem;
 import frc.robot.systems.KitBotShooterFSM;
@@ -20,14 +22,10 @@ import frc.robot.systems.AutoHandlerSystem.AutoPath;
 public class Robot extends TimedRobot {
 	private TeleopInput input;
 	// Systems
-	private KitBotShooterFSM shooterFSM;
-	private ClimberMechFSMLeft climberMechLeftFSM;
-	private ClimberMechFSMRight climberMechRightFSM;
-	private DriveFSMSystem driveFSMSystem;
 
 	private AutoHandlerSystem autoHandler;
 	private AutoPathChooser autoPathChooser;
-
+	private Servo testServo;
 	/**
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
@@ -37,45 +35,36 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		// Instantiate all systems here
-		autoPathChooser = new AutoPathChooser();
-		driveFSMSystem = new DriveFSMSystem();
-		shooterFSM = new KitBotShooterFSM();
-		climberMechLeftFSM = new ClimberMechFSMLeft();
-		climberMechRightFSM = new ClimberMechFSMRight();
-		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
+		testServo = new Servo(0);
 	}
 
 	@Override
 	public void autonomousInit() {
-		System.out.println("-------- Autonomous Init --------");
-		AutoPath path = AutoPath.PATH1;
-		if (AutoPathChooser.getSelectedPath() != null) {
-			path = AutoPathChooser.getSelectedPath();
-		}
-		autoHandler.reset(path);
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		autoHandler.update();
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		driveFSMSystem.reset();
-		climberMechLeftFSM.reset();
-		climberMechRightFSM.reset();
-		shooterFSM.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		driveFSMSystem.update(input);
-		climberMechLeftFSM.update(input);
-		climberMechRightFSM.update(input);
-		shooterFSM.update(input);
+
+		if (input.isServoNinety()) {
+			testServo.setAngle(90);
+		} else if (input.isServoOneEighty()) {
+			testServo.setAngle(180);
+		} else if (input.isServoZeroPressed()) {
+			testServo.setAngle(0);
+		}
+
+		SmartDashboard.putNumber("Servo angle", testServo.getAngle());
 	}
+
 
 	@Override
 	public void disabledInit() {
