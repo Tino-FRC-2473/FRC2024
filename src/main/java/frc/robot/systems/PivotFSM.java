@@ -7,8 +7,9 @@ package frc.robot.systems;
 //import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import com.ctre.phoenix6.hardware.TalonFX;
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -29,7 +30,7 @@ public class PivotFSM {
 		ZEROING
 	}
 
-	private static final float MANUAL_POWER = 0.25f;
+	private static final float MANUAL_POWER = 0.15f;
 	private static final double MIN_TURN_SPEED = -0.5;
 	private static final double MAX_TURN_SPEED = 0.5;
 
@@ -38,14 +39,14 @@ public class PivotFSM {
 	private static final double PID_CONSTANT_PIVOT_D = 0.001;
 
 	private static final double JOYSTICK_DEAD_ZONE = 0.05;
-	private static final double MIN_ENCODER_ROTATIONS = -0.7;
-	private static final double MAX_ENCODER_ROTATIONS = 0;
+	private static final double MIN_ENCODER_ROTATIONS = -1000;
+	private static final double MAX_ENCODER_ROTATIONS = 1000;
 	private static final double GROUND_ENCODER_ROTATIONS = -0.7;
 	private static final double AMP_ENCODER_ROTATIONS = -0.3;
 	private static final double SOURCE_ENCODER_ROTATIONS = -0.2;
 	private static final double SHOOTER_ENCODER_ROTATIONS = -0.05;
-	private static final double INRANGE_VALUE = 0.005;
-	private static final double JOYSTICK_SCALING_CONSTANT = 0.4;
+	private static final double INRANGE_VALUE = 1;
+	private static final double JOYSTICK_SCALING_CONSTANT = 0.2;
 
 
 
@@ -61,7 +62,7 @@ public class PivotFSM {
 
 	private DigitalInput lastLimitSwitch;
 
-	private DutyCycleEncoder throughBore;
+	private Encoder throughBore;
 
 
 	/* ======================== Constructor ======================== */
@@ -82,7 +83,7 @@ public class PivotFSM {
 		lastLimitSwitch = new DigitalInput(HardwareMap.INPUT_LIMIT_SWITCH_PORT);
 
 		currentEncoder = 0;
-		throughBore = new DutyCycleEncoder(0);
+		throughBore = new Encoder(1, 2);
 		throughBore.reset();
 
 
@@ -148,6 +149,7 @@ public class PivotFSM {
 		//SmartDashboard.putNumber("voltage", pivotMotor.getAppliedOutput());
 		SmartDashboard.putNumber("Thru Bore Encoder values", throughBore.getDistance());
 		SmartDashboard.putNumber("CURRENT ENCODER", currentEncoder);
+		SmartDashboard.putBoolean("Bottom Limit Switch", lastLimitSwitch.get());
 
 		switch (currentState) {
 			case IDLE_STOP:
@@ -319,7 +321,8 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleIdleState(TeleopInput input) {
-		pivotMotor.set(pid(throughBore.getDistance(), currentEncoder));
+		//pivotMotor.set(pid(throughBore.getDistance(), currentEncoder));
+		pivotMotor.set(0);
 	}
 	/**
 	 * Handle behavior in SHOOTER.
