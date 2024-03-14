@@ -16,10 +16,10 @@ class Detector:
     def detectGameElement(self, frame, objectsToDetect: list):
 
         constant = 4.2
-        low_threshold = np.array([0.02580477, 0.43139728, 0.34260735])
+        low_threshold = np.array([0.0442839, 0.1188894, 0.8963528])
 
         # WRITE CODE HERE
-        high_threshold = np.array([1.08496632, 1.08496632, 1.26602557])
+        high_threshold = np.array([0.18016434, 1.19385776, 1.0694635])
 
         results = dict(zip(objectsToDetect, [None for i in range(len(objectsToDetect))]))
         colors = {
