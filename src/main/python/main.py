@@ -18,7 +18,6 @@ input = VisionInput(FOV, RES, CAM_HEIGHT, CAM_ANGLE)
 p = 0
 cnt = 0
 while True:
-    
     try:
         frame = input.getFrame()
 
@@ -35,23 +34,18 @@ while True:
                 print("yaw: ", yaw)
                 print("distance: ", distance)
                 print("pitch: ", pitch)
-
-
-                # if target.getType() == "CONE":
-                #     coneY.set(yaw)
-                #     coneD.set(distance)
-                #     if cnt % 50 == 0:
-                #         print(coneYSub.get())
-                #         print(coneDSub.get())
-                # elif target.getType() == "CUBE":
-                #     cubeY.set(yaw)
-                #     cubeD.set(distance)
-        #print("here")
-        # cnt = cnt + 1
+        cv2.imshow('result', frame)
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q'):
+            break
         time.sleep(0.02)
     except KeyboardInterrupt:
         print("keyboard interrupt")
         input.close()
         break 
+    except Exception as error:
+        print("An exception occurred:", error)
+        input.close()
+        break
 
    
