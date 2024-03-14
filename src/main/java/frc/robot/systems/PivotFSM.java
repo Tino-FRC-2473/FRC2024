@@ -269,7 +269,7 @@ public class PivotFSM {
 				return PivotFSMState.IDLE_STOP;
 
 			case ZEROING:
-				if (!zeroed && !lastLimitHit && !input.isAbortButtonPressed()) {
+				if (!zeroed && !lastLimitHit && input.isZeroingButtonPressed()) {
 					return PivotFSMState.ZEROING;
 				} else {
 					return PivotFSMState.IDLE_STOP;
@@ -363,13 +363,13 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleZeroingState(TeleopInput input) {
-		pivotMotor.set(MANUAL_POWER);
-
 		if (lastLimitHit && !zeroed) {
 			zeroed = true;
 			currentEncoder = 0;
 			throughBore.reset();
 			pivotMotor.set(0);
+		} else {
+			pivotMotor.set(MANUAL_POWER);
 		}
 	}
 
