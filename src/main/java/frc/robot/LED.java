@@ -10,9 +10,12 @@ public class LED extends TimedRobot{
     int m_rainbowFirstPixelHue = 0;
     int greenVal = 0;
     boolean forward = true;
+    int r;
+    int g;
+    int b;
     
-    public LED() {
-      led = new AddressableLED(9);
+    public LED(int pwm_port) {
+      led = new AddressableLED(pwm_port);
       ledBuffer = new AddressableLEDBuffer(300);
 		  led.setLength(ledBuffer.getLength());
 		  led.start();
@@ -20,10 +23,67 @@ public class LED extends TimedRobot{
 
     public void greenLight() {
       for (var i = 0; i < ledBuffer.getLength(); i++) {
-        ledBuffer.setRGB(i, 135, 255, 8);
+        ledBuffer.setRGB(i, 135, 255, 8); 
       }
       led.setData(ledBuffer);
     }
+
+    public void redLight() {
+      for (var i = 0; i < ledBuffer.getLength(); i++) {
+        ledBuffer.setRGB(i, 255, 0, 0);
+      }
+      led.setData(ledBuffer);
+    }
+
+    public void orangeLight() {
+      for (var i = 0; i < ledBuffer.getLength(); i++) {
+        ledBuffer.setRGB(i, 255, 60, 0);
+      }
+      led.setData(ledBuffer);
+    }
+
+    public void purpleLight() {
+      for (var i = 0; i < ledBuffer.getLength(); i++) {
+        ledBuffer.setRGB(i, 166, 99, 255);
+      }
+      led.setData(ledBuffer);
+    }
+
+    public void pinkLight() {
+      for (var i = 0; i < ledBuffer.getLength(); i++) {
+        ledBuffer.setRGB(i, 255, 0, 90);
+      }
+      led.setData(ledBuffer);
+    }
+
+    public void blueLight() {
+      for (var i = 0; i < ledBuffer.getLength(); i++) {
+        ledBuffer.setRGB(i, 134, 225, 255);
+      }
+      led.setData(ledBuffer);
+    }
+
+    // public void chasingLED() {
+    //   for (var i = 0; i < ledBuffer.getLength(); i++) {
+    //     ledBuffer.setRGB(i, 199, greenVal, 0);
+    //   }
+
+    //   if (greenVal >= 100) {
+    //     forward = false;
+    //   } else if (greenVal <= 0) {
+    //     forward = true;
+    //   }
+
+    //   if (forward) {
+    //     greenVal++;
+    //   } else {
+    //     greenVal--;
+    //   }
+      
+
+      
+    //   led.setData(ledBuffer);
+    // }
 
     public void cr() {
       for (var i = 0; i < ledBuffer.getLength(); i++) {

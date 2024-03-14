@@ -24,8 +24,7 @@ public class Robot extends TimedRobot {
 	// private FSMSystem subSystem3;
 
 	// private AutoHandlerSystem autoHandler;
-	private LED led1;
-	private LED led2;
+	private LED led;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -35,8 +34,7 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		System.out.println("robotInit");
 		input = new TeleopInput();
-		led1 = new LED(9);
-		led2 = new LED(8); //CHANGE LATER
+		led = new LED(9);
 
 		// Instantiate all systems here
 		// subSystem1 = new FSMSystem();
@@ -54,8 +52,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousPeriodic() {
 		//led1.rainbow();
-		led1.greenLight();
-		led2.redLight();
+		led.chasingLED();
 		//autoHandler.update();
 	}
 
