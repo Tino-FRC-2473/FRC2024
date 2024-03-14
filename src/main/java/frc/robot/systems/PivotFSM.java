@@ -1,15 +1,16 @@
 package frc.robot.systems;
 
+
 // WPILib Imports
 
 // Third party Hardware Imports
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkLimitSwitch;
 //import com.revrobotics.SparkPIDController;
 
-
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import com.ctre.phoenix6.hardware.TalonFX;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
@@ -29,7 +30,7 @@ public class PivotFSM {
 		ZEROING
 	}
 
-	private static final float MANUAL_POWER = 0.25f;
+	private static final float MANUAL_POWER = 0.15f;
 	private static final double MIN_TURN_SPEED = -0.5;
 	private static final double MAX_TURN_SPEED = 0.5;
 
@@ -38,14 +39,14 @@ public class PivotFSM {
 	private static final double PID_CONSTANT_PIVOT_D = 0.001;
 
 	private static final double JOYSTICK_DEAD_ZONE = 0.05;
-	private static final double MIN_ENCODER_ROTATIONS = -0.7;
-	private static final double MAX_ENCODER_ROTATIONS = 0;
+	private static final double MIN_ENCODER_ROTATIONS = -1000;
+	private static final double MAX_ENCODER_ROTATIONS = 1000;
 	private static final double GROUND_ENCODER_ROTATIONS = -0.7;
 	private static final double AMP_ENCODER_ROTATIONS = -0.3;
 	private static final double SOURCE_ENCODER_ROTATIONS = -0.2;
 	private static final double SHOOTER_ENCODER_ROTATIONS = -0.05;
-	private static final double INRANGE_VALUE = 0.005;
-	private static final double JOYSTICK_SCALING_CONSTANT = 0.4;
+	private static final double INRANGE_VALUE = 1;
+	private static final double JOYSTICK_SCALING_CONSTANT = 0.2;
 
 
 
@@ -57,11 +58,11 @@ public class PivotFSM {
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
-	private CANSparkMax pivotMotor;
+	private TalonFX pivotMotor;
 
-	private SparkLimitSwitch lastLimitSwitch;
+	private DigitalInput lastLimitSwitch;
 
-	private DutyCycleEncoder throughBore;
+	private Encoder throughBore;
 
 
 	/* ======================== Constructor ======================== */
@@ -72,18 +73,17 @@ public class PivotFSM {
 	 */
 	public PivotFSM() {
 		// Perform hardware init
-		pivotMotor = new CANSparkMax(HardwareMap.CAN_SPARK_PIVOT_MOTOR,
-										CANSparkMax.MotorType.kBrushless);
+		// pivotMotor = new CANSparkMax(HardwareMap.CAN_SPARK_PIVOT_MOTOR,
+		// 								CANSparkMax.MotorType.kBrushless);
 
-		pivotMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+		// pivotMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
-		lastLimitSwitch =
-		pivotMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
+		pivotMotor = new TalonFX(HardwareMap.DEVICE_ID_ARM_MOTOR);
 
-		lastLimitSwitch.enableLimitSwitch(false);
+		lastLimitSwitch = new DigitalInput(HardwareMap.INPUT_LIMIT_SWITCH_PORT);
 
 		currentEncoder = 0;
-		throughBore = new DutyCycleEncoder(0);
+		throughBore = new Encoder(1, 2);
 		throughBore.reset();
 
 
@@ -122,7 +122,7 @@ public class PivotFSM {
 	 */
 	public void update(TeleopInput input) {
 
-		if (lastLimitSwitch.isPressed()) {
+		if (lastLimitSwitch.get()) {
 			lastLimitHit = true;
 		}
 
@@ -148,7 +148,8 @@ public class PivotFSM {
 		//SmartDashboard.putNumber("Velocity", pidPivotController.getSetpoint().velocity);
 		//SmartDashboard.putNumber("voltage", pivotMotor.getAppliedOutput());
 		SmartDashboard.putNumber("Thru Bore Encoder values", throughBore.getDistance());
-		SmartDashboard.putNumber("CURRENTENCODER", currentEncoder);
+		SmartDashboard.putNumber("CURRENT ENCODER", currentEncoder);
+		SmartDashboard.putBoolean("Bottom Limit Switch", lastLimitSwitch.get());
 
 		switch (currentState) {
 			case IDLE_STOP:
@@ -196,7 +197,7 @@ public class PivotFSM {
 	 * @return if the action carried out in this state has finished executing
 	 */
 	public boolean updateAutonomous(AutoFSMState autoState) {
-		if (lastLimitSwitch.isPressed()) {
+		if (lastLimitSwitch.get()) {
 			lastLimitHit = true;
 		}
 
@@ -270,7 +271,7 @@ public class PivotFSM {
 				return PivotFSMState.IDLE_STOP;
 
 			case ZEROING:
-				if (!zeroed && !lastLimitHit && !input.isAbortButtonPressed()) {
+				if (!zeroed && !lastLimitHit && input.isZeroingButtonPressed()) {
 					return PivotFSMState.ZEROING;
 				} else {
 					return PivotFSMState.IDLE_STOP;
@@ -320,7 +321,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleIdleState(TeleopInput input) {
-		pivotMotor.set(pid(throughBore.getDistance(), currentEncoder));
+		//pivotMotor.set(pid(throughBore.getDistance(), currentEncoder));
 	}
 	/**
 	 * Handle behavior in SHOOTER.
@@ -328,7 +329,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleShooterState(TeleopInput input) {
-		pivotMotor.set(pid(currentEncoder, SHOOTER_ENCODER_ROTATIONS));
+		//pivotMotor.set(pid(currentEncoder, SHOOTER_ENCODER_ROTATIONS));
 	}
 
 	/**
@@ -337,7 +338,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleAmpState(TeleopInput input) {
-		pivotMotor.set(pid(currentEncoder, AMP_ENCODER_ROTATIONS));
+		//pivotMotor.set(pid(currentEncoder, AMP_ENCODER_ROTATIONS));
 	}
 
 	/**
@@ -346,7 +347,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleGroundState(TeleopInput input) {
-		pivotMotor.set(pid(currentEncoder, GROUND_ENCODER_ROTATIONS));
+		//pivotMotor.set(pid(currentEncoder, GROUND_ENCODER_ROTATIONS));
 	}
 
 	/**
@@ -355,7 +356,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleSourceState(TeleopInput input) {
-		pivotMotor.set(pid(currentEncoder, SOURCE_ENCODER_ROTATIONS));
+		//pivotMotor.set(pid(currentEncoder, SOURCE_ENCODER_ROTATIONS));
 	}
 
 	/**
@@ -364,13 +365,14 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleZeroingState(TeleopInput input) {
-		pivotMotor.set(MANUAL_POWER);
-
+		if (!lastLimitHit && !zeroed) {
+			//pivotMotor.set(MANUAL_POWER);
+		}
 		if (lastLimitHit && !zeroed) {
 			zeroed = true;
 			currentEncoder = 0;
 			throughBore.reset();
-			pivotMotor.set(0);
+			//pivotMotor.set(0);
 		}
 	}
 
@@ -380,7 +382,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void handleManualInState(TeleopInput input) {
-		pivotMotor.set(input.getMechControllerLeftY() * JOYSTICK_SCALING_CONSTANT);
+		//pivotMotor.set(input.getMechControllerLeftY() * JOYSTICK_SCALING_CONSTANT);
 	}
 
 	/**
@@ -389,7 +391,7 @@ public class PivotFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	public void handleManualOutState(TeleopInput input) {
-		pivotMotor.set(input.getMechControllerLeftY() * JOYSTICK_SCALING_CONSTANT);
+		//pivotMotor.set(input.getMechControllerLeftY() * JOYSTICK_SCALING_CONSTANT);
 	}
 
 	/**
