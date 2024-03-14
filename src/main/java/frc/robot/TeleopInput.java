@@ -12,12 +12,12 @@ import edu.wpi.first.wpilibj.PS4Controller;
 public class TeleopInput {
 	/* ======================== Constants ======================== */
 	private static final int MECH_CONTROLLER_PORT = 1;
-
+	private static final int DRIVER_CONTROLLER_PORT = 0;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
-
 	private PS4Controller mechController;
+	private PS4Controller driverController;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -26,16 +26,12 @@ public class TeleopInput {
 	 * by WPILib until teleop mode.
 	 */
 	public TeleopInput() {
-
 		mechController = new PS4Controller(MECH_CONTROLLER_PORT);
+		driverController = new PS4Controller(DRIVER_CONTROLLER_PORT);
+
 	}
 
-	/* ======================== Public methods ======================== */
-	// Getter methods for fetch input values should be defined here.
-	// Method names should be descriptive of the behavior, so the
-	// control mapping is hidden from other classes.
-
-	/* ------------------------ Mech Controller ------------------------ */
+	/* ------------------------ Driver Controller ------------------------ */
 	/**
 	 * Get Y axis of Left Joystick of the controller.
 	 * Manual Control for PivotFSM
@@ -46,6 +42,10 @@ public class TeleopInput {
 		return mechController.getLeftY();
 	}
 
+	public double getControllerLeftJoystickY() {
+		return driverController.getLeftY();
+	}
+
 	/**
 	 * Get the value of the Circle Button.
 	 * @return if Circle Button is pressed
@@ -53,14 +53,11 @@ public class TeleopInput {
 	public boolean isShooterArmButtonPressed() {
 		return mechController.getCircleButton();
 	}
-
-	/**
-	 * Get the value of the Square Button.
-	 * @return if Square Button is pressed
-	 */
-	public boolean isAmpArmButtonPressed() {
-		return mechController.getSquareButton();
+	
+	public double getControllerLeftJoystickX() {
+		return driverController.getLeftX();
 	}
+
 
 	/**
 	 * Get the value of the Triangle Button.
@@ -102,6 +99,10 @@ public class TeleopInput {
 		return mechController.getTouchpad();
 	}
 
+	public boolean isAmpArmButtonPressed() {
+		return false;
+	}
+
 	/**
 	 * Get the value of the PS Button.
 	 * @return if PS Button is pressed
@@ -110,9 +111,51 @@ public class TeleopInput {
 		return mechController.getPSButton();
 	}
 
+	/**
+	 * Get the Value of the Options Button.
+	 * @return if Options Button is pressed
+	 */
 	public boolean isZeroingButtonPressed() {
 		return mechController.getOptionsButton();
 	}
-	/* ======================== Private methods ======================== */
+
+	public boolean isCircleButtonPressed() {
+		return driverController.getCircleButtonPressed();
+	}
+	/**
+	 * Get the value of the Circle button.
+	 * @return True if button is released
+	 */
+	public boolean isCircleButtonReleased() {
+		return driverController.getCircleButtonReleased();
+	}
+	/**
+	 * Get the value of the Triangle button.
+	 * @return True if button is pressed
+	 */
+	public boolean isTriangleButtonPressed() {
+		return driverController.getTriangleButtonPressed();
+	}
+	/**
+	 * Get the value of the Circle button.
+	 * @return True if button is released
+	 */
+	public boolean isTriangleButtonReleased() {
+		return driverController.getTriangleButtonReleased();
+	}
+	/**
+	 * Get the value of the left trigger.
+	 * @return value of the left trigger.
+	 */
+	public double getLeftTrigger() {
+		return driverController.getL2Axis();
+	}
+	/**
+	 * Get the value of the right trigger.
+	 * @return value of the right trigger.
+	 */
+	public double getRightTrigger() {
+		return driverController.getR2Axis();
+	}
 
 }

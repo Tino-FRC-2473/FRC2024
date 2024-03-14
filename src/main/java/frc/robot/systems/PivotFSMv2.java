@@ -10,6 +10,7 @@ import com.revrobotics.SparkLimitSwitch;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Robot Imports
@@ -23,13 +24,13 @@ public class PivotFSMv2 {
 	public enum PivotFSMState {
 		ZEROING,
         IDLE_STOP,
-        SHOOTING,
+        MOVE_TO_GROUND,
+        INTAKING,
+        MOVE_TO_SHOOTER,
         OUTTAKING,
         MOVE_TO_AMP,
-        FEED_SHOOTER,
-        MOVE_TO_SHOOTER,
-        INTAKING,
-        MOVE_TO_GROUND
+        REV_UP_SHOOTER,
+        FEED_SHOOTER
 	}
 
 	private static final float MANUAL_POWER = 0.25f;
@@ -69,7 +70,6 @@ public class PivotFSMv2 {
 	private double lastLoopTime;
 	private double lastSpeed;
 	private boolean zeroed = false;
-	private boolean lastLimitHit = false;
 	private double pidVal;
 	private double acceleration;
 
@@ -87,6 +87,7 @@ public class PivotFSMv2 {
 
 	private boolean hasTimerStarted = false;
 
+	private DutyCycleEncoder throughBore;
 
 
 
@@ -127,16 +128,12 @@ public class PivotFSMv2 {
 		pidPivotController.setD(PID_CONSTANT_PIVOT_D);
 		pidPivotController.setOutputRange(MIN_TURN_SPEED, MAX_TURN_SPEED);*/
 
-		pidPivotController = new ProfiledPIDController(PID_CONSTANT_PIVOT_P,
-			PID_CONSTANT_PIVOT_I, PID_CONSTANT_PIVOT_D,
-			new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL));
-
-		pivotFeedforward = new ArmFeedforward(PID_STATIC_CONSTANT,
-			PID_GRAVITY_CONSTANT, PID_VOLTAGE_CONSTANT);
-
 		pivotMotor.getEncoder().setPosition(0);
 
+
 		currentEncoder = 0;
+		throughBore = new DutyCycleEncoder(0);
+		throughBore.reset();
 
 		// Reset state machine
 		reset();
@@ -159,7 +156,7 @@ public class PivotFSMv2 {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		currentState = PivotFSMState.IDLE_STOP;
+		currentState = PivotFSMState.ZEROING;
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -177,7 +174,7 @@ public class PivotFSMv2 {
 		lastSpeed = pidPivotController.getSetpoint().velocity;
 
 		if (lastLimitSwitch.isPressed()) {
-			lastLimitHit = true;
+			zeroed = true;
 		}
 
 		if (currentState != PivotFSMState.IDLE_STOP) {
@@ -284,30 +281,29 @@ public class PivotFSMv2 {
 		}
 		switch (currentState) {
 			case IDLE_STOP:
-				if (!zeroed && !lastLimitHit && !input.isAbortButtonPressed()) {
-					return PivotFSMState.ZEROING;
-				} else if (input.isGroundArmButtonPressed()
+				if (input.isOuttakeButtonPressed()
 					&& !input.isAbortButtonPressed()
 					&& !input.isShooterArmButtonPressed()
-					&& !input.isAmpArmButtonPressed()) {
+					&& !input.isIntakeButtonPressed()
+					&& !input.isRevUpButtonPressed()) {
 					return PivotFSMState.MOVE_TO_GROUND;
-				} else if (input.isAmpArmButtonPressed()
+				} else if (input.isOuttakeButtonPressed()
 					&& !input.isAbortButtonPressed()
 					&& !input.isShooterArmButtonPressed()
-					&& !input.isGroundArmButtonPressed()
-					&& !hasNote()) {
+					&& !input.isIntakeButtonPressed()
+					&& !input.isRevUpButtonPressed()) {
 					return PivotFSMState.MOVE_TO_AMP;
-				} else if (input.isShooterArmButtonPressed()
+				} else if (input.isRevUpButtonPressed()
 					&& !input.isAbortButtonPressed()
-					&& !input.isAmpArmButtonPressed()
-					&& !input.isGroundArmButtonPressed()) {
+					&& !input.isIntakeButtonPressed()
+					&& !input.isOuttakeButtonPressed()) {
 					return PivotFSMState.MOVE_TO_SHOOTER;
 				} else {
 					return PivotFSMState.IDLE_STOP;
 				}
 
 			case ZEROING:
-				if (!zeroed && !lastLimitHit && !input.isAbortButtonPressed()) {
+				if (!zeroed && !input.isAbortButtonPressed()) {
 					return PivotFSMState.ZEROING;
 				} else {
 					return PivotFSMState.IDLE_STOP;
@@ -315,19 +311,23 @@ public class PivotFSMv2 {
 
 			case MOVE_TO_GROUND:
 				if (!input.isAbortButtonPressed()
-					&& !inRange(currentEncoder, GROUND_ENCODER_ROTATIONS)) {
+					&& !inRange(currentEncoder, GROUND_ENCODER_ROTATIONS)
+					&& input.isIntakeButtonPressed()) {
 					return PivotFSMState.MOVE_TO_GROUND;
 				} else if (input.isAbortButtonPressed()) {
 					return PivotFSMState.IDLE_STOP;
 				} else if (!input.isAbortButtonPressed()
-						&& inRange(currentEncoder, GROUND_ENCODER_ROTATIONS)) {
+						&& inRange(currentEncoder, GROUND_ENCODER_ROTATIONS)
+						&& input.isIntakeButtonPressed()) {
 					return PivotFSMState.INTAKING;
 				}
 
 			case INTAKING:
-				if (!input.isAbortButtonPressed() && !hasNote()) {
+				if (!input.isAbortButtonPressed() && !hasNote()
+					&& input.isIntakeButtonPressed()) {
 					return PivotFSMState.INTAKING;
-				} else if (!input.isAbortButtonPressed() && hasNote()) {
+				} else if ((!input.isAbortButtonPressed() && hasNote())
+							|| !input.isIntakeButtonPressed()) {
 					return PivotFSMState.MOVE_TO_SHOOTER;
 				} else if (input.isAbortButtonPressed()) {
 					return PivotFSMState.IDLE_STOP;
@@ -337,36 +337,66 @@ public class PivotFSMv2 {
 				if (!input.isAbortButtonPressed()
 					&& inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)) {
 					return PivotFSMState.MOVE_TO_SHOOTER;
-				} else {
+				} else if (input.isAbortButtonPressed()
+					|| inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)
+					&& !input.isRevUpButtonPressed()){
 					return PivotFSMState.IDLE_STOP;
-				}
-
+				} else if (!input.isAbortButtonPressed() 
+					&& inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)
+					&& input.isRevUpButtonPressed()) {
+						return PivotFSMState.REV_UP_SHOOTER;
+					}
+			
+			case REV_UP_SHOOTER:
+				if (input.isRevUpButtonPressed()
+					&& !input.isShootButtonPressed()
+					&& !input.isAbortButtonPressed()) {
+						return PivotFSMState.REV_UP_SHOOTER;
+				} else if (!input.isAbortButtonPressed()
+					&& input.isRevUpButtonPressed()
+					&& input.isShootButtonPressed()) {
+						return PivotFSMState.FEED_SHOOTER;
+				} else if (input.isAbortButtonPressed()
+					|| !input.isRevUpButtonPressed()) {
+						return PivotFSMState.IDLE_STOP;
+					}
+				
 			case MOVE_TO_AMP:
 				if (!input.isAbortButtonPressed()
-					&& !inRange(currentEncoder, AMP_ENCODER_ROTATIONS)) {
+					&& !inRange(currentEncoder, AMP_ENCODER_ROTATIONS)
+					&& input.isOuttakeButtonPressed()) {
 					return PivotFSMState.MOVE_TO_AMP;
 				} else if (!input.isAbortButtonPressed()
-					&& inRange(currentEncoder, AMP_ENCODER_ROTATIONS)) {
+					&& inRange(currentEncoder, AMP_ENCODER_ROTATIONS)
+					&& input.isOuttakeButtonPressed()) {
 					return PivotFSMState.OUTTAKING;
 				} else if (input.isAbortButtonPressed()) {
 					return PivotFSMState.IDLE_STOP;
 				}
 
-			case SOURCE:
+			case OUTTAKING:
 				if (!input.isAbortButtonPressed()
-					&& !inRange(currentEncoder, SOURCE_ENCODER_ROTATIONS)) {
-					return PivotFSMState.SOURCE;
-				} else {
+					&& input.isOuttakeButtonPressed()
+					&& hasNote()) {
+					return PivotFSMState.OUTTAKING;
+				} else if ((!input.isAbortButtonPressed() || !hasNote()
+					|| !input.isOuttakeButtonPressed())) {
+					return PivotFSMState.MOVE_TO_SHOOTER;
+				}
+				else if (input.isAbortButtonPressed()) {
 					return PivotFSMState.IDLE_STOP;
 				}
 
-			case SHOOTER:
-				if (!input.isAbortButtonPressed()
-					&& !inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)) {
-					return PivotFSMState.SHOOTER;
-				} else {
-					return PivotFSMState.IDLE_STOP;
-				}
+			case FEED_SHOOTER:
+				if (input.isAbortButtonPressed()
+					|| !input.isRevUpButtonPressed()
+					&& !input.isShootButtonPressed()) {
+						return PivotFSMState.IDLE_STOP;
+				} else if (!input.isAbortButtonPressed()
+					&& input.isRevUpButtonPressed()
+					&& input.isShootButtonPressed()) {
+						return PivotFSMState.FEED_SHOOTER;
+					}
 
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -427,7 +457,7 @@ public class PivotFSMv2 {
 	private void handleZeroingState(TeleopInput input) {
 		pivotMotor.set(MANUAL_POWER);
 
-		if (lastLimitHit && !zeroed) {
+		if (!zeroed) {
 			zeroed = true;
 			currentEncoder = 0;
 			pivotMotor.getEncoder().setPosition(0);
@@ -513,15 +543,9 @@ public class PivotFSMv2 {
 	 * Calculates the position to PID to and the motor power required.
 	 * @param goalPosition The position the arm is supposed to go to
 	 */
-	public void pidToPosition(double goalPosition) {
-		pidVal = pidPivotController.calculate(
-			currentEncoder, goalPosition);
-		acceleration = (pidPivotController.getSetpoint().velocity
-			- lastSpeed) / (currentTime - lastLoopTime);
-
-		pivotMotor.setVoltage(clamp((pidVal
-			+ pivotFeedforward.calculate(pidPivotController.getSetpoint().velocity,
-			acceleration))));
+	private double pid(double currentEncoderPID, double targetEncoder) {
+		double correction = PID_CONSTANT_PIVOT_P * (targetEncoder - currentEncoderPID);
+		return -Math.min(MAX_TURN_SPEED, Math.max(MIN_TURN_SPEED, correction));
 	}
 
 	private boolean hasNote() {
