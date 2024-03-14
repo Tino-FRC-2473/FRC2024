@@ -27,6 +27,5 @@
     },
   ],
   "java.test.defaultConfig": "WPIlibUnitTests",
-  "java.checkstyle.configuration": "${workspaceFolder}\\checks.xml",
-  "wpilib.autoSaveOnDeploy": true
+  "java.checkstyle.configuration": "${workspaceFolder}\\checks.xml"
 }
