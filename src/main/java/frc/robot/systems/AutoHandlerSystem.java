@@ -1,47 +1,88 @@
 package frc.robot.systems;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.SwerveConstants.AutoConstants;
+
+import java.util.ArrayList;
 
 public class AutoHandlerSystem {
 	/* ======================== Constants ======================== */
 	// Auto FSM state definitions
 	public enum AutoFSMState {
-		SHOOT,
-		DRIVE_TO_NOTE,
-		DRIVE_TO_SPEAKER
+		/* --------------------------- SVR --------------------------- */
+		// LEAVE,
+		// DRIVE_TO_SCORE,
+		// PICK_UP_1,
+		// PICK_UP_2,
+		// PICK_UP_3,
+		// PICK_UP_4,
+		// SHOOTER_STATE,
+		// PENDING,
+		// SHOOTER_STATE_FAST,
+		// RUN_OVER_NOTES
+		/* --------------------------- SVR --------------------------- */
+		DEFAULT,
+		SPEAKER,
+		NOTE1,
+		NOTE2,
+		NOTE3,
+		NOTE4,
+		NOTE5,
+		NOTE6,
+		NOTE7,
+		NOTE8
 	}
-	public enum AutoPath {
-		PATH1,
-		PATH2,
-		PATH3
-	}
+
+	/* --------------------------- SVR --------------------------- */
+	// public enum AutoPath {
+	// 	PATH1, // score and leave
+	// 	PATH2, // score multiple times
+	// 	PATH3, // tbd emergency path
+	// 	PATH4,
+	// 	PATH5
+	// }
+	/* --------------------------- SVR --------------------------- */
 
 	/* ======================== Private variables ======================== */
 	//Contains the sequential list of states in the current auto path that must be executed
-	private AutoFSMState[] currentStateList;
+	private ArrayList<AutoFSMState> currentStateList = new ArrayList<>();
 
 	//The index in the currentStateList where the currentState is at
 	private int currentStateIndex;
 
 	//FSM Systems that the autoHandlerFSM uses
-	private IntakeFSM intakeFSM;
-	private MBRShooterFSM shooterFSM;
-	private PivotFSM pivotFSM;
+	private DriveFSMSystem driveSystem;
+	//private KitBotShooterFSM shooterFSM;
 
 	//Predefined auto paths
-	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
-		AutoFSMState.DRIVE_TO_NOTE, AutoFSMState.DRIVE_TO_SPEAKER, AutoFSMState.SHOOT};
+
+	/* --------------------------- SVR --------------------------- */
+	// private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
+	// 	AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.LEAVE};
+
+	// private static final AutoFSMState[] PATH2 = new AutoFSMState[]{
+	// 	AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_1,
+	// 	AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_2,
+	// 	AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_3,
+	// 	AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_4};
+
+	// private static final AutoFSMState[] PATH3 = new AutoFSMState[]{AutoFSMState.DRIVE_TO_SCORE,
+	// 	AutoFSMState.SHOOTER_STATE};
+
+	// private static final AutoFSMState[] PATH4 = new AutoFSMState[]{AutoFSMState.DRIVE_TO_SCORE,
+	// 	AutoFSMState.SHOOTER_STATE_FAST, AutoFSMState.RUN_OVER_NOTES};
+
+	// private static final AutoFSMState[] PATH5 = new AutoFSMState[]{AutoFSMState.RUN_OVER_NOTES};
+	/* --------------------------- SVR --------------------------- */
 
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state.
 	 * Initializes any subsystems such as driveFSM, armFSM, ect.
 	 * @param fsm1 the first subsystem that the auto handler will call functions on
-	 * @param fsm2 the second subsystem that the auto handler will call functions on
-	 * @param fsm3 the third subsystem that the auto handler will call functions on
 	 */
-	public AutoHandlerSystem(IntakeFSM fsm1, MBRShooterFSM fsm2, PivotFSM fsm3) {
-		intakeFSM = fsm1;
-		shooterFSM = fsm2;
-		pivotFSM = fsm3;
+	public AutoHandlerSystem(DriveFSMSystem fsm1) {
+		driveSystem = fsm1;
+		//shooterFSM = fsm2;
 	}
 
 	/* ======================== Public methods ======================== */
@@ -50,7 +91,7 @@ public class AutoHandlerSystem {
 	 * @return Current FSM state
 	 */
 	public AutoFSMState getCurrentState() {
-		return currentStateList[currentStateIndex];
+		return currentStateList.get(currentStateIndex);
 	}
 
 	/**
@@ -62,50 +103,148 @@ public class AutoHandlerSystem {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 * @param path the auto path to be executed
 	 */
-	public void reset(AutoPath path) {
-		intakeFSM.reset();
-		shooterFSM.reset();
-		pivotFSM.reset();
-		currentStateList = PATH1; //default
-		currentStateIndex = 0;
-		if (path == AutoPath.PATH1) {
-			currentStateList = PATH1;
+	public void reset(String path) {
+		driveSystem.resetAutonomus();
+		//shooterFSM.reset();
+
+		/* --------------------------- SVR --------------------------- */
+		// if (path == AutoPath.PATH1) {
+		// 	currentStateList = PATH1;
+		// } else if (path == AutoPath.PATH2) {
+		// 	currentStateList = PATH2;
+		// } else if (path == AutoPath.PATH3) {
+		// 	currentStateList = PATH3;
+		// } else if (path == AutoPath.PATH4) {
+		// 	currentStateList = PATH4;
+		// } else if (path == AutoPath.PATH5) {
+		// 	currentStateList = PATH5;
+		// }
+		// currentStateIndex = 0;
+		/* --------------------------- SVR --------------------------- */
+
+		currentStateList.clear();
+		// add <Shooting into speaker> Path to currentStateList
+		currentStateList.add(AutoFSMState.DEFAULT);
+		if (path.contains("PROT") || path.contains("MISC") || path.contains("MIDF")) {
+			if (!path.contains("PROT")) {
+				currentStateList.add(AutoFSMState.SPEAKER);
+			}
+			String notes = path.substring((int) AutoConstants.N_8 + 1 + 1); // 10
+			for (int i = 0; i < notes.length(); i++) {
+				int id = notes.charAt(i) - '0';
+				if (id == 1) {
+					currentStateList.add(AutoFSMState.NOTE1);
+				} else if (id == 2) {
+					currentStateList.add(AutoFSMState.NOTE2);
+				} else if (id == AutoConstants.N_3) {
+					currentStateList.add(AutoFSMState.NOTE3);
+				} else if (id == AutoConstants.N_4) {
+					currentStateList.add(AutoFSMState.NOTE4);
+				} else if (id == AutoConstants.N_5) {
+					currentStateList.add(AutoFSMState.NOTE5);
+				} else if (id == AutoConstants.N_6) {
+					currentStateList.add(AutoFSMState.NOTE6);
+				} else if (id == AutoConstants.N_7) {
+					currentStateList.add(AutoFSMState.NOTE7);
+				} else if (id == AutoConstants.N_8) {
+					currentStateList.add(AutoFSMState.NOTE8);
+				}
+				//add <Intaking note> Path to currentStateList
+				currentStateList.add(AutoFSMState.SPEAKER);
+				//add <Shooting into speaker> Path to currentStateList
+
+			}
 		}
+		//add <LEAVE ZONE> Path to currentStateList
+		currentStateIndex = 0;
 	}
 
 	/**
 	 * This function runs the auto's current state.
 	 */
 	public void update() {
-		if (currentStateIndex >= currentStateList.length) {
+		if (currentStateIndex >= currentStateList.size()) {
 			return;
 		}
-
 		boolean isCurrentStateFinished;
-		System.out.println("In State: " + getCurrentState());
+		SmartDashboard.putString("In Auto State: ", "" + getCurrentState());
 		switch (getCurrentState()) {
-			case SHOOT:
-				isCurrentStateFinished = intakeFSM.updateAutonomous(AutoFSMState.SHOOT)
-					& shooterFSM.updateAutonomous(AutoFSMState.SHOOT)
-					& pivotFSM.updateAutonomous(AutoFSMState.SHOOT);
+			/* --------------------------- SVR --------------------------- */
+			// case LEAVE:
+			// 	isCurrentStateFinished = driveSystem.updateAutonomous(
+			// 		AutoFSMState.LEAVE);
+			// 	break;
+			// case PICK_UP_1:
+			// 	isCurrentStateFinished = driveSystem.updateAutonomous(
+			// 		AutoFSMState.PICK_UP_1);
+			// 	break;
+			// case DRIVE_TO_SCORE:
+			// 	isCurrentStateFinished = driveSystem.updateAutonomous(
+			// 		AutoFSMState.DRIVE_TO_SCORE);
+			// 	break;
+			// case PICK_UP_2:
+			// 	isCurrentStateFinished = driveSystem.updateAutonomous(
+			// 		AutoFSMState.PICK_UP_2);
+			// 	break;
+			// case PICK_UP_3:
+			// 	isCurrentStateFinished = driveSystem.updateAutonomous(
+			// 		AutoFSMState.PICK_UP_3);
+			// 	break;
+			// case PICK_UP_4:
+			// 	isCurrentStateFinished = driveSystem.updateAutonomous(
+			// 		AutoFSMState.PICK_UP_4);
+			// 	break;
+			// case SHOOTER_STATE:
+			// 	isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE);
+			// 	break;
+			// case PENDING:
+			// 	isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.PENDING);
+			// 	break;
+			// case SHOOTER_STATE_FAST:
+			// 	isCurrentStateFinished =
+			// shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_FAST);
+			// 	break;
+			// case RUN_OVER_NOTES:
+			// 	isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.RUN_OVER_NOTES);
+			// 	break;
+			/* --------------------------- SVR --------------------------- */
+			case DEFAULT:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DEFAULT);
 				break;
-			case DRIVE_TO_NOTE:
-				//add driveFSM.updateAutonomous() & to the front of the bottom expression
-				isCurrentStateFinished = (pivotFSM.updateAutonomous(AutoFSMState.DRIVE_TO_NOTE)
-					&& intakeFSM.updateAutonomous(AutoFSMState.DRIVE_TO_NOTE))
-					& shooterFSM.updateAutonomous(AutoFSMState.DRIVE_TO_NOTE);
+			case SPEAKER:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.SPEAKER);
 				break;
-			case DRIVE_TO_SPEAKER:
-				//add driveFSM.updateAutonomous() & to the front of the bottom expression
-				isCurrentStateFinished = (pivotFSM.updateAutonomous(AutoFSMState.DRIVE_TO_SPEAKER)
-					&& shooterFSM.updateAutonomous(AutoFSMState.DRIVE_TO_SPEAKER))
-					& intakeFSM.updateAutonomous(AutoFSMState.DRIVE_TO_SPEAKER);
+			case NOTE1:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE1);
+				break;
+			case NOTE2:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE2);
+				break;
+			case NOTE3:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE3);
+				break;
+			case NOTE4:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE4);
+				break;
+			case NOTE5:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE5);
+				break;
+			case NOTE6:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE6);
+				break;
+			case NOTE7:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE7);
+				break;
+			case NOTE8:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE8);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());
 		}
+
 		if (isCurrentStateFinished) {
 			currentStateIndex++;
+			driveSystem.setCurrentPointInPath(0);
 		}
 	}
 }
