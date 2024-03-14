@@ -40,7 +40,7 @@ public final class SwerveConstants {
 		// Chassis configuration
 		public static final double TRACK_WIDTH = Units.inchesToMeters(22.5);
 		// Distance between centers of right and left wheels on robot
-		public static final double WHEEL_BASE = Units.inchesToMeters(22.5);
+		public static final double WHEEL_BASE = Units.inchesToMeters(22.75);
 		// Distance between front and back wheels on robot
 		public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
 			new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
@@ -60,7 +60,6 @@ public final class SwerveConstants {
 		// some small number to avoid floating-point errors with equality checking
 		public static final double ANGLE_MULTIPLIER_1 = 0.45;
 		public static final double ANGLE_MULTIPLIER_2 = 0.85;
-		public static final double BALANCE_SPEED_INVERSE_PROPORTION = 120;
 	}
 
 	public static final class ModuleConstants {
@@ -126,17 +125,17 @@ public final class SwerveConstants {
 
 	public static final class AutoConstants {
 		//auto paths constants
-		public static final double MAX_SPEED_METERS_PER_SECOND = 0.5; // 0.5 decided
+		public static final double MAX_SPEED_METERS_PER_SECOND = 0.2; // 0.5 decided
 		public static final double MAX_SPEED_METERS_PER_SECOND_FAST = 0.75; // 0.5 decided
 
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 10;
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI / 2;
 		public static final double AUTO_DRIVE_METERS_MARGIN_OF_ERROR = 0.03;
 		public static final double AUTO_DRIVE_METERS_MARGIN_OF_ERROR_FAST = 0.05;
-		public static final double AUTO_DRIVE_DEGREES_MARGIN_OF_ERROR = 3;
-		public static final double AUTO_DRIVE_ANGULAR_SPEED_ACCEL_CONSTANT = 120;
+		public static final double AUTO_DRIVE_DEGREES_MARGIN_OF_ERROR = 1.5;
+		public static final double AUTO_DRIVE_ANGULAR_SPEED_ACCEL_CONSTANT = 90;
 		public static final double AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT = 3;
-		public static final double CONSTANT_SPEED_THRESHOLD = 0.2; // meters
+		public static final double CONSTANT_SPEED_THRESHOLD = 0.4; // meters
 		public static final double WAIT_TIME = 5; // seconds
 
 		// constants for auto path points

@@ -51,7 +51,7 @@ public class DriveFSMSystem {
 	// private boolean svrMech;
 
 	private boolean blueAlliance;
-	private int multiplyer;
+	private int multiplier;
 	private String path;
 	private String placement;
 	private ArrayList<Integer> notes;
@@ -237,10 +237,10 @@ public class DriveFSMSystem {
 		/* --------------------------- SVR --------------------------- */
 		if (AutoPathChooser.getAllianceChooser() != null) {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
-			multiplyer = (blueAlliance ? -1 : 1);
+			multiplier = (blueAlliance ? -1 : 1);
 		} else {
 			blueAlliance = true;
-			multiplyer = -1;
+			multiplier = -1;
 		}
 		if (AutoPathChooser.getPathChooser() != null) {
 			path = AutoPathChooser.getSelectedPath();
@@ -257,16 +257,19 @@ public class DriveFSMSystem {
 				notes.add(AutoPathChooser.getSelectedNote(i));
 			}
 		}
+		gyro.reset();
 		if (placement.equals("SWSR")) {
-			resetOdometry(new Pose2d(AutoConstants.N_0_5, -1 * multiplyer,
-				new Rotation2d(AutoConstants.DEG_55 * multiplyer)));
+			resetOdometry(new Pose2d(AutoConstants.N_0_5, -1 * multiplier,
+				new Rotation2d(AutoConstants.DEG_55 * multiplier)));
+			gyro.setAngleAdjustment(-AutoConstants.DEG_55 * multiplier);
 		} else if (placement.equals("SWAM")) {
-			resetOdometry(new Pose2d(AutoConstants.N_0_5, 1 * multiplyer,
-				new Rotation2d(-AutoConstants.DEG_55 * multiplyer)));
+			resetOdometry(new Pose2d(AutoConstants.N_0_5, 1 * multiplier,
+				new Rotation2d(-AutoConstants.DEG_55 * multiplier)));
+			gyro.setAngleAdjustment(AutoConstants.DEG_55 * multiplier);
 		} else {
 			resetOdometry(new Pose2d());
+			gyro.setAngleAdjustment(0);
 		}
-		gyro.setAngleAdjustment(getPose().getRotation().getDegrees());
 		if (blueAlliance) {
 			tagOrientationAngles = new Double[]
 				{null, VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
@@ -306,7 +309,7 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("X Pos", getPose().getX());
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
 		SmartDashboard.putNumber("Heading", getPose().getRotation().getDegrees());
-
+		SmartDashboard.putNumber("Gyro Angle", gyro.getAngle());
 		switch (autoState) {
 			/* --------------------------- SVR --------------------------- */
 			// case LEAVE:
@@ -445,25 +448,25 @@ public class DriveFSMSystem {
 				ArrayList<Pose2d> def = new ArrayList<>();
 				if (path.equals("MISC")) {
 					if (placement.equals("SWSR")) {
-						def.add(new Pose2d(-AutoConstants.N_0_5, multiplyer, new Rotation2d(0)));
+						def.add(new Pose2d(-AutoConstants.N_0_5, multiplier, new Rotation2d(0)));
 					} else if (placement.equals("SWAM")) {
 						def.add(new Pose2d(-AutoConstants.N_1_5, 0,
-							new Rotation2d(-AutoConstants.DEG_45 * multiplyer)));
+							new Rotation2d(-AutoConstants.DEG_45 * multiplier)));
 					}
 				} else if (path.equals("MIDF")) {
 					if (placement.equals("SWSR")) {
-						def.add(new Pose2d(-AutoConstants.N_2_5, -AutoConstants.N_2_5 * multiplyer,
+						def.add(new Pose2d(-AutoConstants.N_2_5, -AutoConstants.N_2_5 * multiplier,
 							new Rotation2d(0)));
-						def.add(new Pose2d(-AutoConstants.N_7, -AutoConstants.N_3_5 * multiplyer,
-							new Rotation2d(AutoConstants.DEG_45 * multiplyer)));
-						def.add(new Pose2d(-AutoConstants.N_2_5, -AutoConstants.N_2_5 * multiplyer,
+						def.add(new Pose2d(-AutoConstants.N_7, -AutoConstants.N_3_5 * multiplier,
+							new Rotation2d(AutoConstants.DEG_45 * multiplier)));
+						def.add(new Pose2d(-AutoConstants.N_2_5, -AutoConstants.N_2_5 * multiplier,
 							new Rotation2d(0)));
 					} else if (placement.equals("SWAM")) {
 						def.add(new Pose2d(-AutoConstants.N_1_5,
-							(1 + AutoConstants.N_0_25) * multiplyer, new Rotation2d(0)));
+							(1 + AutoConstants.N_0_25) * multiplier, new Rotation2d(0)));
 						def.add(new Pose2d(-AutoConstants.N_5_5,
-							(1 + AutoConstants.N_0_25) * multiplyer, new Rotation2d(0)));
-						def.add(new Pose2d(-AutoConstants.N_7, multiplyer, new Rotation2d(0)));
+							(1 + AutoConstants.N_0_25) * multiplier, new Rotation2d(0)));
+						def.add(new Pose2d(-AutoConstants.N_7, multiplier, new Rotation2d(0)));
 					}
 				} else if (path.equals("SAFE")) {
 					if (placement.equals("SWCT")) {
@@ -482,8 +485,8 @@ public class DriveFSMSystem {
 			case NOTE1:
 				ArrayList<Pose2d> note1 = new ArrayList<>();
 				note1.add(new Pose2d(-1 - AutoConstants.N_0_25,
-					(-1 - AutoConstants.N_0_25) * multiplyer,
-					new Rotation2d(AutoConstants.DEG_45 * multiplyer)));
+					(-1 - AutoConstants.N_0_25) * multiplier,
+					new Rotation2d(AutoConstants.DEG_45 * multiplier)));
 				return driveAlongPath(note1);
 			case NOTE2:
 				ArrayList<Pose2d> note2 = new ArrayList<>();
@@ -493,44 +496,44 @@ public class DriveFSMSystem {
 			case NOTE3:
 				ArrayList<Pose2d> note3 = new ArrayList<>();
 				note3.add(new Pose2d(-1 - AutoConstants.N_0_25,
-					(1 + AutoConstants.N_0_25) * multiplyer,
-					new Rotation2d(-AutoConstants.DEG_45 * multiplyer)));
+					(1 + AutoConstants.N_0_25) * multiplier,
+					new Rotation2d(-AutoConstants.DEG_45 * multiplier)));
 				return driveAlongPath(note3);
 			case NOTE4:
 				ArrayList<Pose2d> note4 = new ArrayList<>();
 				note4.add(new Pose2d(-AutoConstants.N_2,
-					(-AutoConstants.N_3_5) * multiplyer,
+					(-AutoConstants.N_3_5) * multiplier,
 					new Rotation2d(0)));
 				note4.add(new Pose2d(-AutoConstants.N_6_5,
-					(-AutoConstants.N_4_5) * multiplyer,
-					new Rotation2d(AutoConstants.DEG_45 * multiplyer)));
+					(-AutoConstants.N_4_5) * multiplier,
+					new Rotation2d(AutoConstants.DEG_45 * multiplier)));
 				note4.add(new Pose2d(-AutoConstants.N_2,
-					(-AutoConstants.N_3_5) * multiplyer,
+					(-AutoConstants.N_3_5) * multiplier,
 					new Rotation2d(0)));
 				return driveAlongPath(note4);
 			case NOTE5:
 				ArrayList<Pose2d> note5 = new ArrayList<>();
 				note5.add(new Pose2d(-AutoConstants.N_6_5,
-					(-AutoConstants.N_3) * multiplyer,
-					new Rotation2d(AutoConstants.DEG_30 * multiplyer)));
+					(-AutoConstants.N_3) * multiplier,
+					new Rotation2d(AutoConstants.DEG_30 * multiplier)));
 				return driveAlongPath(note5);
 			case NOTE6:
 				ArrayList<Pose2d> note6 = new ArrayList<>();
 				note6.add(new Pose2d(-AutoConstants.N_6_5,
-					(-AutoConstants.N_1_5) * multiplyer,
-					new Rotation2d(AutoConstants.DEG_15 * multiplyer)));
+					(-AutoConstants.N_1_5) * multiplier,
+					new Rotation2d(AutoConstants.DEG_15 * multiplier)));
 				return driveAlongPath(note6);
 			case NOTE7:
 				ArrayList<Pose2d> note7 = new ArrayList<>();
 				note7.add(new Pose2d(-AutoConstants.N_6_5,
-					(AutoConstants.N_0_25) * multiplyer,
-					new Rotation2d(AutoConstants.DEG_15 * multiplyer)));
+					(AutoConstants.N_0_25) * multiplier,
+					new Rotation2d(AutoConstants.DEG_15 * multiplier)));
 				return driveAlongPath(note7);
 			case NOTE8:
 				ArrayList<Pose2d> note8 = new ArrayList<>();
 				note8.add(new Pose2d(-AutoConstants.N_6_5,
-					(AutoConstants.N_1_5) * multiplyer,
-					new Rotation2d(-AutoConstants.DEG_20 * multiplyer)));
+					(AutoConstants.N_1_5) * multiplier,
+					new Rotation2d(-AutoConstants.DEG_20 * multiplier)));
 				return driveAlongPath(note8);
 			default:
 				return false;
@@ -561,12 +564,12 @@ public class DriveFSMSystem {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-		// odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()),
-		// 	new SwerveModulePosition[] {
-		// 		frontLeft.getPosition(),
-		// 		frontRight.getPosition(),
-		// 		rearLeft.getPosition(),
-		// 		rearRight.getPosition()});
+		odometry.update(Rotation2d.fromDegrees(-gyro.getAngle()),
+			new SwerveModulePosition[] {
+				frontLeft.getPosition(),
+				frontRight.getPosition(),
+				rearLeft.getPosition(),
+				rearRight.getPosition()});
 
 		if (input == null) {
 			return;
@@ -574,6 +577,9 @@ public class DriveFSMSystem {
 		SmartDashboard.putString("Drive State", getCurrentState().toString());
 		SmartDashboard.putBoolean("Is Source Aligned", isSourceAligned);
 		SmartDashboard.putBoolean("Is Speaker Aligned", isSpeakerAligned);
+		SmartDashboard.putNumber("X Pos", getPose().getX());
+		SmartDashboard.putNumber("Y Pos", getPose().getY());
+		SmartDashboard.putNumber("Heading", getPose().getRotation().getDegrees());
 		if (blueAlliance) {
 			if (!(rpi.getAprilTagZInv(VisionConstants.BLUE_SOURCE_TAG1_ID)
 						== VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
