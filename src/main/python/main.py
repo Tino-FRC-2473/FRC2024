@@ -18,7 +18,7 @@ input = VisionInput(FOV, RES, CAM_HEIGHT, CAM_ANGLE)
 curr = 0
 cnt = 0
 while True:
-    p = time.time()
+    
     try:
         frame = input.getFrame()
         table = inst.getTable("datatable")
@@ -26,7 +26,9 @@ while True:
         noteY = table.getDoubleTopic("note_yaw").publish()
         noteD = table.getDoubleTopic("note_distance").publish()
 
+        p = time.time()
         results = d.detectGameElement(np.asarray(frame), ["RING"])
+        print("detection time: ", str(time.time() - p))
 
         if results is not None:
             for type, target in results.items():

@@ -990,9 +990,9 @@ public class DriveFSMSystem {
 				isSourceAligned = true;
 			}
 			if (!isSourceAligned) {
-				drive(xSpeed, ySpeed, aSpeed, false, false);
+				drive(0, 0, aSpeed/4, false, false);
 			} else {
-				drive(0, 0, aSpeed, false, false);
+				drive(0, 0, aSpeed/4, false, false);
 			}
 		}
 	}
