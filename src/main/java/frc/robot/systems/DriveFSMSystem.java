@@ -596,6 +596,7 @@ public class DriveFSMSystem {
 				} else if (input.isTriangleButtonPressed()) {
 					return FSMState.ALIGN_TO_SOURCE_STATE;
 				} else if (input.isCrossButtonPressed()) {
+					isNoteAligned = false;
 					return FSMState.ALIGN_TO_NOTE_STATE;
 				}
 
@@ -985,16 +986,20 @@ public class DriveFSMSystem {
 			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND) : 0;
 
+		System.out.println(aSpeed/4);
+		SmartDashboard.putNumber("yaw", rpi.getNoteYaw());
+
 		if (!isNoteAligned) {
+			drive(0, 0, aSpeed, false, false);
 			if (aSpeed == 0) {
-				isSourceAligned = true;
-			}
-			if (!isSourceAligned) {
-				drive(0, 0, aSpeed/4, false, false);
-			} else {
-				drive(0, 0, aSpeed/4, false, false);
+				isNoteAligned = true;
 			}
 		}
+		if (isNoteAligned) {
+				System.out.println("stopped note alignment");
+				drive(0, 0, 0, false, false);
+		}
+			
 	}
 
 	/**
