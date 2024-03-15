@@ -8,33 +8,10 @@ import edu.wpi.first.wpilibj.DigitalInput;
  */
 public final class HardwareMap {
 	// ID numbers for devices on the CAN bus
-	public static final int CAN_ID_SPARK_DRIVE_FRONT_RIGHT = 1;
-	public static final int CAN_ID_SPARK_DRIVE_BACK_RIGHT = 2;
-	public static final int CAN_ID_SPARK_DRIVE_FRONT_LEFT = 3;
-	public static final int CAN_ID_SPARK_DRIVE_BACK_LEFT = 4;
-
 	public static final int CAN_ID_SPARK_LSHOOTER_MOTOR = 38;
 	public static final int CAN_ID_SPARK_RSHOOTER_MOTOR = 39;
-	public static final int CAN_ID_SPARK_INTAKE_MOTOR = 31;
 	public static final int DEVICE_ID_ARM_MOTOR = 0;
 	public static final int DEVICE_ID_INTAKE_MOTOR = 1;
 
-	public static final int CAN_SPARK_PIVOT_MOTOR = 36;
 
-	public static final int INPUT_LIMIT_SWITCH_PORT = 2;
-
-	// Pneumatics channel numbers
-	public static final int PCM_CHANNEL_INTAKE_CYLINDER_FORWARD = 1;
-	public static final int PCM_CHANNEL_INTAKE_CYLINDER_REVERSE = 2;
-
-	// Place jumper from DIO pin 9 to GND to indicate this is a test setup
-	private static final int DIO_TEST_SETUP_CHANNEL = 9;
-	private static DigitalInput testBoardPin = new DigitalInput(HardwareMap.DIO_TEST_SETUP_CHANNEL);
-	/**
-	 * Check if the current RoboRIO is part of a test setup or real robot.
-	 * @return true if the current setup is a test setup
-	 */
-	public static boolean isTestBoard() {
-		return !HardwareMap.testBoardPin.get();
-	}
 }

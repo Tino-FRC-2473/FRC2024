@@ -12,12 +12,10 @@ import edu.wpi.first.wpilibj.PS4Controller;
 public class TeleopInput {
 	/* ======================== Constants ======================== */
 	private static final int MECH_CONTROLLER_PORT = 1;
-	private static final int DRIVER_CONTROLLER_PORT = 0;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
 	private PS4Controller mechController;
-	private PS4Controller driverController;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -27,135 +25,34 @@ public class TeleopInput {
 	 */
 	public TeleopInput() {
 		mechController = new PS4Controller(MECH_CONTROLLER_PORT);
-		driverController = new PS4Controller(DRIVER_CONTROLLER_PORT);
 
 	}
 
 	/* ------------------------ Driver Controller ------------------------ */
-	/**
-	 * Get Y axis of Left Joystick of the controller.
-	 * Manual Control for PivotFSM
-	 * @return Axis value
-	 */
-
-	public double getMechControllerLeftY() {
-		return mechController.getLeftY();
-	}
-
-	/**
-	 * Get the value of the left joystick Y for drive controller.
-	 * @return the value of the left joystick Y
-	 */
-	public double getControllerLeftJoystickY() {
-		return driverController.getLeftY();
-	}
 
 	/**
 	 * Get the value of the Circle Button.
 	 * @return if Circle Button is pressed
 	 */
-	public boolean isShooterArmButtonPressed() {
-		return mechController.getCircleButton();
-	}
-
-	/**
-	 * Get the value of the left joystick X for drive controller.
-	 * @return the value of the left joystick X
-	 */
-	public double getControllerLeftJoystickX() {
-		return driverController.getLeftX();
-	}
-
-	/**
-	 * Get the value of the Cross Button.
-	 * @return if Cross Button is pressed
-	 */
-	public boolean isGroundArmButtonPressed() {
-		return mechController.getCrossButton();
-	}
-
-	/**
-	 * Get the value of the L1 Button.
-	 * @return if L1 Button is pressed
-	 */
-	public boolean isIntakeButtonPressed() {
-		return mechController.getL1Button();
+	public boolean isShootButtonPressed() {
+		return mechController.getTriangleButton();
 	}
 
 	/**
 	 * Get the value of the R1 Button.
 	 * @return if R1 Button is pressed
 	 */
-	public boolean isOuttakeButtonPressed() {
-		return mechController.getR1Button();
+	public boolean isIntakeButtonPressed() {
+		return mechController.getCircleButton();
 	}
 
 	/**
 	 * Get the value of the Touchpad Button.
 	 * @return if Touchpad Button is pressed
 	 */
-	public boolean isShootButtonPressed() {
-		return mechController.getTouchpad();
+	public boolean isRevButtonPressed() {
+		return mechController.getL1Button();
 	}
 
-	/**
-	 * Get the value of the Square Button.
-	 * @return if Square Button is pressed
-	 */
-	public boolean isAmpArmButtonPressed() {
-		return mechController.getSquareButton();
-	}
-
-	/**
-	 * Get the value of the PS Button.
-	 * @return if PS Button is pressed
-	 */
-	public boolean isAbortButtonPressed() {
-		return mechController.getPSButton();
-	}
-
-	/**
-	 * Get if the Circle Button is pressed.
-	 * @return if circle Button is pressed
-	 */
-
-	public boolean isCircleButtonPressed() {
-		return driverController.getCircleButtonPressed();
-	}
-	/**
-	 * Get the value of the Circle button.
-	 * @return True if button is released
-	 */
-	public boolean isCircleButtonReleased() {
-		return driverController.getCircleButtonReleased();
-	}
-	/**
-	 * Get the value of the Triangle button.
-	 * @return True if button is pressed
-	 */
-	public boolean isTriangleButtonPressed() {
-		return driverController.getTriangleButtonPressed();
-	}
-	/**
-	 * Get the value of the Circle button.
-	 * @return True if button is released
-	 */
-	public boolean isTriangleButtonReleased() {
-		return driverController.getTriangleButtonReleased();
-	}
-	/**
-	 * Get the value of the left trigger.
-	 * @return value of the left trigger.
-	 */
-	public double getLeftTrigger() {
-		return driverController.getL2Axis();
-	}
-	/**
-	 * Get the value of the right trigger.
-	 * @return value of the right trigger.
-	 */
-	public double getRightTrigger() {
-		return driverController.getR2Axis();
-	}
 
 }
