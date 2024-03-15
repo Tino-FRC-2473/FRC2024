@@ -32,17 +32,8 @@ public class TeleopInput {
 	}
 
 	/* ------------------------ Driver Controller ------------------------ */
-	/**
-	 * Get Y axis of Left Joystick of the controller.
-	 * Manual Control for PivotFSM
-	 * @return Axis value
-	 */
-
-	public double getMechControllerLeftY() {
-		return mechController.getLeftY();
-	}
-
-	/**
+	
+/**
 	 * Get the value of the left joystick Y for drive controller.
 	 * @return the value of the left joystick Y
 	 */
@@ -50,15 +41,8 @@ public class TeleopInput {
 		return driverController.getLeftY();
 	}
 
-	/**
-	 * Get the value of the Circle Button.
-	 * @return if Circle Button is pressed
-	 */
-	public boolean isShooterArmButtonPressed() {
-		return mechController.getCircleButton();
-	}
 
-	/**
+/**
 	 * Get the value of the left joystick X for drive controller.
 	 * @return the value of the left joystick X
 	 */
@@ -67,18 +51,61 @@ public class TeleopInput {
 	}
 
 	/**
-	 * Get the value of the Cross Button.
-	 * @return if Cross Button is pressed
+	 * Get if the Circle Button is pressed.
+	 * @return if circle Button is pressed
 	 */
-	public boolean isGroundArmButtonPressed() {
-		return mechController.getCrossButton();
+
+	public boolean isCircleButtonPressed() {
+		return driverController.getCircleButtonPressed();
 	}
+
+	/**
+	 * Get the value of the Circle button.
+	 * @return True if button is released
+	 */
+	public boolean isCircleButtonReleased() {
+		return driverController.getCircleButtonReleased();
+	}
+
+	/**
+	 * Get the value of the Triangle button.
+	 * @return True if button is pressed
+	 */
+	public boolean isTriangleButtonPressed() {
+		return driverController.getTriangleButtonPressed();
+	}
+
+	/**
+	 * Get the value of the Circle button.
+	 * @return True if button is released
+	 */
+	public boolean isTriangleButtonReleased() {
+		return driverController.getTriangleButtonReleased();
+	}
+
+	/**
+	 * Get the value of the left trigger.
+	 * @return value of the left trigger.
+	 */
+	public double getLeftTrigger() {
+		return driverController.getL2Axis();
+	}
+
+	/**
+	 * Get the value of the right trigger.
+	 * @return value of the right trigger.
+	 */
+	public double getRightTrigger() {
+		return driverController.getR2Axis();
+	}
+
+/* ------------------------ Mech Controller ------------------------ */
 
 	/**
 	 * Get the value of the L1 Button.
 	 * @return if L1 Button is pressed
 	 */
-	public boolean isIntakeButtonPressed() {
+	public boolean isRevUpButtonPressed() {
 		return mechController.getL1Button();
 	}
 
@@ -86,24 +113,32 @@ public class TeleopInput {
 	 * Get the value of the R1 Button.
 	 * @return if R1 Button is pressed
 	 */
-	public boolean isOuttakeButtonPressed() {
-		return mechController.getR1Button();
-	}
-
-	/**
-	 * Get the value of the Touchpad Button.
-	 * @return if Touchpad Button is pressed
-	 */
 	public boolean isShootButtonPressed() {
-		return mechController.getTouchpad();
+		return mechController.getR1Button();
 	}
 
 	/**
 	 * Get the value of the Square Button.
 	 * @return if Square Button is pressed
 	 */
-	public boolean isAmpArmButtonPressed() {
+	public boolean isAmpButtonPressed() {
 		return mechController.getSquareButton();
+	}
+
+	/**
+	 * Get the value of the Circle Button.
+	 * @return if Circle Button is pressed
+	 */
+	public boolean isIntakeButtonPressed() {
+		return mechController.getCircleButton();
+	}
+
+	/**
+	 * Get the value of the Cross Button.
+	 * @return if Cross Button is pressed
+	 */
+	public boolean isClimbButtonPressed() {
+		return mechController.getCrossButton();
 	}
 
 	/**
@@ -115,47 +150,12 @@ public class TeleopInput {
 	}
 
 	/**
-	 * Get if the Circle Button is pressed.
-	 * @return if circle Button is pressed
+	 * Get Y axis of Left Joystick of the controller.
+	 * Manual Control for PivotFSM
+	 * @return Axis value
 	 */
 
-	public boolean isCircleButtonPressed() {
-		return driverController.getCircleButtonPressed();
+	 public double getMechControllerLeftY() {
+		return mechController.getLeftY();
 	}
-	/**
-	 * Get the value of the Circle button.
-	 * @return True if button is released
-	 */
-	public boolean isCircleButtonReleased() {
-		return driverController.getCircleButtonReleased();
-	}
-	/**
-	 * Get the value of the Triangle button.
-	 * @return True if button is pressed
-	 */
-	public boolean isTriangleButtonPressed() {
-		return driverController.getTriangleButtonPressed();
-	}
-	/**
-	 * Get the value of the Circle button.
-	 * @return True if button is released
-	 */
-	public boolean isTriangleButtonReleased() {
-		return driverController.getTriangleButtonReleased();
-	}
-	/**
-	 * Get the value of the left trigger.
-	 * @return value of the left trigger.
-	 */
-	public double getLeftTrigger() {
-		return driverController.getL2Axis();
-	}
-	/**
-	 * Get the value of the right trigger.
-	 * @return value of the right trigger.
-	 */
-	public double getRightTrigger() {
-		return driverController.getR2Axis();
-	}
-
 }

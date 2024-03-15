@@ -4,7 +4,6 @@ package frc.robot.systems;
 // WPILib Imports
 
 // Third party Hardware Imports
-//import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
@@ -134,15 +133,10 @@ public class PivotFSM {
 
 		SmartDashboard.putString("Current State", currentState.toString());
 		SmartDashboard.putNumber("Motor Power", pivotMotor.get());
-		//SmartDashboard.putNumber("Encoder Value", currentEncoder);
-		//SmartDashboard.putNumber("PidVAL", pidVal);
-		//SmartDashboard.putNumber("Accel", acceleration);
-		//SmartDashboard.putNumber("Velocity", pidPivotController.getSetpoint().velocity);
-		//SmartDashboard.putNumber("voltage", pivotMotor.getAppliedOutput());
 		SmartDashboard.putNumber("Thru Bore Encoder values", throughBore.getDistance());
 		SmartDashboard.putNumber("CURRENT ENCODER", currentEncoder);
 		SmartDashboard.putBoolean("Bottom Limit Switch", lastLimitSwitch.get());
-		SmartDashboard.putBoolean("Ground pivot burron", input.isGroundArmButtonPressed());
+		SmartDashboard.putBoolean("Ground pivot button", input.isIntakeButtonPressed());
 		switch (currentState) {
 			case IDLE_STOP:
 				handleIdleState(input);
@@ -223,13 +217,13 @@ public class PivotFSM {
 				} else if (currentEncoder <= MAX_ENCODER_ROTATIONS
 					&& input.getMechControllerLeftY() >= JOYSTICK_DEAD_ZONE) {
 					return PivotFSMState.MANUAL_OUT;
-				} else if (input.isGroundArmButtonPressed()
+				} else if (input.isIntakeButtonPressed()
 					&& !inRange(currentEncoder, GROUND_ENCODER_ROTATIONS)) {
 					return PivotFSMState.GROUND;
-				} else if (input.isAmpArmButtonPressed()
+				} else if (input.isAmpButtonPressed()
 					&& !inRange(currentEncoder, AMP_ENCODER_ROTATIONS)) {
 					return PivotFSMState.AMP;
-				} else if (input.isShooterArmButtonPressed()
+				} else if (input.isShootButtonPressed()
 					&& !inRange(currentEncoder, SHOOTER_ENCODER_ROTATIONS)) {
 					return PivotFSMState.SHOOTER;
 				} else {
