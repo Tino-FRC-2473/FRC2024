@@ -105,7 +105,7 @@ public class IntakeFSM {
 			return;
 		}
 
-		SmartDashboard.putBoolean("Current value surpassed / hasNote", hasNote());
+		// SmartDashboard.putBoolean("Current value surpassed / hasNote", hasNote());
 		SmartDashboard.putNumberArray("Current array values", currLogs);
 
 		switch (currentState) {
@@ -175,19 +175,6 @@ public class IntakeFSM {
 			case INTAKING:
 				if (input.isIntakeButtonPressed() && !input.isOuttakeButtonPressed()
 					&& !hasNote()) {
-					currLogs[tick % AVERAGE_SIZE] = intakeMotor.getOutputCurrent();
-					tick++;
-					double avgcone = 0;
-					for (int i = 0; i < AVERAGE_SIZE; i++) {
-						avgcone += currLogs[i];
-					}
-					avgcone /= AVERAGE_SIZE;
-					if (avgcone > CURRENT_THRESHOLD) {
-						holding = true;
-						return IntakeFSMState.IDLE_STOP;
-					} else {
-						holding = false;
-					}
 					return IntakeFSMState.INTAKING;
 				}
 
@@ -211,11 +198,11 @@ public class IntakeFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleIdleState(TeleopInput input) {
-		if (holding) {
-			intakeMotor.set(HOLDING_POWER);
-		} else {
-			intakeMotor.set(0);
-		}
+		// if (holding) {
+		// 	intakeMotor.set(HOLDING_POWER);
+		// } else {
+		intakeMotor.set(0);
+		// }
 	}
 	/**
 	 * Handle behavior in INTAKING.
@@ -224,6 +211,19 @@ public class IntakeFSM {
 	 */
 	private void handleIntakingState(TeleopInput input) {
 		intakeMotor.set(INTAKE_POWER);
+		currLogs[tick % AVERAGE_SIZE] = intakeMotor.getOutputCurrent();
+		tick++;
+		double avgcone = 0;
+		for (int i = 0; i < AVERAGE_SIZE; i++) {
+			avgcone += currLogs[i];
+		}
+		avgcone /= AVERAGE_SIZE;
+		SmartDashboard.putNumber("avg current", avgcone);
+		// if (avgcone > CURRENT_THRESHOLD) {
+		// 	holding = true;
+		// } else {
+		// 	holding = false;
+		// }
 	}
 
 	/**
@@ -235,7 +235,7 @@ public class IntakeFSM {
 		for (int i = 0; i < AVERAGE_SIZE; i++) {
 			currLogs[i] = 0;
 		}
-		holding = false;
+		// holding = false;
 		intakeMotor.set(OUTTAKE_POWER);
 	}
 
@@ -273,6 +273,7 @@ public class IntakeFSM {
 	}
 
 	private boolean hasNote() {
-		return holding;
+		//return holding;
+		return false;
 	}
 }

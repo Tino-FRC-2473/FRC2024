@@ -42,6 +42,10 @@ public class TeleopInput {
 		return mechController.getLeftY();
 	}
 
+	/**
+	 * Get the value of the left joystick Y for drive controller.
+	 * @return the value of the left joystick Y
+	 */
 	public double getControllerLeftJoystickY() {
 		return driverController.getLeftY();
 	}
@@ -53,18 +57,13 @@ public class TeleopInput {
 	public boolean isShooterArmButtonPressed() {
 		return mechController.getCircleButton();
 	}
-	
-	public double getControllerLeftJoystickX() {
-		return driverController.getLeftX();
-	}
-
 
 	/**
-	 * Get the value of the Triangle Button.
-	 * @return if Triangle Button is pressed
+	 * Get the value of the left joystick X for drive controller.
+	 * @return the value of the left joystick X
 	 */
-	public boolean isSourceArmButtonPressed() {
-		return mechController.getTriangleButton();
+	public double getControllerLeftJoystickX() {
+		return driverController.getLeftX();
 	}
 
 	/**
@@ -99,8 +98,12 @@ public class TeleopInput {
 		return mechController.getTouchpad();
 	}
 
+	/**
+	 * Get the value of the Square Button.
+	 * @return if Square Button is pressed
+	 */
 	public boolean isAmpArmButtonPressed() {
-		return false;
+		return mechController.getSquareButton();
 	}
 
 	/**
@@ -112,12 +115,9 @@ public class TeleopInput {
 	}
 
 	/**
-	 * Get the Value of the Options Button.
-	 * @return if Options Button is pressed
+	 * Get if the Circle Button is pressed.
+	 * @return if circle Button is pressed
 	 */
-	public boolean isZeroingButtonPressed() {
-		return mechController.getOptionsButton();
-	}
 
 	public boolean isCircleButtonPressed() {
 		return driverController.getCircleButtonPressed();

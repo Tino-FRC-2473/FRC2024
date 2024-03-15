@@ -20,7 +20,7 @@ public final class HardwareMap {
 
 	public static final int CAN_SPARK_PIVOT_MOTOR = 36;
 
-	public static final int INPUT_LIMIT_SWITCH_PORT = 0;
+	public static final int INPUT_LIMIT_SWITCH_PORT = 2;
 
 	// Pneumatics channel numbers
 	public static final int PCM_CHANNEL_INTAKE_CYLINDER_FORWARD = 1;
