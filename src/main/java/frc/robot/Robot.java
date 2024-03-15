@@ -38,8 +38,8 @@ public class Robot extends TimedRobot {
 	private UsbCamera driverCam;
 	private UsbCamera chainCam;
 	private VideoSink videoSink;
-	private MjpegServer driverStream;
-	private MjpegServer chainStream;
+	// private MjpegServer driverStream;
+	// private MjpegServer chainStream;
 
 	private boolean chainCamToggled;
 
@@ -59,11 +59,11 @@ public class Robot extends TimedRobot {
 		// climberMechRightFSM = new ClimberMechFSMRight();
 		autoHandler = new AutoHandlerSystem(driveFSMSystem);
 
-		driverCam = CameraServer.startAutomaticCapture(0);
-		chainCam = CameraServer.startAutomaticCapture(1);
+		// driverCam = CameraServer.startAutomaticCapture(0);
+		// chainCam = CameraServer.startAutomaticCapture(1);
 
-		driverCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
-		chainCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+		// driverCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+		// chainCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
 
 		// videoSink = CameraServer.getServer();
 		// chainCamToggled = false;
