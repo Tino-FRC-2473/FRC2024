@@ -4,18 +4,18 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 // WPILib Imports
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
 //import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
-import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 
 public class PivotFSMv2 {
 	/* ======================== Constants ======================== */
@@ -27,12 +27,24 @@ public class PivotFSMv2 {
 		SHOOTING
 	}
 
+	public enum AutoFSMState {
+		SPEAKER,
+		NOTE,
+		SHOOT
+	}
+
 	private static final float SHOOTING_POWER = 0.7f;
+	private static final double AUTO_SHOOTING_TIME = 1.0;
 
 	private static final float INTAKE_POWER = 0.1f;
 	private static final float OUTTAKE_POWER = -0.1f;
 	private static final float HOLDING_POWER = 0.03f;
 	private static final int AVERAGE_SIZE = 7;
+	private static final float CURRENT_THRESHOLD = 15.0f;
+	private double[] currLogs;
+	private int tick = 0;
+	private boolean holding = false;
+
 
 	private static final double MIN_TURN_SPEED = -0.15;
 	private static final double MAX_TURN_SPEED = 0.15;
@@ -51,9 +63,8 @@ public class PivotFSMv2 {
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 
-	private double currentEncoder;
 	private Encoder throughBore;
-
+	private Timer timer;
 
 
 
@@ -75,7 +86,6 @@ public class PivotFSMv2 {
 		pivotMotor = new TalonFX(HardwareMap.DEVICE_ID_ARM_MOTOR);
 		pivotMotor.setNeutralMode(NeutralModeValue.Brake);
 
-		currentEncoder = 0;
 		throughBore = new Encoder(0, 1);
 		throughBore.reset();
 
@@ -101,6 +111,7 @@ public class PivotFSMv2 {
 	 */
 	public void reset() {
 		currentState = PivotFSMState.MOVE_TO_SHOOTER;
+		timer.reset();
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -116,6 +127,21 @@ public class PivotFSMv2 {
 		if (input == null) {
 			return;
 		}
+
+		currLogs[tick % AVERAGE_SIZE] = intakeMotor.getTorqueCurrent().getValueAsDouble();
+		tick++;
+		double avgcone = 0;
+		for (int i = 0; i < AVERAGE_SIZE; i++) {
+			avgcone += currLogs[i];
+		}
+		avgcone /= AVERAGE_SIZE;
+		SmartDashboard.putNumber("avg current", avgcone);
+		SmartDashboard.putString("Current State", getCurrentState().toString());
+		SmartDashboard.putNumber("Intake power", intakeMotor.get());
+		SmartDashboard.putNumber("Pivot power", pivotMotor.get());
+		SmartDashboard.putNumber("Left shooter power", shooterLeftMotor.get());
+		SmartDashboard.putNumber("Right shooter power", shooterRightMotor.get());
+		SmartDashboard.putNumber("Pivot encoder count", throughBore.getDistance());
 
 		switch (currentState) {
 			case MOVE_TO_SHOOTER:
@@ -144,6 +170,12 @@ public class PivotFSMv2 {
 	 */
 	public boolean updateAutonomous(AutoFSMState autoState) {
 		switch (autoState) {
+			case NOTE:
+				return handleAutoMoveGround() && handleAutoIntake();
+			case SPEAKER:
+				return handleAutoMoveShooter() && handleAutoRev();
+			case SHOOT:
+				return handleAutoShoot();
 			default:
 				return true;
 		}
@@ -168,7 +200,11 @@ public class PivotFSMv2 {
 				}
 				if (!input.isIntakeButtonPressed() && (input.isShootButtonPressed()
 					|| input.isRevButtonPressed())) {
-					return PivotFSMState.SHOOTING;
+					if (inRange(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS)) {
+						return PivotFSMState.SHOOTING;
+					} else {
+						return PivotFSMState.MOVE_TO_SHOOTER;
+					}
 				}
 				return PivotFSMState.MOVE_TO_SHOOTER;
 			case MOVE_TO_GROUND:
@@ -213,24 +249,43 @@ public class PivotFSMv2 {
 		return Math.min(MAX_TURN_SPEED, Math.max(MIN_TURN_SPEED, correction));
 	}
 
+	/**
+	 * Handles the moving to shooter state of the MBR Mech.
+	 * @param input
+	 */
 	public void handleMoveShooterState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
 		intakeMotor.set(0);
 	}
+
+	/**
+	 * Handles the moving to ground state of the MBR Mech.
+	 * @param input
+	 */
 	public void handleMoveGroundState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
 		intakeMotor.set(0);
 	}
+
+	/**
+	 * Handles the intaking state of the MBR Mech.
+	 * @param input
+	 */
 	public void handleIntakingState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
 		intakeMotor.set(INTAKE_POWER);
 	}
+
+	/**
+	 * Handles the shooting state of the MBR Mech.
+	 * @param input
+	 */
 	public void handleShootingState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		if (input.isRevButtonPressed() && !input.isShootButtonPressed()) {
@@ -245,7 +300,56 @@ public class PivotFSMv2 {
 		}
 	}
 
+	/**
+	 * Checks if the intake is holding a note.
+	 * NEEDS TO BE IMPLEMENTED STILL
+	 * @return if the intake is holding a note
+	 */
 	public boolean hasNote() {
 		return false;
+	}
+
+	public boolean handleAutoMoveGround() {
+		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
+		return inRange(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS);
+	}
+
+	public boolean handleAutoMoveShooter() {
+		intakeMotor.set(HOLDING_POWER);
+		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
+		return inRange(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS);
+	}
+
+	public boolean handleAutoRev() {
+		shooterLeftMotor.set(SHOOTING_POWER);
+		shooterRightMotor.set(SHOOTING_POWER);
+		return true;
+	}
+
+	public boolean handleAutoShoot() {
+		if (timer.get() == 0) {
+			timer.start();
+		}
+		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
+		if (timer.get() > AUTO_SHOOTING_TIME) {
+			intakeMotor.set(0);
+			shooterLeftMotor.set(0);
+			shooterRightMotor.set(0);
+			timer.stop();
+			timer.reset();
+			return true;
+		} else {
+			intakeMotor.set(OUTTAKE_POWER);
+			shooterLeftMotor.set(SHOOTING_POWER);
+			shooterRightMotor.set(SHOOTING_POWER);
+			return false;
+		}
+	}
+
+	public boolean handleAutoIntake() {
+		intakeMotor.set(INTAKE_POWER);
+		shooterLeftMotor.set(0);
+		shooterRightMotor.set(0);
+		return true;
 	}
 }

@@ -1,229 +1,229 @@
-package frc.robot.systems;
+// package frc.robot.systems;
 
-// WPILib Imports
+// // WPILib Imports
 
-// Third party Hardware Imports
-import com.revrobotics.CANSparkMax;
+// // Third party Hardware Imports
+// import com.revrobotics.CANSparkMax;
 
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// Robot Imports
-import frc.robot.TeleopInput;
-import frc.robot.HardwareMap;
-import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
+// import edu.wpi.first.wpilibj.Timer;
+// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+// // Robot Imports
+// import frc.robot.TeleopInput;
+// import frc.robot.HardwareMap;
+// import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 
-public class MBRShooterFSM {
-	/* ======================== Constants ======================== */
-	// FSM state definitions
-	public enum FSMState {
-		IDLE_STOP,
-		SHOOTING
-	}
+// public class MBRShooterFSM {
+// 	/* ======================== Constants ======================== */
+// 	// FSM state definitions
+// 	public enum FSMState {
+// 		IDLE_STOP,
+// 		SHOOTING
+// 	}
 
-	private static final float SHOOTING_POWER = 0.7f;
-	private static final float SHOOTING_TIME = 1.0f;
-	private boolean buttonToggle = false;
-	private boolean buttonPressedLastFrame = false;
+// 	private static final float SHOOTING_POWER = 0.7f;
+// 	private static final float SHOOTING_TIME = 1.0f;
+// 	private boolean buttonToggle = false;
+// 	private boolean buttonPressedLastFrame = false;
 
 
-	/* ======================== Private variables ======================== */
-	private FSMState currentState;
+// 	/* ======================== Private variables ======================== */
+// 	private FSMState currentState;
 
-	// Hardware devices should be owned by one and only one system. They must
-	// be private to their owner system and may not be used elsewhere.
-	private CANSparkMax leftMotor;
-	private CANSparkMax rightMotor;
+// 	// Hardware devices should be owned by one and only one system. They must
+// 	// be private to their owner system and may not be used elsewhere.
+// 	private CANSparkMax leftMotor;
+// 	private CANSparkMax rightMotor;
 
-	private boolean autoShootingTimerStarted = false;
-	private double autoShootingTimerStart;
+// 	private boolean autoShootingTimerStarted = false;
+// 	private double autoShootingTimerStart;
 
-	private Timer shootingTimer = new Timer();
+// 	private Timer shootingTimer = new Timer();
 
-	/* ======================== Constructor ======================== */
-	/**
-	 * Create FSMSystem and initialize to starting state. Also perform any
-	 * one-time initialization or configuration of hardware required. Note
-	 * the constructor is called only once when the robot boots.
-	 */
-	public MBRShooterFSM() {
-		// Perform hardware init
-		leftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LSHOOTER_MOTOR,
-										CANSparkMax.MotorType.kBrushless);
+// 	/* ======================== Constructor ======================== */
+// 	/**
+// 	 * Create FSMSystem and initialize to starting state. Also perform any
+// 	 * one-time initialization or configuration of hardware required. Note
+// 	 * the constructor is called only once when the robot boots.
+// 	 */
+// 	public MBRShooterFSM() {
+// 		// Perform hardware init
+// 		leftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LSHOOTER_MOTOR,
+// 										CANSparkMax.MotorType.kBrushless);
 
-		rightMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_RSHOOTER_MOTOR,
-										CANSparkMax.MotorType.kBrushless);
-		// Reset state machine
-		reset();
-	}
+// 		rightMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_RSHOOTER_MOTOR,
+// 										CANSparkMax.MotorType.kBrushless);
+// 		// Reset state machine
+// 		reset();
+// 	}
 
-	/* ======================== Public methods ======================== */
-	/**
-	 * Return current FSM state.
-	 * @return Current FSM state
-	 */
-	public FSMState getCurrentState() {
-		return currentState;
-	}
-	/**
-	 * Reset this system to its start state. This may be called from mode init
-	 * when the robot is enabled.
-	 *
-	 * Note this is distinct from the one-time initialization in the constructor
-	 * as it may be called multiple times in a boot cycle,
-	 * Ex. if the robot is enabled, disabled, then reenabled.
-	 */
-	public void reset() {
-		currentState = FSMState.IDLE_STOP;
-		shootingTimer = new Timer();
-		shootingTimer.start();
-		autoShootingTimerStarted = false;
-		// Call one tick of update to ensure outputs reflect start state
-		update(null);
-	}
+// 	/* ======================== Public methods ======================== */
+// 	/**
+// 	 * Return current FSM state.
+// 	 * @return Current FSM state
+// 	 */
+// 	public FSMState getCurrentState() {
+// 		return currentState;
+// 	}
+// 	/**
+// 	 * Reset this system to its start state. This may be called from mode init
+// 	 * when the robot is enabled.
+// 	 *
+// 	 * Note this is distinct from the one-time initialization in the constructor
+// 	 * as it may be called multiple times in a boot cycle,
+// 	 * Ex. if the robot is enabled, disabled, then reenabled.
+// 	 */
+// 	public void reset() {
+// 		currentState = FSMState.IDLE_STOP;
+// 		shootingTimer = new Timer();
+// 		shootingTimer.start();
+// 		autoShootingTimerStarted = false;
+// 		// Call one tick of update to ensure outputs reflect start state
+// 		update(null);
+// 	}
 
-	/**
-	 * Update FSM based on new inputs. This function only calls the FSM state
-	 * specific handlers.
-	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
-	 */
-	public void update(TeleopInput input) {
+// 	/**
+// 	 * Update FSM based on new inputs. This function only calls the FSM state
+// 	 * specific handlers.
+// 	 * @param input Global TeleopInput if robot in teleop mode or null if
+// 	 *        the robot is in autonomous mode.
+// 	 */
+// 	public void update(TeleopInput input) {
 
-		if (input == null) {
-			return;
-		}
+// 		if (input == null) {
+// 			return;
+// 		}
 
-		if (input.isShootButtonPressed() && !buttonPressedLastFrame) {
-			buttonToggle = !buttonToggle;
-			buttonPressedLastFrame = true;
-		} else if (!input.isShootButtonPressed()) {
-			buttonPressedLastFrame = false;
-		}
+// 		if (input.isShootButtonPressed() && !buttonPressedLastFrame) {
+// 			buttonToggle = !buttonToggle;
+// 			buttonPressedLastFrame = true;
+// 		} else if (!input.isShootButtonPressed()) {
+// 			buttonPressedLastFrame = false;
+// 		}
 
-		SmartDashboard.putBoolean("SHOOT BUTTON", input.isShootButtonPressed());
-		SmartDashboard.putString("Current State", currentState.toString());
-		SmartDashboard.putNumber("Left Motor Power", leftMotor.get());
-		SmartDashboard.putNumber("Right Motor Power", rightMotor.get());
+// 		SmartDashboard.putBoolean("SHOOT BUTTON", input.isShootButtonPressed());
+// 		SmartDashboard.putString("Current State", currentState.toString());
+// 		SmartDashboard.putNumber("Left Motor Power", leftMotor.get());
+// 		SmartDashboard.putNumber("Right Motor Power", rightMotor.get());
 
-		switch (currentState) {
-			case IDLE_STOP:
-				handleIdleState(input);
-				break;
+// 		switch (currentState) {
+// 			case IDLE_STOP:
+// 				handleIdleState(input);
+// 				break;
 
-			case SHOOTING:
-				handleShootingState(input);
-				break;
+// 			case SHOOTING:
+// 				handleShootingState(input);
+// 				break;
 
-			default:
-				throw new IllegalStateException("Invalid state: " + currentState.toString());
-		}
-		currentState = nextState(input);
-	}
+// 			default:
+// 				throw new IllegalStateException("Invalid state: " + currentState.toString());
+// 		}
+// 		currentState = nextState(input);
+// 	}
 
-	/**
-	 * Performs specific action based on the autoState passed in.
-	 * @param autoState autoState that the subsystem executes.
-	 * @return if the action carried out in this state has finished executing
-	 */
-	public boolean updateAutonomous(AutoFSMState autoState) {
-		switch (autoState) {
-			case SHOOT:
-				return handleAutoShootingState();
-			case DRIVE_TO_NOTE:
-				return handleAutoIdleState();
-			case DRIVE_TO_SPEAKER:
-				return handleAutoRevShootingState();
-			default:
-				return true;
-		}
-	}
+// 	/**
+// 	 * Performs specific action based on the autoState passed in.
+// 	 * @param autoState autoState that the subsystem executes.
+// 	 * @return if the action carried out in this state has finished executing
+// 	 */
+// 	public boolean updateAutonomous(AutoFSMState autoState) {
+// 		switch (autoState) {
+// 			case SHOOT:
+// 				return handleAutoShootingState();
+// 			case DRIVE_TO_NOTE:
+// 				return handleAutoIdleState();
+// 			case DRIVE_TO_SPEAKER:
+// 				return handleAutoRevShootingState();
+// 			default:
+// 				return true;
+// 		}
+// 	}
 
-	/* ======================== Private methods ======================== */
-	/**
-	 * Decide the next state to transition to. This is a function of the inputs
-	 * and the current state of this FSM. This method should not have any side
-	 * effects on outputs. In other words, this method should only read or get
-	 * values to decide what state to go to.
-	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
-	 * @return FSM state for the next iteration
-	 */
-	private FSMState nextState(TeleopInput input) {
-		switch (currentState) {
-			case IDLE_STOP:
-				if (buttonToggle) {
-					return FSMState.SHOOTING;
-				} else {
-					return FSMState.IDLE_STOP;
-				}
-			case SHOOTING:
-				if (buttonToggle) {
-					return FSMState.SHOOTING;
-				} else {
-					return FSMState.IDLE_STOP;
-				}
+// 	/* ======================== Private methods ======================== */
+// 	/**
+// 	 * Decide the next state to transition to. This is a function of the inputs
+// 	 * and the current state of this FSM. This method should not have any side
+// 	 * effects on outputs. In other words, this method should only read or get
+// 	 * values to decide what state to go to.
+// 	 * @param input Global TeleopInput if robot in teleop mode or null if
+// 	 *        the robot is in autonomous mode.
+// 	 * @return FSM state for the next iteration
+// 	 */
+// 	private FSMState nextState(TeleopInput input) {
+// 		switch (currentState) {
+// 			case IDLE_STOP:
+// 				if (buttonToggle) {
+// 					return FSMState.SHOOTING;
+// 				} else {
+// 					return FSMState.IDLE_STOP;
+// 				}
+// 			case SHOOTING:
+// 				if (buttonToggle) {
+// 					return FSMState.SHOOTING;
+// 				} else {
+// 					return FSMState.IDLE_STOP;
+// 				}
 
-			default:
-				throw new IllegalStateException("Invalid state: " + currentState.toString());
-		}
-	}
+// 			default:
+// 				throw new IllegalStateException("Invalid state: " + currentState.toString());
+// 		}
+// 	}
 
-	/* ------------------------ FSM state handlers ------------------------ */
-	/**
-	 * Handle behavior in START_STATE.
-	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
-	 */
-	private void handleIdleState(TeleopInput input) {
-		leftMotor.set(0);
-		rightMotor.set(0);
-	}
-	/**
-	 * Handle behavior in OTHER_STATE.
-	 * @param input Global TeleopInput if robot in teleop mode or null if
-	 *        the robot is in autonomous mode.
-	 */
-	private void handleShootingState(TeleopInput input) {
-		leftMotor.set(SHOOTING_POWER); //dont forget the "-" sign
-		rightMotor.set(SHOOTING_POWER);
-	}
+// 	/* ------------------------ FSM state handlers ------------------------ */
+// 	/**
+// 	 * Handle behavior in START_STATE.
+// 	 * @param input Global TeleopInput if robot in teleop mode or null if
+// 	 *        the robot is in autonomous mode.
+// 	 */
+// 	private void handleIdleState(TeleopInput input) {
+// 		leftMotor.set(0);
+// 		rightMotor.set(0);
+// 	}
+// 	/**
+// 	 * Handle behavior in OTHER_STATE.
+// 	 * @param input Global TeleopInput if robot in teleop mode or null if
+// 	 *        the robot is in autonomous mode.
+// 	 */
+// 	private void handleShootingState(TeleopInput input) {
+// 		leftMotor.set(SHOOTING_POWER); //dont forget the "-" sign
+// 		rightMotor.set(SHOOTING_POWER);
+// 	}
 
-	/**
-	 * Performs action for auto Shooting.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoShootingState() {
-		//run shooter motor for 1 second and once finished, return true
-		if (!autoShootingTimerStarted) {
-			autoShootingTimerStarted = true;
-			autoShootingTimerStart = shootingTimer.get();
-		}
+// 	/**
+// 	 * Performs action for auto Shooting.
+// 	 * @return if the action carried out has finished executing
+// 	 */
+// 	private boolean handleAutoShootingState() {
+// 		//run shooter motor for 1 second and once finished, return true
+// 		if (!autoShootingTimerStarted) {
+// 			autoShootingTimerStarted = true;
+// 			autoShootingTimerStart = shootingTimer.get();
+// 		}
 
-		if (autoShootingTimerStarted
-			&& !shootingTimer.hasElapsed(autoShootingTimerStart + SHOOTING_TIME)) {
-			leftMotor.set(SHOOTING_POWER);
-			rightMotor.set(SHOOTING_POWER);
-		} else {
-			leftMotor.set(0);
-			rightMotor.set(0);
+// 		if (autoShootingTimerStarted
+// 			&& !shootingTimer.hasElapsed(autoShootingTimerStart + SHOOTING_TIME)) {
+// 			leftMotor.set(SHOOTING_POWER);
+// 			rightMotor.set(SHOOTING_POWER);
+// 		} else {
+// 			leftMotor.set(0);
+// 			rightMotor.set(0);
 
-			autoShootingTimerStarted = false;
+// 			autoShootingTimerStarted = false;
 
-			return true;
-		}
+// 			return true;
+// 		}
 
-		return false;
-	}
+// 		return false;
+// 	}
 
-	private boolean handleAutoRevShootingState() {
-		leftMotor.set(SHOOTING_POWER);
-		rightMotor.set(SHOOTING_POWER);
-		return true;
-	}
+// 	private boolean handleAutoRevShootingState() {
+// 		leftMotor.set(SHOOTING_POWER);
+// 		rightMotor.set(SHOOTING_POWER);
+// 		return true;
+// 	}
 
-	private boolean handleAutoIdleState() {
-		leftMotor.set(0);
-		rightMotor.set(0);
-		return true;
-	}
-}
+// 	private boolean handleAutoIdleState() {
+// 		leftMotor.set(0);
+// 		rightMotor.set(0);
+// 		return true;
+// 	}
+// }

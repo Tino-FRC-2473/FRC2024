@@ -7,11 +7,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 // Systems
-import frc.robot.systems.IntakeFSM;
-import frc.robot.systems.MBRShooterFSM;
-import frc.robot.systems.PivotFSM;
-import frc.robot.systems.AutoHandlerSystem;
-import frc.robot.systems.AutoHandlerSystem.AutoPath;
+import frc.robot.systems.PivotFSMv2;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -21,11 +18,7 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
-	private IntakeFSM intakeFSM;
-	private MBRShooterFSM shooterFSM;
-	private PivotFSM pivotFSM;
-
-	private AutoHandlerSystem autoHandler;
+	private PivotFSMv2 pivotFSM;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -37,35 +30,26 @@ public class Robot extends TimedRobot {
 		input = new TeleopInput();
 
 		// Instantiate all systems here
-		//intakeFSM = new IntakeFSM();
-		//shooterFSM = new MBRShooterFSM();
-		pivotFSM = new PivotFSM();
-		autoHandler = new AutoHandlerSystem(intakeFSM, shooterFSM, pivotFSM);
+		pivotFSM = new PivotFSMv2();
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		autoHandler.reset(AutoPath.PATH1);
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		autoHandler.update();
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		//intakeFSM.reset();
-		//shooterFSM.reset();
 		pivotFSM.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		//intakeFSM.update(input);
-		//shooterFSM.update(input);
 		pivotFSM.update(input);
 	}
 
