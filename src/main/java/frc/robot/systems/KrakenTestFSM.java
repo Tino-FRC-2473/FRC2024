@@ -1,35 +1,34 @@
 package frc.robot.systems;
 
 // WPILib Imports
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 // Third party Hardware Imports
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkLimitSwitch;
 
 // Robot Imports
 import frc.robot.TeleopInput;
-import frc.robot.HardwareMap;
-import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 
-public class ClimberMechFSMLeft {
+public class KrakenTestFSM {
 	/* ======================== Constants ======================== */
 	// FSM state definitions
-	public enum ClimberMechFSMState {
+	public enum KrakenTestFSMState {
 		IDLE_STOP,
-		RETRACTING
+		RUN_MOTOR,
+		PLAY_MUSIC,
 	}
 
-	private static final float MOTOR_RUN_POWER = -0.4f;
-	private boolean limitPressed = false;
+	private static final float RUN_SPEED = 0.1f;
 
 	/* ======================== Private variables ======================== */
-	private ClimberMechFSMState currentState;
+	private KrakenTestFSMState currentState;
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
-	private CANSparkMax motor;
-	private SparkLimitSwitch peakLimitSwitch;
+	private TalonFX testMotor;
+	private Orchestra mOrchestra;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -37,14 +36,13 @@ public class ClimberMechFSMLeft {
 	 * one-time initialization or configuration of hardware required. Note
 	 * the constructor is called only once when the robot boots.
 	 */
-	public ClimberMechFSMLeft() {
+	public KrakenTestFSM() {
 		// Perform hardware init
-		motor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LEFT_CLIMBER_MOTOR,
-						CANSparkMax.MotorType.kBrushless);
-		motor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+		testMotor = new TalonFX(1);
+		testMotor.setNeutralMode(NeutralModeValue.Brake);
 
-		peakLimitSwitch = motor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
-		peakLimitSwitch.enableLimitSwitch(false);
+		mOrchestra = new Orchestra("tetris.chrp");
+		mOrchestra.addInstrument(testMotor);
 
 		// Reset state machine
 		reset();
@@ -55,7 +53,7 @@ public class ClimberMechFSMLeft {
 	 * Return current FSM state.
 	 * @return Current FSM state
 	 */
-	public ClimberMechFSMState getCurrentState() {
+	public KrakenTestFSMState getCurrentState() {
 		return currentState;
 	}
 	/**
@@ -67,8 +65,7 @@ public class ClimberMechFSMLeft {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		currentState = ClimberMechFSMState.IDLE_STOP;
-		limitPressed = false;
+		currentState = KrakenTestFSMState.IDLE_STOP;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -80,9 +77,6 @@ public class ClimberMechFSMLeft {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-		if (peakLimitSwitch.isPressed()) {
-			limitPressed = true;
-		}
 
 		if (input == null) {
 			return;
@@ -92,30 +86,16 @@ public class ClimberMechFSMLeft {
 			case IDLE_STOP:
 				handleIdleState(input);
 				break;
-			case RETRACTING:
-				handleRetractingState(input);
+			case RUN_MOTOR:
+				handleRunState(input);
+				break;
+			case PLAY_MUSIC:
+				handleMusicState(input);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-		SmartDashboard.putString("Current State Left", currentState.toString());
-		SmartDashboard.putBoolean("Bottom Limit Left Switch Pressed", peakLimitSwitchHit());
-		SmartDashboard.putBoolean("Retract Button Pressed", input.isRetractClimberButtonPressed());
 		currentState = nextState(input);
-		SmartDashboard.putNumber("left output", motor.getAppliedOutput());
-		SmartDashboard.putNumber("left motor applied", motor.get());
-	}
-
-	/**
-	 * Performs specific action based on the autoState passed in.
-	 * @param autoState autoState that the subsystem executes.
-	 * @return if the action carried out in this state has finished executing
-	 */
-	public boolean updateAutonomous(AutoFSMState autoState) {
-		switch (autoState) {
-			default:
-				return true;
-		}
 	}
 
 	/* ======================== Private methods ======================== */
@@ -128,19 +108,30 @@ public class ClimberMechFSMLeft {
 	 *        the robot is in autonomous mode.
 	 * @return FSM state for the next iteration
 	 */
-	private ClimberMechFSMState nextState(TeleopInput input) {
+	private KrakenTestFSMState nextState(TeleopInput input) {
+		if (input == null) {
+			return KrakenTestFSMState.IDLE_STOP;
+		}
 		switch (currentState) {
 			case IDLE_STOP:
-				if (input.isRetractClimberButtonPressed() && !peakLimitSwitchHit()) {
-					return ClimberMechFSMState.RETRACTING;
-				} else {
-					return ClimberMechFSMState.IDLE_STOP;
+				if (input.isPlayMusicPressed()) {
+					return KrakenTestFSMState.PLAY_MUSIC;
 				}
-			case RETRACTING:
-				if (input.isRetractClimberButtonPressed() && !peakLimitSwitchHit()) {
-					return ClimberMechFSMState.RETRACTING;
+				if (input.isRunMotorPressed()) {
+					return KrakenTestFSMState.RUN_MOTOR;
+				}
+				return KrakenTestFSMState.IDLE_STOP;
+			case RUN_MOTOR:
+				if (input.isRunMotorPressed()) {
+					return KrakenTestFSMState.RUN_MOTOR;
 				} else {
-					return ClimberMechFSMState.IDLE_STOP;
+					return KrakenTestFSMState.IDLE_STOP;
+				}
+			case PLAY_MUSIC:
+				if (input.isPlayMusicPressed()) {
+					return KrakenTestFSMState.PLAY_MUSIC;
+				} else {
+					return KrakenTestFSMState.IDLE_STOP;
 				}
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -154,18 +145,24 @@ public class ClimberMechFSMLeft {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleIdleState(TeleopInput input) {
-		motor.set(0);
+		testMotor.set(0);
+		mOrchestra.stop();
 	}
 	/**
-	 * Handle behavior in RETRACTING state.
+	 * Handle behavior in INTAKING state.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-	private void handleRetractingState(TeleopInput input) {
-		motor.set(-MOTOR_RUN_POWER);
+	private void handleRunState(TeleopInput input) {
+		testMotor.set(RUN_SPEED);
 	}
 
-	private boolean peakLimitSwitchHit() {
-		return limitPressed;
+	/**
+	 * Handle behavior in OUTTAKING_SPEAKER state.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 */
+	private void handleMusicState(TeleopInput input) {
+		mOrchestra.play();
 	}
 }

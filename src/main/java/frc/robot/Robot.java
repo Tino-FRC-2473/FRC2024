@@ -5,16 +5,7 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// Systems
-import frc.robot.systems.DriveFSMSystem;
-import frc.robot.systems.KitBotShooterFSM;
-import frc.robot.systems.AutoHandlerSystem;
-import frc.robot.systems.ClimberMechFSMLeft;
-import frc.robot.systems.ClimberMechFSMRight;
-import frc.robot.systems.AutoHandlerSystem.AutoPath;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.revrobotics.SparkMaxAbsoluteEncoder;
+import frc.robot.systems.KrakenTestFSM;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -22,7 +13,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder;
  */
 public class Robot extends TimedRobot {
 	private TeleopInput input;
-	private TalonFX motor;
+	private KrakenTestFSM krakenTestFSM;
 	// Systems
 
 	/**
@@ -33,9 +24,8 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		System.out.println("robotInit");
 		input = new TeleopInput();
-		motor = new TalonFX(0, "rio");
+		krakenTestFSM = new KrakenTestFSM();
 	}
-
 	@Override
 	public void autonomousInit() {
 
@@ -48,14 +38,13 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
+		krakenTestFSM.reset();
 
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		motor.set( 0.05);
-		String KrakenEncoderValue = "" + motor.getRotorPosition();
-		SmartDashboard.putString("Encoder Value", KrakenEncoderValue);
+		krakenTestFSM.update(input);
 	}
 
 	@Override
@@ -75,7 +64,7 @@ public class Robot extends TimedRobot {
 	}
 
 	@Override
-	public void simulationPeriodic() { }
+	public void simulationPeriodic() {	}
 
 	// Do not use robotPeriodic. Use mode specific periodic methods instead.
 	@Override
