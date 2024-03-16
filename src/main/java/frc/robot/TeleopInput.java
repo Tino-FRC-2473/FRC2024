@@ -32,7 +32,7 @@ public class TeleopInput {
 	}
 
 	/* ------------------------ Driver Controller ------------------------ */
-	
+
 /**
 	 * Get the value of the left joystick Y for drive controller.
 	 * @return the value of the left joystick Y
@@ -155,7 +155,7 @@ public class TeleopInput {
 	 * @return Axis value
 	 */
 
-	 public double getMechControllerLeftY() {
+	public double getMechControllerLeftY() {
 		return mechController.getLeftY();
 	}
 }
