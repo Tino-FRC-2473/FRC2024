@@ -17,10 +17,10 @@ import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
 
-public class PivotFSMv2 {
+public class MBRFSMv2 {
 	/* ======================== Constants ======================== */
 	// FSM state definitions
-	public enum PivotFSMState {
+	public enum MBRFSMState {
 		MOVE_TO_GROUND,
 		INTAKING,
 		MOVE_TO_SHOOTER,
@@ -54,7 +54,7 @@ public class PivotFSMv2 {
 	private static final double INRANGE_VALUE = 15;
 
 	/* ======================== Private variables ======================== */
-	private PivotFSMState currentState;
+	private MBRFSMState currentState;
 	private CANSparkMax shooterLeftMotor;
 	private CANSparkMax shooterRightMotor;
 	private TalonFX intakeMotor;
@@ -74,12 +74,12 @@ public class PivotFSMv2 {
 	 * one-time initialization or configuration of hardware required. Note
 	 * the constructor is called only once when the robot boots.
 	 */
-	public PivotFSMv2() {
-		// shooterLeftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LSHOOTER_MOTOR,
-		// 								CANSparkMax.MotorType.kBrushless);
+	public MBRFSMv2() {
+		shooterLeftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LSHOOTER_MOTOR,
+										CANSparkMax.MotorType.kBrushless);
 
-		// shooterRightMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_RSHOOTER_MOTOR,
-		// 								CANSparkMax.MotorType.kBrushless);
+		shooterRightMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_RSHOOTER_MOTOR,
+										CANSparkMax.MotorType.kBrushless);
 		intakeMotor = new TalonFX(HardwareMap.DEVICE_ID_INTAKE_MOTOR);
 		intakeMotor.setNeutralMode(NeutralModeValue.Brake);
 
@@ -99,7 +99,7 @@ public class PivotFSMv2 {
 	 * Return current FSM state.
 	 * @return Current FSM state
 	 */
-	public PivotFSMState getCurrentState() {
+	public MBRFSMState getCurrentState() {
 		return currentState;
 	}
 	/**
@@ -111,7 +111,7 @@ public class PivotFSMv2 {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		currentState = PivotFSMState.MOVE_TO_SHOOTER;
+		currentState = MBRFSMState.MOVE_TO_SHOOTER;
 		timer.stop();
 		timer.reset();
 
@@ -142,8 +142,8 @@ public class PivotFSMv2 {
 		SmartDashboard.putString("Current State", getCurrentState().toString());
 		SmartDashboard.putNumber("Intake power", intakeMotor.get());
 		SmartDashboard.putNumber("Pivot power", pivotMotor.get());
-		// SmartDashboard.putNumber("Left shooter power", shooterLeftMotor.get());
-		// SmartDashboard.putNumber("Right shooter power", shooterRightMotor.get());
+		SmartDashboard.putNumber("Left shooter power", shooterLeftMotor.get());
+		SmartDashboard.putNumber("Right shooter power", shooterRightMotor.get());
 		SmartDashboard.putNumber("Pivot encoder count", throughBore.getDistance());
 
 		switch (currentState) {
@@ -194,49 +194,49 @@ public class PivotFSMv2 {
 	 *        the robot is in autonomous mode.
 	 * @return FSM state for the next iteration
 	 */
-	private PivotFSMState nextState(TeleopInput input) {
+	private MBRFSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case MOVE_TO_SHOOTER:
 				if (input.isIntakeButtonPressed() && !input.isShootButtonPressed()
 					&& !input.isRevButtonPressed() && !holding) {
-					return PivotFSMState.MOVE_TO_GROUND;
+					return MBRFSMState.MOVE_TO_GROUND;
 				}
 				if (!input.isIntakeButtonPressed() && (input.isShootButtonPressed()
 					|| input.isRevButtonPressed())) {
 					if (inRange(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS)) {
 						holding = false;
-						return PivotFSMState.SHOOTING;
+						return MBRFSMState.SHOOTING;
 					} else {
-						return PivotFSMState.MOVE_TO_SHOOTER;
+						return MBRFSMState.MOVE_TO_SHOOTER;
 					}
 				}
-				return PivotFSMState.MOVE_TO_SHOOTER;
+				return MBRFSMState.MOVE_TO_SHOOTER;
 			case MOVE_TO_GROUND:
 				if (input.isIntakeButtonPressed() && !input.isShootButtonPressed()
 					&& !input.isRevButtonPressed()) {
 					if (inRange(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS)) {
-						return PivotFSMState.INTAKING;
+						return MBRFSMState.INTAKING;
 					} else {
-						return PivotFSMState.MOVE_TO_GROUND;
+						return MBRFSMState.MOVE_TO_GROUND;
 					}
 				}
-				return PivotFSMState.MOVE_TO_SHOOTER;
+				return MBRFSMState.MOVE_TO_SHOOTER;
 			case INTAKING:
 				if (input.isIntakeButtonPressed() && !input.isShootButtonPressed()
 					&& !input.isRevButtonPressed()) {
 					if (hasNote()) {
-						return PivotFSMState.MOVE_TO_SHOOTER;
+						return MBRFSMState.MOVE_TO_SHOOTER;
 					} else {
-						return PivotFSMState.INTAKING;
+						return MBRFSMState.INTAKING;
 					}
 				}
-				return PivotFSMState.MOVE_TO_SHOOTER;
+				return MBRFSMState.MOVE_TO_SHOOTER;
 			case SHOOTING:
 				if (!input.isIntakeButtonPressed() && (input.isShootButtonPressed()
 					|| input.isRevButtonPressed())) {
-					return PivotFSMState.SHOOTING;
+					return MBRFSMState.SHOOTING;
 				}
-				return PivotFSMState.MOVE_TO_SHOOTER;
+				return MBRFSMState.MOVE_TO_SHOOTER;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -259,8 +259,8 @@ public class PivotFSMv2 {
 	 */
 	public void handleMoveShooterState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
-		// shooterLeftMotor.set(0);
-		// shooterRightMotor.set(0);
+		shooterLeftMotor.set(0);
+		shooterRightMotor.set(0);
 		intakeMotor.set(0);
 	}
 
@@ -270,8 +270,8 @@ public class PivotFSMv2 {
 	 */
 	public void handleMoveGroundState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
-		// shooterLeftMotor.set(0);
-		// shooterRightMotor.set(0);
+		shooterLeftMotor.set(0);
+		shooterRightMotor.set(0);
 		intakeMotor.set(0);
 	}
 
@@ -281,8 +281,8 @@ public class PivotFSMv2 {
 	 */
 	public void handleIntakingState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
-		// shooterLeftMotor.set(0);
-		// shooterRightMotor.set(0);
+		shooterLeftMotor.set(0);
+		shooterRightMotor.set(0);
 		if (!holding) {
 			intakeMotor.set(INTAKE_POWER);
 		} else {
@@ -297,13 +297,13 @@ public class PivotFSMv2 {
 	public void handleShootingState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		if (input.isRevButtonPressed() && !input.isShootButtonPressed()) {
-			// shooterLeftMotor.set(-SHOOTING_POWER);
-			// shooterRightMotor.set(SHOOTING_POWER);
+			shooterLeftMotor.set(-SHOOTING_POWER);
+			shooterRightMotor.set(SHOOTING_POWER);
 			intakeMotor.set(0);
 		}
 		if (input.isShootButtonPressed()) {
-			// shooterLeftMotor.set(-SHOOTING_POWER);
-			// shooterRightMotor.set(SHOOTING_POWER);
+			shooterLeftMotor.set(-SHOOTING_POWER);
+			shooterRightMotor.set(SHOOTING_POWER);
 			intakeMotor.set(OUTTAKE_POWER);
 		}
 	}
@@ -337,8 +337,8 @@ public class PivotFSMv2 {
 	}
 
 	public boolean handleAutoRev() {
-		// shooterLeftMotor.set(-SHOOTING_POWER);
-		// shooterRightMotor.set(SHOOTING_POWER);
+		shooterLeftMotor.set(-SHOOTING_POWER);
+		shooterRightMotor.set(SHOOTING_POWER);
 		return true;
 	}
 
@@ -349,23 +349,23 @@ public class PivotFSMv2 {
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		if (timer.get() > AUTO_SHOOTING_TIME) {
 			intakeMotor.set(0);
-			// shooterLeftMotor.set(0);
-			// shooterRightMotor.set(0);
+			shooterLeftMotor.set(0);
+			shooterRightMotor.set(0);
 			timer.stop();
 			timer.reset();
 			return true;
 		} else {
 			intakeMotor.set(OUTTAKE_POWER);
-			// shooterLeftMotor.set(-SHOOTING_POWER);
-			// shooterRightMotor.set(SHOOTING_POWER);
+			shooterLeftMotor.set(-SHOOTING_POWER);
+			shooterRightMotor.set(SHOOTING_POWER);
 			return false;
 		}
 	}
 
 	public boolean handleAutoIntake() {
 		intakeMotor.set(INTAKE_POWER);
-		// shooterLeftMotor.set(0);
-		// shooterRightMotor.set(0);
+		shooterLeftMotor.set(0);
+		shooterRightMotor.set(0);
 		return true;
 	}
 }
