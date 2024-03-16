@@ -1,16 +1,16 @@
 package frc.robot.systems;
 
+
 // WPILib Imports
 
 // Third party Hardware Imports
-import com.revrobotics.CANSparkMax;
-
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
 import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class IntakeFSM {
 	/* ======================== Constants ======================== */
@@ -29,7 +29,6 @@ public class IntakeFSM {
 	private static final float AUTO_OUTTAKING_TIME = 2.0f;
 	private static final int AVERAGE_SIZE = 7;
 	private static final float CURRENT_THRESHOLD = 15.0f;
-	private static final double TIME_RESET_CURRENT = 0.5;
 
 
 	/* ======================== Private variables ======================== */
@@ -37,15 +36,14 @@ public class IntakeFSM {
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
-	private CANSparkMax intakeMotor;
+	private TalonFX intakeMotor;
 
 	private boolean autoIntakingTimerStarted;
 	private double autoIntakingTimerStart;
 	private boolean autoOuttakingTimerStarted;
 	private double autoOuttakingTimerStart;
 	private double[] currLogs;
-	private Timer intakeTimer;
-	private int tick;
+	private int tick = 0;
 	private boolean holding = false;
 
 
@@ -58,12 +56,10 @@ public class IntakeFSM {
 	 */
 	public IntakeFSM() {
 		// Perform hardware init
-		intakeTimer = new Timer();
 
-		intakeMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_INTAKE_MOTOR,
-										CANSparkMax.MotorType.kBrushless);
+		intakeMotor = new TalonFX(HardwareMap.DEVICE_ID_INTAKE_MOTOR);
+		intakeMotor.setNeutralMode(NeutralModeValue.Brake);
 
-		intakeMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
 		currLogs = new double[AVERAGE_SIZE];
 		// Reset state machine
@@ -105,7 +101,7 @@ public class IntakeFSM {
 			return;
 		}
 
-		SmartDashboard.putBoolean("Current value surpassed / hasNote", hasNote());
+		// SmartDashboard.putBoolean("Current value surpassed / hasNote", hasNote());
 		SmartDashboard.putNumberArray("Current array values", currLogs);
 
 		switch (currentState) {
@@ -175,19 +171,6 @@ public class IntakeFSM {
 			case INTAKING:
 				if (input.isIntakeButtonPressed() && !input.isOuttakeButtonPressed()
 					&& !hasNote()) {
-					currLogs[tick % AVERAGE_SIZE] = intakeMotor.getOutputCurrent();
-					tick++;
-					double avgcone = 0;
-					for (int i = 0; i < AVERAGE_SIZE; i++) {
-						avgcone += currLogs[i];
-					}
-					avgcone /= AVERAGE_SIZE;
-					if (avgcone > CURRENT_THRESHOLD) {
-						holding = true;
-						return IntakeFSMState.IDLE_STOP;
-					} else {
-						holding = false;
-					}
 					return IntakeFSMState.INTAKING;
 				}
 
@@ -211,11 +194,11 @@ public class IntakeFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleIdleState(TeleopInput input) {
-		if (holding) {
-			intakeMotor.set(HOLDING_POWER);
-		} else {
-			intakeMotor.set(0);
-		}
+		// if (holding) {
+		// 	intakeMotor.set(HOLDING_POWER);
+		// } else {
+		intakeMotor.set(0);
+		// }
 	}
 	/**
 	 * Handle behavior in INTAKING.
@@ -224,6 +207,19 @@ public class IntakeFSM {
 	 */
 	private void handleIntakingState(TeleopInput input) {
 		intakeMotor.set(INTAKE_POWER);
+		currLogs[tick % AVERAGE_SIZE] = intakeMotor.getTorqueCurrent().getValueAsDouble();
+		tick++;
+		double avgcone = 0;
+		for (int i = 0; i < AVERAGE_SIZE; i++) {
+			avgcone += currLogs[i];
+		}
+		avgcone /= AVERAGE_SIZE;
+		SmartDashboard.putNumber("avg current", avgcone);
+		// if (avgcone > CURRENT_THRESHOLD) {
+		// 	holding = true;
+		// } else {
+		// 	holding = false;
+		// }
 	}
 
 	/**
@@ -235,7 +231,7 @@ public class IntakeFSM {
 		for (int i = 0; i < AVERAGE_SIZE; i++) {
 			currLogs[i] = 0;
 		}
-		holding = false;
+		// holding = false;
 		intakeMotor.set(OUTTAKE_POWER);
 	}
 
@@ -273,6 +269,7 @@ public class IntakeFSM {
 	}
 
 	private boolean hasNote() {
-		return holding;
+		//return holding;
+		return false;
 	}
 }
