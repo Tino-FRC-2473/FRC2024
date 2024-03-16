@@ -112,69 +112,28 @@ public class TeleopInput {
 	}
 
 	/* ------------------------ Mech Controller ------------------------ */
-	/**
-	 * Get the value of the intake button.
-	 * @return True if button is pressed
-	 */
-	public boolean isIntakeButtonPressed() {
-		return mechController.getCircleButton();
-	}
-
-	/**
-	 * Get the value of the shoot button.
-	 * @return True if button is pressed
+		/**
+	 * Get the value of the Circle Button.
+	 * @return if Circle Button is pressed
 	 */
 	public boolean isShootButtonPressed() {
 		return mechController.getTriangleButton();
 	}
 
 	/**
-	 * Get the value of the rev button for the shooter.
-	 * @return True if button is pressed
+	 * Get the value of the R1 Button.
+	 * @return if R1 Button is pressed
 	 */
-	public boolean isRevOuttakeButtonPressed() {
+	public boolean isIntakeButtonPressed() {
+		return mechController.getCircleButton();
+	}
+
+	/**
+	 * Get the value of the Touchpad Button.
+	 * @return if Touchpad Button is pressed
+	 */
+	public boolean isRevButtonPressed() {
 		return mechController.getL1Button();
-	}
-
-	/**
-	 * Get the value of the left climber trigger.
-	 * @return True if button is pressed
-	 */
-	public double leftClimberTrigger() {
-		return mechController.getL2Axis();
-	}
-
-	/**
-	 * Get the value of the right climber trigger.
-	 * @return True if button is pressed
-	 */
-	public double rightClimberTrigger() {
-		return mechController.getR2Axis();
-	}
-
-	/**
-	 * Get the value of the toggle cam button.
-	 * @return True if button is pressed
-	 */
-	public boolean chainChamToggleButton() {
-		return driverController.getR1ButtonPressed();
-	}
-
-	/**
-	 * Get the value of the synched climber button.
-	 * @return True if button is pressed
-	 */
-	public boolean synchClimberTrigger() {
-		return mechController.getCrossButton();
-	}
-
-	/**
-	 * Get the value of the override intake button.
-	 * Use with CAUTION. This should only be used when the normal intake button doesn't work.
-	 * @return True if button is pressed
-	 */
-	public boolean overrideIntakeButton() {
-		return mechController.getSquareButton();
 	}
 
 

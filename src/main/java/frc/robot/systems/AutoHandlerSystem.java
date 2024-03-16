@@ -29,7 +29,8 @@ public class AutoHandlerSystem {
 		NOTE5,
 		NOTE6,
 		NOTE7,
-		NOTE8
+		NOTE8,
+		SHOOT
 	}
 
 	/* --------------------------- SVR --------------------------- */
@@ -51,7 +52,7 @@ public class AutoHandlerSystem {
 
 	//FSM Systems that the autoHandlerFSM uses
 	private DriveFSMSystem driveSystem;
-	//private KitBotShooterFSM shooterFSM;
+	private MBRFSMv2 mechSystem;
 
 	//Predefined auto paths
 
@@ -80,9 +81,9 @@ public class AutoHandlerSystem {
 	 * Initializes any subsystems such as driveFSM, armFSM, ect.
 	 * @param fsm1 the first subsystem that the auto handler will call functions on
 	 */
-	public AutoHandlerSystem(DriveFSMSystem fsm1) {
+	public AutoHandlerSystem(DriveFSMSystem fsm1, MBRFSMv2 fsm2) {
 		driveSystem = fsm1;
-		//shooterFSM = fsm2;
+		mechSystem = fsm2;
 	}
 
 	/* ======================== Public methods ======================== */
@@ -105,7 +106,7 @@ public class AutoHandlerSystem {
 	 */
 	public void reset(String path) {
 		driveSystem.resetAutonomus();
-		//shooterFSM.reset();
+		mechSystem.reset();
 
 		/* --------------------------- SVR --------------------------- */
 		// if (path == AutoPath.PATH1) {
@@ -123,7 +124,7 @@ public class AutoHandlerSystem {
 		/* --------------------------- SVR --------------------------- */
 
 		currentStateList.clear();
-		// add <Shooting into speaker> Path to currentStateList
+		currentStateList.add(AutoFSMState.SHOOT);
 		currentStateList.add(AutoFSMState.DEFAULT);
 		if (path.contains("PROT") || path.contains("MISC") || path.contains("MIDF")) {
 			if (!path.contains("PROT")) {
@@ -149,10 +150,8 @@ public class AutoHandlerSystem {
 				} else if (id == AutoConstants.N_8) {
 					currentStateList.add(AutoFSMState.NOTE8);
 				}
-				//add <Intaking note> Path to currentStateList
 				currentStateList.add(AutoFSMState.SPEAKER);
-				//add <Shooting into speaker> Path to currentStateList
-
+				currentStateList.add(AutoFSMState.SHOOT);
 			}
 		}
 		//add <LEAVE ZONE> Path to currentStateList
@@ -212,31 +211,34 @@ public class AutoHandlerSystem {
 				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DEFAULT);
 				break;
 			case SPEAKER:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.SPEAKER);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.SPEAKER) & mechSystem.updateAutonomous(AutoFSMState.SPEAKER);
 				break;
 			case NOTE1:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE1);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE1) & mechSystem.updateAutonomous(AutoFSMState.NOTE1);
 				break;
 			case NOTE2:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE2);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE2) & mechSystem.updateAutonomous(AutoFSMState.NOTE2);
 				break;
 			case NOTE3:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE3);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE3) & mechSystem.updateAutonomous(AutoFSMState.NOTE3);
 				break;
 			case NOTE4:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE4);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE4) & mechSystem.updateAutonomous(AutoFSMState.NOTE4);
 				break;
 			case NOTE5:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE5);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE5) & mechSystem.updateAutonomous(AutoFSMState.NOTE5);
 				break;
 			case NOTE6:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE6);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE6) & mechSystem.updateAutonomous(AutoFSMState.NOTE6);
 				break;
 			case NOTE7:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE7);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE7) & mechSystem.updateAutonomous(AutoFSMState.NOTE7);
 				break;
 			case NOTE8:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE8);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE8) & mechSystem.updateAutonomous(AutoFSMState.NOTE8);
+				break;
+			case SHOOT:
+				isCurrentStateFinished = mechSystem.updateAutonomous(AutoFSMState.SHOOT);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());
