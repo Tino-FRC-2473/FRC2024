@@ -1,6 +1,5 @@
 package frc.robot.systems;
 
-import com.ctre.phoenix6.signals.NeutralModeValue;
 
 // WPILib Imports
 
