@@ -3,7 +3,7 @@ import math
 import numpy as np
 from target import Target
 import skimage.color
-
+import time
 
 class Detector:
 
@@ -26,25 +26,23 @@ class Detector:
             "RING": [low_threshold, high_threshold]
         }
         for object in objectsToDetect:
+            p = time.time()
             #Converts the color format of the frame from BGR to HSV for usage with cv2
-
             full_test_image = self.bgr_to_rgb(frame)
             hsv_frame = skimage.color.rgb2hsv(full_test_image)
+            print("color conversion", str(time.time()-p))
 
-            #Creates a mask which is a frame with only the range of colors inputed shown in black and white
+            #Creates a mask which is a frame with only the range of colors inputed
             mask = cv2.inRange(hsv_frame, colors[object][0], colors[object][1])
+            print("simple mask", str(time.time()-p))
 
             #The following three functinos edits the mask in order to remove potential discrepencies in the frame
             kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (12, 12))
             morph = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-            mask = cv2.medianBlur(mask, 5)
+            # mask = cv2.medianBlur(mask, 5)
 
-            # plt.figure()
-            # plt.title("Masked foreground")
-            mask = np.expand_dims(mask, axis = -1)
-            rbg_image = skimage.color.hsv2rgb(hsv_frame)
-            # plt.imshow(hsv_frame * (1-mask))
-
+            # mask = np.expand_dims(mask, axis = -1)
+            print("better mask", str(time.time()-p))
 
             #The below code runs to detect if there is a ring in the given frame.
             if (object == "RING"):

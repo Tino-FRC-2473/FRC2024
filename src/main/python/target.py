@@ -33,7 +33,7 @@ class Target:
         B = center_tag - center_cam
         A = center_cam
         theta = math.atan(B * math.tan(math.radians(Target.FOV[0] / 2)) / A)
-        print(math.degrees(theta))
+        #print(math.degrees(theta))
         return math.degrees(theta)
 
     def get_pitch_degrees(self):
@@ -47,5 +47,5 @@ class Target:
 
     def get_distance_meters(self):
         height = self.heights[self.getType()]
-        print("angle: ", math.radians(Target.CAM_ANGLE + self.get_pitch_degrees()))
+        #print("angle: ", math.radians(Target.CAM_ANGLE + self.get_pitch_degrees()))
         return 0.684*math.tan(math.radians(Target.CAM_ANGLE + self.get_pitch_degrees())) * (Target.CAM_HEIGHT-height)-0.138
