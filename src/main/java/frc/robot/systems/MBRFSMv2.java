@@ -255,7 +255,8 @@ public class MBRFSMv2 {
 
 	/**
 	 * Handles the moving to shooter state of the MBR Mech.
-	 * @param input
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
 	 */
 	public void handleMoveShooterState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
@@ -266,7 +267,8 @@ public class MBRFSMv2 {
 
 	/**
 	 * Handles the moving to ground state of the MBR Mech.
-	 * @param input
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
 	 */
 	public void handleMoveGroundState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
@@ -277,7 +279,8 @@ public class MBRFSMv2 {
 
 	/**
 	 * Handles the intaking state of the MBR Mech.
-	 * @param input
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
 	 */
 	public void handleIntakingState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
@@ -292,7 +295,8 @@ public class MBRFSMv2 {
 
 	/**
 	 * Handles the shooting state of the MBR Mech.
-	 * @param input
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
 	 */
 	public void handleShootingState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
@@ -325,23 +329,39 @@ public class MBRFSMv2 {
 		return holding;
 	}
 
+	/**
+	 * Handles the Auto Move to Ground state of the MBR Mech.
+	 * @return if the pivot is Inrange or target encoder
+	 */
 	public boolean handleAutoMoveGround() {
 		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
 		return inRange(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS);
 	}
 
+	/**
+	 * Handles the Auto Move to Shooter state of the MBR Mech.
+	 * @return if the pivot is Inrange or target encoder
+	 */
 	public boolean handleAutoMoveShooter() {
 		intakeMotor.set(0);
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		return inRange(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS);
 	}
 
+	/**
+	 * Handles the Auto Rev Up state of the MBR Mech.
+	 * @return if the action is completed
+	 */
 	public boolean handleAutoRev() {
 		shooterLeftMotor.set(-SHOOTING_POWER);
 		shooterRightMotor.set(SHOOTING_POWER);
 		return true;
 	}
 
+	/**
+	 * Handles the Auto Shoot state of the MBR Mech.
+	 * @return if the action is compkleted
+	 */
 	public boolean handleAutoShoot() {
 		if (timer.get() == 0) {
 			timer.start();
@@ -362,6 +382,10 @@ public class MBRFSMv2 {
 		}
 	}
 
+	/**
+	 * Handle the Auto Intake state.
+	 * @return if the action has been completed
+	 */
 	public boolean handleAutoIntake() {
 		intakeMotor.set(INTAKE_POWER);
 		shooterLeftMotor.set(0);
