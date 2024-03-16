@@ -1,5 +1,6 @@
 package frc.robot.systems;
 
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
 
 // WPILib Imports
@@ -21,12 +22,15 @@ public class KitBotShooterFSM {
 		IDLE_STOP,
 		INTAKING,
 		OUTTAKING_SPEAKER,
+		OUTTAKING_AMP,
 		OVERRIDE_INTAKE
 
 	}
 
-	private static final float SPEAKER_L_MOTOR_RUN_POWER = 0.13f;
-	private static final float SPEAKER_U_MOTOR_RUN_POWER = -0.15f;
+	private static final float AMP_L_MOTOR_RUN_POWER = 0.0f;
+	private static final float AMP_U_MOTOR_RUN_POWER = -0.0f;
+	private static final float SPEAKER_L_MOTOR_RUN_POWER = 0.8f;
+	private static final float SPEAKER_U_MOTOR_RUN_POWER = -1.0f;
 	private static final float INTAKING_SPEED = -0.1f;
 	private static final float OUTTAKING_TIME = 2.5f;
 	private static final float REV_OUTTAKING_TIME = 1.5f;
@@ -41,6 +45,7 @@ public class KitBotShooterFSM {
 	private CANSparkMax lowMotor;
 	private CANSparkMax highMotor;
 	private SparkLimitSwitch bottomLimitSwitch;
+	private Servo ampServo;
 
 	private boolean autoOuttakingTimerStarted;
 	private double outtakingTimerStart;
@@ -64,7 +69,7 @@ public class KitBotShooterFSM {
 		highMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER_UPPER,
 		CANSparkMax.MotorType.kBrushless);
 		highMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-
+		ampServo = new Servo(9);
 		autoOuttakingTimerStarted = false;
 
 		timer = new Timer();
@@ -94,6 +99,7 @@ public class KitBotShooterFSM {
 		timer = new Timer();
 		timer.start();
 		autoOuttakingTimerStarted = false;
+
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -110,6 +116,12 @@ public class KitBotShooterFSM {
 			return;
 		}
 
+		if (currentState != ShooterFSMState.OUTTAKING_AMP) {
+			ampServo.setAngle(180);
+		}
+
+		SmartDashboard.putNumber("Servo val", ampServo.getAngle());
+
 		switch (currentState) {
 			case IDLE_STOP:
 				handleIdleState(input);
@@ -119,6 +131,9 @@ public class KitBotShooterFSM {
 				break;
 			case OUTTAKING_SPEAKER:
 				handleShootSpeakerState(input);
+				break;
+			case OUTTAKING_AMP:
+				handleShootAmpState(input);
 				break;
 			case OVERRIDE_INTAKE:
 				handleOverrideIntakingState(input);
@@ -164,38 +179,57 @@ public class KitBotShooterFSM {
 		switch (currentState) {
 			case IDLE_STOP:
 				if ((input.isShootButtonPressed() || input.isRevOuttakeButtonPressed())
-					&& !input.isIntakeButtonPressed() && !input.overrideIntakeButton()) {
+					&& !input.isIntakeButtonPressed() && !input.overrideIntakeButton()
+					&& !input.isRevAmpButtonPressed() && !input.isAmpButtonPressed()) {
 					return ShooterFSMState.OUTTAKING_SPEAKER;
+				}
+				if ((input.isAmpButtonPressed() || input.isRevAmpButtonPressed())
+					&& !input.isIntakeButtonPressed() && !input.overrideIntakeButton()
+					&& !input.isRevOuttakeButtonPressed() && !input.isShootButtonPressed()) {
+					return ShooterFSMState.OUTTAKING_AMP;
 				}
 				if (input.isIntakeButtonPressed() && !hasNote()
 					&& !input.isShootButtonPressed()
-					&& !input.isRevOuttakeButtonPressed() && !input.overrideIntakeButton()) {
+					&& !input.isRevOuttakeButtonPressed() && !input.overrideIntakeButton()
+					&& !input.isRevAmpButtonPressed() && !input.isAmpButtonPressed()) {
 					return ShooterFSMState.INTAKING;
 				}
 				if (input.overrideIntakeButton() && !input.isShootButtonPressed()
-					&& !input.isRevOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+					&& !input.isRevOuttakeButtonPressed() && !input.isIntakeButtonPressed()
+					&& !input.isRevAmpButtonPressed() && !input.isAmpButtonPressed()) {
 					return ShooterFSMState.OVERRIDE_INTAKE;
 				}
 				return ShooterFSMState.IDLE_STOP;
 			case INTAKING:
 				if (input.isIntakeButtonPressed() && !hasNote()
 					&& !input.isShootButtonPressed()
-					&& !input.isRevOuttakeButtonPressed() && !input.overrideIntakeButton()) {
+					&& !input.isRevOuttakeButtonPressed() && !input.overrideIntakeButton()
+					&& !input.isAmpButtonPressed() && !input.isRevAmpButtonPressed()) {
 					return ShooterFSMState.INTAKING;
 				} else {
 					return ShooterFSMState.IDLE_STOP;
 				}
 			case OUTTAKING_SPEAKER:
 				if ((input.isShootButtonPressed() || input.isRevOuttakeButtonPressed())
-					&& !input.isIntakeButtonPressed() && !input.overrideIntakeButton()) {
+					&& !input.isIntakeButtonPressed() && !input.overrideIntakeButton()
+					&& !input.isAmpButtonPressed() && !input.isRevAmpButtonPressed()) {
 					return ShooterFSMState.OUTTAKING_SPEAKER;
 				} else {
 					return ShooterFSMState.IDLE_STOP;
 				}
 			case OVERRIDE_INTAKE:
 				if (input.overrideIntakeButton() && !input.isShootButtonPressed()
-					&& !input.isRevOuttakeButtonPressed() && !input.isIntakeButtonPressed()) {
+					&& !input.isRevOuttakeButtonPressed() && !input.isIntakeButtonPressed()
+					&& !input.isAmpButtonPressed() && !input.isRevAmpButtonPressed()) {
 					return ShooterFSMState.OVERRIDE_INTAKE;
+				} else {
+					return ShooterFSMState.IDLE_STOP;
+				}
+			case OUTTAKING_AMP:
+				if ((input.isAmpButtonPressed() || input.isRevAmpButtonPressed())
+					&& !input.isIntakeButtonPressed() && !input.overrideIntakeButton()
+					&& !input.isShootButtonPressed() && !input.isRevOuttakeButtonPressed()) {
+					return ShooterFSMState.OUTTAKING_AMP;
 				} else {
 					return ShooterFSMState.IDLE_STOP;
 				}
@@ -229,6 +263,23 @@ public class KitBotShooterFSM {
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
+	private void handleShootAmpState(TeleopInput input) {
+
+		if (input.isRevAmpButtonPressed()) {
+			highMotor.set(AMP_U_MOTOR_RUN_POWER);
+			ampServo.setAngle(45);
+		} else {
+			ampServo.setAngle(180);
+			highMotor.set(0);
+		}
+
+		if (input.isAmpButtonPressed()) {
+			lowMotor.set(AMP_L_MOTOR_RUN_POWER);
+		} else {
+			lowMotor.set(0);
+		}
+	}
+
 	private void handleShootSpeakerState(TeleopInput input) {
 		if (input.isRevOuttakeButtonPressed()) {
 			highMotor.set(SPEAKER_U_MOTOR_RUN_POWER);

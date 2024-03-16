@@ -176,4 +176,20 @@ public class TeleopInput {
 	public boolean overrideIntakeButton() {
 		return mechController.getSquareButton();
 	}
+
+	/**
+	 * Get the value of the shoot button.
+	 * @return True if button is pressed
+	 */
+	public boolean isAmpButtonPressed() {
+		return mechController.getL2Button();
+	}
+
+	/**
+	 * Get the value of the rev button for the shooter.
+	 * @return True if button is pressed
+	 */
+	public boolean isRevAmpButtonPressed() {
+		return mechController.getR2Button();
+	}
 }
