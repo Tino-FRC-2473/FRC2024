@@ -20,7 +20,7 @@ public class MBRShooterFSM {
 		SHOOTING
 	}
 
-	private static final float SHOOTING_POWER = 0.7f;
+	private static final float SHOOTING_POWER = 0.5f;
 	private static final float SHOOTING_TIME = 1.0f;
 	private boolean buttonToggle = false;
 	private boolean buttonPressedLastFrame = false;
@@ -184,7 +184,7 @@ public class MBRShooterFSM {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleShootingState(TeleopInput input) {
-		leftMotor.set(SHOOTING_POWER); //dont forget the "-" sign
+		leftMotor.set(-SHOOTING_POWER); //dont forget the "-" sign
 		rightMotor.set(SHOOTING_POWER);
 	}
 
