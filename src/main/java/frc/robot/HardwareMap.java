@@ -1,7 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-
 /**
  * HardwareMap provides a centralized spot for constants related to the hardware
  * configuration of the robot.

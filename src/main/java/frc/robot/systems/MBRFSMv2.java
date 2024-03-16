@@ -17,10 +17,10 @@ import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
 
-public class PivotFSMv2 {
+public class MBRFSMv2 {
 	/* ======================== Constants ======================== */
 	// FSM state definitions
-	public enum PivotFSMState {
+	public enum MBRFSMState {
 		MOVE_TO_GROUND,
 		INTAKING,
 		MOVE_TO_SHOOTER,
@@ -36,11 +36,11 @@ public class PivotFSMv2 {
 	private static final float SHOOTING_POWER = 0.5f;
 	private static final double AUTO_SHOOTING_TIME = 1.0;
 
-	private static final float INTAKE_POWER = 0.1f;
-	private static final float OUTTAKE_POWER = -0.1f;
+	private static final float INTAKE_POWER = 0.3f;
+	private static final float OUTTAKE_POWER = -0.3f;
 	private static final float HOLDING_POWER = 0.03f;
 	private static final int AVERAGE_SIZE = 7;
-	private static final float CURRENT_THRESHOLD = 15.0f;
+	private static final float CURRENT_THRESHOLD = 11.0f;
 	private double[] currLogs;
 	private int tick = 0;
 	private boolean holding = false;
@@ -51,10 +51,10 @@ public class PivotFSMv2 {
 	private static final double PID_CONSTANT_PIVOT_P = 0.001;
 	private static final double GROUND_ENCODER_ROTATIONS = -1000;
 	private static final double SHOOTER_ENCODER_ROTATIONS = 0;
-	private static final double INRANGE_VALUE = 5;
+	private static final double INRANGE_VALUE = 15;
 
 	/* ======================== Private variables ======================== */
-	private PivotFSMState currentState;
+	private MBRFSMState currentState;
 	private CANSparkMax shooterLeftMotor;
 	private CANSparkMax shooterRightMotor;
 	private TalonFX intakeMotor;
@@ -74,7 +74,7 @@ public class PivotFSMv2 {
 	 * one-time initialization or configuration of hardware required. Note
 	 * the constructor is called only once when the robot boots.
 	 */
-	public PivotFSMv2() {
+	public MBRFSMv2() {
 		shooterLeftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LSHOOTER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 
@@ -88,7 +88,7 @@ public class PivotFSMv2 {
 
 		throughBore = new Encoder(0, 1);
 		throughBore.reset();
-
+		timer = new Timer();
 		currLogs = new double[AVERAGE_SIZE];
 		// Reset state machine
 		reset();
@@ -99,7 +99,7 @@ public class PivotFSMv2 {
 	 * Return current FSM state.
 	 * @return Current FSM state
 	 */
-	public PivotFSMState getCurrentState() {
+	public MBRFSMState getCurrentState() {
 		return currentState;
 	}
 	/**
@@ -111,7 +111,7 @@ public class PivotFSMv2 {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		currentState = PivotFSMState.MOVE_TO_SHOOTER;
+		currentState = MBRFSMState.MOVE_TO_SHOOTER;
 		timer.stop();
 		timer.reset();
 
@@ -130,8 +130,15 @@ public class PivotFSMv2 {
 			return;
 		}
 
-		currLogs[tick % AVERAGE_SIZE] = intakeMotor.getTorqueCurrent().getValueAsDouble();
+		currLogs[tick % AVERAGE_SIZE] = intakeMotor.getSupplyCurrent().getValueAsDouble();
 		tick++;
+		double avgcone = 0;
+		for (int i = 0; i < AVERAGE_SIZE; i++) {
+			avgcone += currLogs[i];
+		}
+		avgcone /= AVERAGE_SIZE;
+		SmartDashboard.putBoolean("holding", holding);
+		SmartDashboard.putNumber("avg current", avgcone);
 		SmartDashboard.putString("Current State", getCurrentState().toString());
 		SmartDashboard.putNumber("Intake power", intakeMotor.get());
 		SmartDashboard.putNumber("Pivot power", pivotMotor.get());
@@ -187,48 +194,49 @@ public class PivotFSMv2 {
 	 *        the robot is in autonomous mode.
 	 * @return FSM state for the next iteration
 	 */
-	private PivotFSMState nextState(TeleopInput input) {
+	private MBRFSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case MOVE_TO_SHOOTER:
 				if (input.isIntakeButtonPressed() && !input.isShootButtonPressed()
-					&& !input.isRevButtonPressed()) {
-					return PivotFSMState.MOVE_TO_GROUND;
+					&& !input.isRevButtonPressed() && !holding) {
+					return MBRFSMState.MOVE_TO_GROUND;
 				}
 				if (!input.isIntakeButtonPressed() && (input.isShootButtonPressed()
 					|| input.isRevButtonPressed())) {
 					if (inRange(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS)) {
-						return PivotFSMState.SHOOTING;
+						holding = false;
+						return MBRFSMState.SHOOTING;
 					} else {
-						return PivotFSMState.MOVE_TO_SHOOTER;
+						return MBRFSMState.MOVE_TO_SHOOTER;
 					}
 				}
-				return PivotFSMState.MOVE_TO_SHOOTER;
+				return MBRFSMState.MOVE_TO_SHOOTER;
 			case MOVE_TO_GROUND:
 				if (input.isIntakeButtonPressed() && !input.isShootButtonPressed()
 					&& !input.isRevButtonPressed()) {
 					if (inRange(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS)) {
-						return PivotFSMState.INTAKING;
+						return MBRFSMState.INTAKING;
 					} else {
-						return PivotFSMState.MOVE_TO_GROUND;
+						return MBRFSMState.MOVE_TO_GROUND;
 					}
 				}
-				return PivotFSMState.MOVE_TO_SHOOTER;
+				return MBRFSMState.MOVE_TO_SHOOTER;
 			case INTAKING:
 				if (input.isIntakeButtonPressed() && !input.isShootButtonPressed()
 					&& !input.isRevButtonPressed()) {
 					if (hasNote()) {
-						return PivotFSMState.MOVE_TO_SHOOTER;
+						return MBRFSMState.MOVE_TO_SHOOTER;
 					} else {
-						return PivotFSMState.INTAKING;
+						return MBRFSMState.INTAKING;
 					}
 				}
-				return PivotFSMState.MOVE_TO_SHOOTER;
+				return MBRFSMState.MOVE_TO_SHOOTER;
 			case SHOOTING:
 				if (!input.isIntakeButtonPressed() && (input.isShootButtonPressed()
 					|| input.isRevButtonPressed())) {
-					return PivotFSMState.SHOOTING;
+					return MBRFSMState.SHOOTING;
 				}
-				return PivotFSMState.MOVE_TO_SHOOTER;
+				return MBRFSMState.MOVE_TO_SHOOTER;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -275,7 +283,11 @@ public class PivotFSMv2 {
 		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
-		intakeMotor.set(INTAKE_POWER);
+		if (!holding) {
+			intakeMotor.set(INTAKE_POWER);
+		} else {
+			intakeMotor.set(0);
+		}
 	}
 
 	/**
@@ -307,8 +319,10 @@ public class PivotFSMv2 {
 			avgcone += currLogs[i];
 		}
 		avgcone /= AVERAGE_SIZE;
-		SmartDashboard.putNumber("avg current", avgcone);
-		return false;
+		if (avgcone > CURRENT_THRESHOLD) {
+			holding = true;
+		}
+		return holding;
 	}
 
 	public boolean handleAutoMoveGround() {
@@ -317,7 +331,7 @@ public class PivotFSMv2 {
 	}
 
 	public boolean handleAutoMoveShooter() {
-		intakeMotor.set(HOLDING_POWER);
+		intakeMotor.set(0);
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		return inRange(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS);
 	}

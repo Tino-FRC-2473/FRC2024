@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 // Systems
-import frc.robot.systems.PivotFSMv2;
+import frc.robot.systems.MBRFSMv2;
 
 
 /**
@@ -18,7 +18,7 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
-	private PivotFSMv2 pivotFSM;
+	private MBRFSMv2 mBRFSMv2;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -30,7 +30,7 @@ public class Robot extends TimedRobot {
 		input = new TeleopInput();
 
 		// Instantiate all systems here
-		pivotFSM = new PivotFSMv2();
+		mBRFSMv2 = new MBRFSMv2();
 	}
 
 	@Override
@@ -45,12 +45,12 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		pivotFSM.reset();
+		mBRFSMv2.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		pivotFSM.update(input);
+		mBRFSMv2.update(input);
 	}
 
 	@Override
