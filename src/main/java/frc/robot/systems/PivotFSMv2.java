@@ -33,7 +33,7 @@ public class PivotFSMv2 {
 		SHOOT
 	}
 
-	private static final float SHOOTING_POWER = 0.7f;
+	private static final float SHOOTING_POWER = 0.5f;
 	private static final double AUTO_SHOOTING_TIME = 1.0;
 
 	private static final float INTAKE_POWER = 0.1f;
@@ -132,12 +132,6 @@ public class PivotFSMv2 {
 
 		currLogs[tick % AVERAGE_SIZE] = intakeMotor.getTorqueCurrent().getValueAsDouble();
 		tick++;
-		double avgcone = 0;
-		for (int i = 0; i < AVERAGE_SIZE; i++) {
-			avgcone += currLogs[i];
-		}
-		avgcone /= AVERAGE_SIZE;
-		SmartDashboard.putNumber("avg current", avgcone);
 		SmartDashboard.putString("Current State", getCurrentState().toString());
 		SmartDashboard.putNumber("Intake power", intakeMotor.get());
 		SmartDashboard.putNumber("Pivot power", pivotMotor.get());
@@ -291,12 +285,12 @@ public class PivotFSMv2 {
 	public void handleShootingState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		if (input.isRevButtonPressed() && !input.isShootButtonPressed()) {
-			shooterLeftMotor.set(SHOOTING_POWER);
+			shooterLeftMotor.set(-SHOOTING_POWER);
 			shooterRightMotor.set(SHOOTING_POWER);
 			intakeMotor.set(0);
 		}
 		if (input.isShootButtonPressed()) {
-			shooterLeftMotor.set(SHOOTING_POWER);
+			shooterLeftMotor.set(-SHOOTING_POWER);
 			shooterRightMotor.set(SHOOTING_POWER);
 			intakeMotor.set(OUTTAKE_POWER);
 		}
@@ -308,6 +302,12 @@ public class PivotFSMv2 {
 	 * @return if the intake is holding a note
 	 */
 	public boolean hasNote() {
+		double avgcone = 0;
+		for (int i = 0; i < AVERAGE_SIZE; i++) {
+			avgcone += currLogs[i];
+		}
+		avgcone /= AVERAGE_SIZE;
+		SmartDashboard.putNumber("avg current", avgcone);
 		return false;
 	}
 
@@ -323,7 +323,7 @@ public class PivotFSMv2 {
 	}
 
 	public boolean handleAutoRev() {
-		shooterLeftMotor.set(SHOOTING_POWER);
+		shooterLeftMotor.set(-SHOOTING_POWER);
 		shooterRightMotor.set(SHOOTING_POWER);
 		return true;
 	}
@@ -342,7 +342,7 @@ public class PivotFSMv2 {
 			return true;
 		} else {
 			intakeMotor.set(OUTTAKE_POWER);
-			shooterLeftMotor.set(SHOOTING_POWER);
+			shooterLeftMotor.set(-SHOOTING_POWER);
 			shooterRightMotor.set(SHOOTING_POWER);
 			return false;
 		}
