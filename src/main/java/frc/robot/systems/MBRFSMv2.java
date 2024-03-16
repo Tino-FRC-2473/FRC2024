@@ -176,7 +176,7 @@ public class MBRFSMv2 {
 			case NOTE:
 				return handleAutoMoveGround() && handleAutoIntake();
 			case SPEAKER:
-				return handleAutoMoveShooter() && handleAutoRev();
+				return handleAutoMoveShooter() & handleAutoRev();
 			case SHOOT:
 				return handleAutoShoot();
 			default:
