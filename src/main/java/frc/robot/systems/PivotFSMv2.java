@@ -89,6 +89,7 @@ public class PivotFSMv2 {
 		throughBore = new Encoder(0, 1);
 		throughBore.reset();
 
+		currLogs = new double[AVERAGE_SIZE];
 		// Reset state machine
 		reset();
 	}
@@ -111,6 +112,7 @@ public class PivotFSMv2 {
 	 */
 	public void reset() {
 		currentState = PivotFSMState.MOVE_TO_SHOOTER;
+		timer.stop();
 		timer.reset();
 
 		// Call one tick of update to ensure outputs reflect start state
