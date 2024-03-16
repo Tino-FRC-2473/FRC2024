@@ -32,7 +32,7 @@ public class MBRFSMv2 {
 	private static final double AUTO_SHOOTING_TIME = 1.0;
 
 	private static final float INTAKE_POWER = 0.3f;
-	private static final float OUTTAKE_POWER = -0.3f;
+	private static final float OUTTAKE_POWER = -0.65f;
 	private static final float HOLDING_POWER = 0.03f;
 	private static final int AVERAGE_SIZE = 7;
 	private static final float CURRENT_THRESHOLD = 11.0f;
@@ -44,7 +44,7 @@ public class MBRFSMv2 {
 	private static final double MIN_TURN_SPEED = -0.15;
 	private static final double MAX_TURN_SPEED = 0.15;
 	private static final double PID_CONSTANT_PIVOT_P = 0.001;
-	private static final double GROUND_ENCODER_ROTATIONS = -1000;
+	private static final double GROUND_ENCODER_ROTATIONS = -1200;
 	private static final double SHOOTER_ENCODER_ROTATIONS = 0;
 	private static final double INRANGE_VALUE = 15;
 
@@ -109,7 +109,7 @@ public class MBRFSMv2 {
 		currentState = MBRFSMState.MOVE_TO_SHOOTER;
 		timer.stop();
 		timer.reset();
-
+		holding = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
