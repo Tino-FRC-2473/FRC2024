@@ -36,11 +36,11 @@ public class PivotFSMv2 {
 	private static final float SHOOTING_POWER = 0.5f;
 	private static final double AUTO_SHOOTING_TIME = 1.0;
 
-	private static final float INTAKE_POWER = 0.1f;
-	private static final float OUTTAKE_POWER = -0.1f;
+	private static final float INTAKE_POWER = 0.3f;
+	private static final float OUTTAKE_POWER = -0.3f;
 	private static final float HOLDING_POWER = 0.03f;
 	private static final int AVERAGE_SIZE = 7;
-	private static final float CURRENT_THRESHOLD = 15.0f;
+	private static final float CURRENT_THRESHOLD = 11.0f;
 	private double[] currLogs;
 	private int tick = 0;
 	private boolean holding = false;
@@ -51,7 +51,7 @@ public class PivotFSMv2 {
 	private static final double PID_CONSTANT_PIVOT_P = 0.001;
 	private static final double GROUND_ENCODER_ROTATIONS = -1000;
 	private static final double SHOOTER_ENCODER_ROTATIONS = 0;
-	private static final double INRANGE_VALUE = 5;
+	private static final double INRANGE_VALUE = 15;
 
 	/* ======================== Private variables ======================== */
 	private PivotFSMState currentState;
@@ -75,11 +75,11 @@ public class PivotFSMv2 {
 	 * the constructor is called only once when the robot boots.
 	 */
 	public PivotFSMv2() {
-		shooterLeftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LSHOOTER_MOTOR,
-										CANSparkMax.MotorType.kBrushless);
+		// shooterLeftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LSHOOTER_MOTOR,
+		// 								CANSparkMax.MotorType.kBrushless);
 
-		shooterRightMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_RSHOOTER_MOTOR,
-										CANSparkMax.MotorType.kBrushless);
+		// shooterRightMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_RSHOOTER_MOTOR,
+		// 								CANSparkMax.MotorType.kBrushless);
 		intakeMotor = new TalonFX(HardwareMap.DEVICE_ID_INTAKE_MOTOR);
 		intakeMotor.setNeutralMode(NeutralModeValue.Brake);
 
@@ -88,7 +88,7 @@ public class PivotFSMv2 {
 
 		throughBore = new Encoder(0, 1);
 		throughBore.reset();
-
+		timer = new Timer();
 		currLogs = new double[AVERAGE_SIZE];
 		// Reset state machine
 		reset();
@@ -130,14 +130,20 @@ public class PivotFSMv2 {
 			return;
 		}
 
-		currLogs[tick % AVERAGE_SIZE] = intakeMotor.getTorqueCurrent().getValueAsDouble();
+		currLogs[tick % AVERAGE_SIZE] = intakeMotor.getSupplyCurrent().getValueAsDouble();
 		tick++;
-
+		double avgcone = 0;
+		for (int i = 0; i < AVERAGE_SIZE; i++) {
+			avgcone += currLogs[i];
+		}
+		avgcone /= AVERAGE_SIZE;
+		SmartDashboard.putBoolean("holding", holding);
+		SmartDashboard.putNumber("avg current", avgcone);
 		SmartDashboard.putString("Current State", getCurrentState().toString());
 		SmartDashboard.putNumber("Intake power", intakeMotor.get());
 		SmartDashboard.putNumber("Pivot power", pivotMotor.get());
-		SmartDashboard.putNumber("Left shooter power", shooterLeftMotor.get());
-		SmartDashboard.putNumber("Right shooter power", shooterRightMotor.get());
+		// SmartDashboard.putNumber("Left shooter power", shooterLeftMotor.get());
+		// SmartDashboard.putNumber("Right shooter power", shooterRightMotor.get());
 		SmartDashboard.putNumber("Pivot encoder count", throughBore.getDistance());
 
 		switch (currentState) {
@@ -192,12 +198,13 @@ public class PivotFSMv2 {
 		switch (currentState) {
 			case MOVE_TO_SHOOTER:
 				if (input.isIntakeButtonPressed() && !input.isShootButtonPressed()
-					&& !input.isRevButtonPressed()) {
+					&& !input.isRevButtonPressed() && !holding) {
 					return PivotFSMState.MOVE_TO_GROUND;
 				}
 				if (!input.isIntakeButtonPressed() && (input.isShootButtonPressed()
 					|| input.isRevButtonPressed())) {
 					if (inRange(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS)) {
+						holding = false;
 						return PivotFSMState.SHOOTING;
 					} else {
 						return PivotFSMState.MOVE_TO_SHOOTER;
@@ -252,8 +259,8 @@ public class PivotFSMv2 {
 	 */
 	public void handleMoveShooterState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
-		shooterLeftMotor.set(0);
-		shooterRightMotor.set(0);
+		// shooterLeftMotor.set(0);
+		// shooterRightMotor.set(0);
 		intakeMotor.set(0);
 	}
 
@@ -263,8 +270,8 @@ public class PivotFSMv2 {
 	 */
 	public void handleMoveGroundState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
-		shooterLeftMotor.set(0);
-		shooterRightMotor.set(0);
+		// shooterLeftMotor.set(0);
+		// shooterRightMotor.set(0);
 		intakeMotor.set(0);
 	}
 
@@ -274,9 +281,13 @@ public class PivotFSMv2 {
 	 */
 	public void handleIntakingState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
-		shooterLeftMotor.set(0);
-		shooterRightMotor.set(0);
-		intakeMotor.set(INTAKE_POWER);
+		// shooterLeftMotor.set(0);
+		// shooterRightMotor.set(0);
+		if (!holding) {
+			intakeMotor.set(INTAKE_POWER);
+		} else {
+			intakeMotor.set(0);
+		}
 	}
 
 	/**
@@ -286,13 +297,13 @@ public class PivotFSMv2 {
 	public void handleShootingState(TeleopInput input) {
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		if (input.isRevButtonPressed() && !input.isShootButtonPressed()) {
-			shooterLeftMotor.set(-SHOOTING_POWER);
-			shooterRightMotor.set(SHOOTING_POWER);
+			// shooterLeftMotor.set(-SHOOTING_POWER);
+			// shooterRightMotor.set(SHOOTING_POWER);
 			intakeMotor.set(0);
 		}
 		if (input.isShootButtonPressed()) {
-			shooterLeftMotor.set(-SHOOTING_POWER);
-			shooterRightMotor.set(SHOOTING_POWER);
+			// shooterLeftMotor.set(-SHOOTING_POWER);
+			// shooterRightMotor.set(SHOOTING_POWER);
 			intakeMotor.set(OUTTAKE_POWER);
 		}
 	}
@@ -308,8 +319,10 @@ public class PivotFSMv2 {
 			avgcone += currLogs[i];
 		}
 		avgcone /= AVERAGE_SIZE;
-		SmartDashboard.putNumber("avg current", avgcone);
-		return false;
+		if (avgcone > CURRENT_THRESHOLD) {
+			holding = true;
+		}
+		return holding;
 	}
 
 	public boolean handleAutoMoveGround() {
@@ -318,14 +331,14 @@ public class PivotFSMv2 {
 	}
 
 	public boolean handleAutoMoveShooter() {
-		intakeMotor.set(HOLDING_POWER);
+		intakeMotor.set(0);
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		return inRange(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS);
 	}
 
 	public boolean handleAutoRev() {
-		shooterLeftMotor.set(-SHOOTING_POWER);
-		shooterRightMotor.set(SHOOTING_POWER);
+		// shooterLeftMotor.set(-SHOOTING_POWER);
+		// shooterRightMotor.set(SHOOTING_POWER);
 		return true;
 	}
 
@@ -336,23 +349,23 @@ public class PivotFSMv2 {
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		if (timer.get() > AUTO_SHOOTING_TIME) {
 			intakeMotor.set(0);
-			shooterLeftMotor.set(0);
-			shooterRightMotor.set(0);
+			// shooterLeftMotor.set(0);
+			// shooterRightMotor.set(0);
 			timer.stop();
 			timer.reset();
 			return true;
 		} else {
 			intakeMotor.set(OUTTAKE_POWER);
-			shooterLeftMotor.set(-SHOOTING_POWER);
-			shooterRightMotor.set(SHOOTING_POWER);
+			// shooterLeftMotor.set(-SHOOTING_POWER);
+			// shooterRightMotor.set(SHOOTING_POWER);
 			return false;
 		}
 	}
 
 	public boolean handleAutoIntake() {
 		intakeMotor.set(INTAKE_POWER);
-		shooterLeftMotor.set(0);
-		shooterRightMotor.set(0);
+		// shooterLeftMotor.set(0);
+		// shooterRightMotor.set(0);
 		return true;
 	}
 }
