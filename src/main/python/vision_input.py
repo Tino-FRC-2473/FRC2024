@@ -37,3 +37,4 @@ class VisionInput:
     
     def close(self):
         self.cap.release()
+        cv2.destroyAllWindows()
