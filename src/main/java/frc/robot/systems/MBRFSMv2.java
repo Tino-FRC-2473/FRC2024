@@ -27,7 +27,6 @@ public class MBRFSMv2 {
 		MOVE_TO_SHOOTER,
 		SHOOTING,
 		MOVE_TO_AMP,
-		SHOOT_AMP
 	}
 
 	private static final float SHOOTING_POWER = 0.5f;
@@ -160,9 +159,6 @@ public class MBRFSMv2 {
 			case MOVE_TO_AMP:
 				handleMoveAmpState(input);
 				break;
-			case SHOOT_AMP:
-				handleShootAmpState(input);
-				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -262,18 +258,7 @@ public class MBRFSMv2 {
 			case MOVE_TO_AMP:
 				if (input.isAmpButtonPressed() && !input.isShootButtonPressed()
 					&& !input.isRevButtonPressed() && !input.isIntakeButtonPressed()) {
-					if (inRange(throughBore.getDistance(), AMP_ENCODER_ROTATIONS)) {
-						holding = false;
-						return MBRFSMState.SHOOT_AMP;
-					} else {
 						return MBRFSMState.MOVE_TO_AMP;
-					}
-				}
-				return MBRFSMState.MOVE_TO_SHOOTER;
-			case SHOOT_AMP:
-				if (input.isAmpButtonPressed() && !input.isShootButtonPressed()
-					&& !input.isRevButtonPressed() && !input.isIntakeButtonPressed()) {
-					return MBRFSMState.SHOOT_AMP;
 				}
 				return MBRFSMState.MOVE_TO_SHOOTER;
 			default:
@@ -358,7 +343,12 @@ public class MBRFSMv2 {
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
 		pivotMotor.set(pid(throughBore.getDistance(), AMP_ENCODER_ROTATIONS));
-		intakeMotor.set(AMP_SHOOT_POWER);
+		if (input.isShootAmpButtonPressed()) {
+			holding = false;
+			intakeMotor.set(AMP_SHOOT_POWER);
+		} else {
+			intakeMotor.set(0);
+		}
 	}
 
 	public void handleMoveAmpState(TeleopInput input) {
