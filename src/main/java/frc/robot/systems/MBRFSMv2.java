@@ -339,7 +339,7 @@ public class MBRFSMv2 {
 		}
 	}
 
-	public void handleShootAmpState(TeleopInput input) {
+	public void handleMoveAmpState(TeleopInput input) {
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
 		pivotMotor.set(pid(throughBore.getDistance(), AMP_ENCODER_ROTATIONS));
@@ -349,13 +349,6 @@ public class MBRFSMv2 {
 		} else {
 			intakeMotor.set(0);
 		}
-	}
-
-	public void handleMoveAmpState(TeleopInput input) {
-		pivotMotor.set(pid(throughBore.getDistance(), AMP_ENCODER_ROTATIONS));
-		shooterLeftMotor.set(0);
-		shooterRightMotor.set(0);
-		intakeMotor.set(0);
 	}
 	/**
 	 * Checks if the intake is holding a note.
