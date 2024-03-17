@@ -274,6 +274,7 @@ public class MBRFSMv2 {
 			intakeMotor.set(INTAKE_POWER);
 		} else if (!input.isoverrideIntakeButtonPressed() && input.isoverrideOuttakeButtonPressed()) {
 			intakeMotor.set(OUTTAKE_POWER);
+			holding = false;
 		} else {
 			intakeMotor.set(0);
 		}
