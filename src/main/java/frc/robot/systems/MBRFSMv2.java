@@ -29,7 +29,7 @@ public class MBRFSMv2 {
 		MOVE_TO_AMP,
 	}
 
-	private static final float SHOOTING_POWER = 0.5f;
+	private static final float SHOOTING_POWER = 0.8f;
 	private static final double AUTO_SHOOTING_TIME = 1.0;
 
 	private static final float INTAKE_POWER = 0.3f;
@@ -42,8 +42,8 @@ public class MBRFSMv2 {
 	private boolean holding = false;
 
 
-	private static final double MIN_TURN_SPEED = -0.15;
-	private static final double MAX_TURN_SPEED = 0.15;
+	private static final double MIN_TURN_SPEED = -0.2;
+	private static final double MAX_TURN_SPEED = 0.2;
 	private static final double PID_CONSTANT_PIVOT_P = 0.001;
 	private static final double GROUND_ENCODER_ROTATIONS = -1200;
 	private static final double AMP_ENCODER_ROTATIONS = -500;
