@@ -136,5 +136,11 @@ public class TeleopInput {
 		return mechController.getL1Button();
 	}
 
+	public boolean isoverrideIntakeButtonPressed() {
+		return mechController.getL2Button();
+	}
 
+	public boolean isoverrideOuttakeButtonPressed() {
+		return mechController.getR2Button();
+	}
 }

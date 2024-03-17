@@ -270,7 +270,13 @@ public class MBRFSMv2 {
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
-		intakeMotor.set(0);
+		if (input.isoverrideIntakeButtonPressed() && !input.isoverrideOuttakeButtonPressed()) {
+			intakeMotor.set(INTAKE_POWER);
+		} else if (!input.isoverrideIntakeButtonPressed() && input.isoverrideOuttakeButtonPressed()) {
+			intakeMotor.set(OUTTAKE_POWER);
+		} else {
+			intakeMotor.set(0);
+		}
 	}
 
 	/**
