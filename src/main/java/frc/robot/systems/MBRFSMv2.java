@@ -42,8 +42,8 @@ public class MBRFSMv2 {
 	private boolean holding = false;
 
 
-	private static final double MIN_TURN_SPEED = -0.3;
-	private static final double MAX_TURN_SPEED = 0.3;
+	private static final double MIN_TURN_SPEED = -0.4;
+	private static final double MAX_TURN_SPEED = 0.4;
 	private static final double PID_CONSTANT_PIVOT_P = 0.001;
 	private static final double GROUND_ENCODER_ROTATIONS = -1200;
 	private static final double AMP_ENCODER_ROTATIONS = -500;
