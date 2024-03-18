@@ -431,7 +431,7 @@ public class MBRFSMv2 {
 	}
 
 	public boolean handleAutoIntake() {
-		intakeMotor.set(INTAKE_POWER);
+		intakeMotor.set(INTAKE_POWER + 0.3);
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
 		return true;

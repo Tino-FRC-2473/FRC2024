@@ -169,45 +169,6 @@ public class AutoHandlerSystem {
 		boolean isCurrentStateFinished;
 		SmartDashboard.putString("In Auto State: ", "" + getCurrentState());
 		switch (getCurrentState()) {
-			/* --------------------------- SVR --------------------------- */
-			// case LEAVE:
-			// 	isCurrentStateFinished = driveSystem.updateAutonomous(
-			// 		AutoFSMState.LEAVE);
-			// 	break;
-			// case PICK_UP_1:
-			// 	isCurrentStateFinished = driveSystem.updateAutonomous(
-			// 		AutoFSMState.PICK_UP_1);
-			// 	break;
-			// case DRIVE_TO_SCORE:
-			// 	isCurrentStateFinished = driveSystem.updateAutonomous(
-			// 		AutoFSMState.DRIVE_TO_SCORE);
-			// 	break;
-			// case PICK_UP_2:
-			// 	isCurrentStateFinished = driveSystem.updateAutonomous(
-			// 		AutoFSMState.PICK_UP_2);
-			// 	break;
-			// case PICK_UP_3:
-			// 	isCurrentStateFinished = driveSystem.updateAutonomous(
-			// 		AutoFSMState.PICK_UP_3);
-			// 	break;
-			// case PICK_UP_4:
-			// 	isCurrentStateFinished = driveSystem.updateAutonomous(
-			// 		AutoFSMState.PICK_UP_4);
-			// 	break;
-			// case SHOOTER_STATE:
-			// 	isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE);
-			// 	break;
-			// case PENDING:
-			// 	isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.PENDING);
-			// 	break;
-			// case SHOOTER_STATE_FAST:
-			// 	isCurrentStateFinished =
-			// shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE_FAST);
-			// 	break;
-			// case RUN_OVER_NOTES:
-			// 	isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.RUN_OVER_NOTES);
-			// 	break;
-			/* --------------------------- SVR --------------------------- */
 			case DEFAULT:
 				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DEFAULT);
 				break;
@@ -240,6 +201,9 @@ public class AutoHandlerSystem {
 				break;
 			case SHOOT:
 				isCurrentStateFinished = mechSystem.updateAutonomous(AutoFSMState.SHOOT);
+				break;
+			case SHOOT_PRELOADED:
+				isCurrentStateFinished = mechSystem.updateAutonomous(AutoFSMState.SHOOT_PRELOADED);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());
