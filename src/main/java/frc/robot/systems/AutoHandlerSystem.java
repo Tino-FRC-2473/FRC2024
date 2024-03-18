@@ -30,7 +30,8 @@ public class AutoHandlerSystem {
 		NOTE6,
 		NOTE7,
 		NOTE8,
-		SHOOT
+		SHOOT,
+		SHOOT_PRELOADED
 	}
 
 	/* --------------------------- SVR --------------------------- */
@@ -124,7 +125,7 @@ public class AutoHandlerSystem {
 		/* --------------------------- SVR --------------------------- */
 
 		currentStateList.clear();
-		currentStateList.add(AutoFSMState.SHOOT);
+		currentStateList.add(AutoFSMState.SHOOT_PRELOADED);
 		currentStateList.add(AutoFSMState.DEFAULT);
 		if (path.contains("PROT") || path.contains("MISC") || path.contains("MIDF")) {
 			if (!path.contains("PROT")) {
