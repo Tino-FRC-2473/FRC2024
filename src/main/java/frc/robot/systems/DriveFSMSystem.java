@@ -357,7 +357,7 @@ public class DriveFSMSystem {
 				} else {
 					note1.add(new Pose2d(-1 - AutoConstants.N_0_25,
 						(-1 - AutoConstants.N_0_25) * multiplier,
-						new Rotation2d(AutoConstants.DEG_45 * multiplier)));
+						new Rotation2d(AutoConstants.DEG_35 * multiplier)));
 				}
 				return driveAlongPath(note1);
 			case NOTE2:
@@ -373,7 +373,7 @@ public class DriveFSMSystem {
 				} else {
 					note3.add(new Pose2d(-1 - AutoConstants.N_0_25,
 						(1 + AutoConstants.N_0_25) * multiplier,
-						new Rotation2d(-AutoConstants.DEG_45 * multiplier)));
+						new Rotation2d(-AutoConstants.DEG_35 * multiplier)));
 				}
 				return driveAlongPath(note3);
 			case NOTE4:

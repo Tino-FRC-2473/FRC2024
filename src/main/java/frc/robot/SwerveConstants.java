@@ -162,6 +162,7 @@ public final class SwerveConstants {
 		public static final double DEG_15 = Math.toRadians(15);
 		public static final double DEG_20 = Math.toRadians(20);
 		public static final double DEG_30 = Math.toRadians(30);
+		public static final double DEG_35 = Math.toRadians(35);
 		public static final double DEG_45 = Math.toRadians(45);
 		public static final double DEG_55 = Math.toRadians(55);
 		public static final double DEG_90 = Math.toRadians(90);

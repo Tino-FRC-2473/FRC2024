@@ -32,9 +32,9 @@ public class MBRFSMv2 {
 	private static final float SHOOTING_POWER = 0.8f;
 	private static final double AUTO_SHOOTING_TIME = 1.0;
 
-	private static final float INTAKE_POWER = 0.3f;
+	private static final float INTAKE_POWER = 0.35f;
 	private static final float OUTTAKE_POWER = -0.65f;
-	private static final float AMP_SHOOT_POWER = -0.7f;
+	private static final float AMP_SHOOT_POWER = -0.65f;
 	private static final int AVERAGE_SIZE = 7;
 	private static final float CURRENT_THRESHOLD = 11.0f;
 	private double[] currLogs;
