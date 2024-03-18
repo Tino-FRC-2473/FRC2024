@@ -42,8 +42,8 @@ public class MBRFSMv2 {
 	private boolean holding = false;
 
 
-	private static final double MIN_TURN_SPEED = -0.2;
-	private static final double MAX_TURN_SPEED = 0.2;
+	private static final double MIN_TURN_SPEED = -0.3;
+	private static final double MAX_TURN_SPEED = 0.3;
 	private static final double PID_CONSTANT_PIVOT_P = 0.001;
 	private static final double GROUND_ENCODER_ROTATIONS = -1200;
 	private static final double AMP_ENCODER_ROTATIONS = -500;
@@ -193,6 +193,8 @@ public class MBRFSMv2 {
 				return handleAutoMoveShooter() & handleAutoRev();
 			case SHOOT:
 				return handleAutoShoot();
+			case SHOOT_PRELOADED:
+				return handleAutoShootPreloaded();
 			default:
 				return true;
 		}
@@ -400,6 +402,31 @@ public class MBRFSMv2 {
 			shooterLeftMotor.set(-SHOOTING_POWER);
 			shooterRightMotor.set(SHOOTING_POWER);
 			return false;
+		}
+	}
+
+	public boolean handleAutoShootPreloaded() {
+		if (timer.get() == 0) {
+			timer.start();
+		}
+		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
+		if (timer.get() < 1) {
+			intakeMotor.set(0);
+			shooterLeftMotor.set(-SHOOTING_POWER);
+			shooterRightMotor.set(SHOOTING_POWER);
+			return false;
+		} else if (timer.get() < 2){
+			intakeMotor.set(OUTTAKE_POWER);
+			shooterLeftMotor.set(-SHOOTING_POWER);
+			shooterRightMotor.set(SHOOTING_POWER);
+			return false;
+		} else {
+			intakeMotor.set(0);
+			shooterLeftMotor.set(0);
+			shooterRightMotor.set(0);
+			timer.stop();
+			timer.reset();
+			return true;
 		}
 	}
 
