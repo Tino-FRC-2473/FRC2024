@@ -136,18 +136,34 @@ public class TeleopInput {
 		return mechController.getL1Button();
 	}
 
+	/**
+	 * Get the value of the Square Button.
+	 * @return if Square Button is pressed
+	 */
 	public boolean isAmpButtonPressed() {
 		return mechController.getSquareButton();
 	}
 
+	/**
+	 * Get the value of the Share Button.
+	 * @return if Square Share is pressed
+	 */
 	public boolean isShootAmpButtonPressed() {
 		return mechController.getShareButton();
 	}
 
+	/**
+	 * Get the value of the L2 Button.
+	 * @return if L2 Button is pressed
+	 */
 	public boolean isoverrideIntakeButtonPressed() {
 		return mechController.getL2Button();
 	}
 
+	/**
+	 * Get the value of the R2 Button.
+	 * @return if R2 Button is pressed
+	 */
 	public boolean isoverrideOuttakeButtonPressed() {
 		return mechController.getR2Button();
 	}
