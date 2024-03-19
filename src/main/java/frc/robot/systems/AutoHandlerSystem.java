@@ -81,6 +81,7 @@ public class AutoHandlerSystem {
 	 * Create FSMSystem and initialize to starting state.
 	 * Initializes any subsystems such as driveFSM, armFSM, ect.
 	 * @param fsm1 the first subsystem that the auto handler will call functions on
+	 * @param fsm2 the second subsystem that the auto handler will call functions on
 	 */
 	public AutoHandlerSystem(DriveFSMSystem fsm1, MBRFSMv2 fsm2) {
 		driveSystem = fsm1;
@@ -173,31 +174,40 @@ public class AutoHandlerSystem {
 				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DEFAULT);
 				break;
 			case SPEAKER:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.SPEAKER) & mechSystem.updateAutonomous(AutoFSMState.SPEAKER);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.SPEAKER)
+					& mechSystem.updateAutonomous(AutoFSMState.SPEAKER);
 				break;
 			case NOTE1:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE1) & mechSystem.updateAutonomous(AutoFSMState.NOTE1);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE1)
+					& mechSystem.updateAutonomous(AutoFSMState.NOTE1);
 				break;
 			case NOTE2:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE2) & mechSystem.updateAutonomous(AutoFSMState.NOTE2);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE2)
+					& mechSystem.updateAutonomous(AutoFSMState.NOTE2);
 				break;
 			case NOTE3:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE3) & mechSystem.updateAutonomous(AutoFSMState.NOTE3);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE3)
+					& mechSystem.updateAutonomous(AutoFSMState.NOTE3);
 				break;
 			case NOTE4:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE4) & mechSystem.updateAutonomous(AutoFSMState.NOTE4);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE4)
+					& mechSystem.updateAutonomous(AutoFSMState.NOTE4);
 				break;
 			case NOTE5:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE5) & mechSystem.updateAutonomous(AutoFSMState.NOTE5);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE5)
+					& mechSystem.updateAutonomous(AutoFSMState.NOTE5);
 				break;
 			case NOTE6:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE6) & mechSystem.updateAutonomous(AutoFSMState.NOTE6);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE6)
+					& mechSystem.updateAutonomous(AutoFSMState.NOTE6);
 				break;
 			case NOTE7:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE7) & mechSystem.updateAutonomous(AutoFSMState.NOTE7);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE7)
+					& mechSystem.updateAutonomous(AutoFSMState.NOTE7);
 				break;
 			case NOTE8:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE8) & mechSystem.updateAutonomous(AutoFSMState.NOTE8);
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE8)
+					& mechSystem.updateAutonomous(AutoFSMState.NOTE8);
 				break;
 			case SHOOT:
 				isCurrentStateFinished = mechSystem.updateAutonomous(AutoFSMState.SHOOT);
