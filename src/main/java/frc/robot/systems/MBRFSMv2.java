@@ -6,10 +6,16 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 // WPILib Imports
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ColorMatch;
+import com.revrobotics.ColorMatchResult;
+
 //import com.revrobotics.SparkPIDController;
+import edu.wpi.first.wpilibj.I2C;
+import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
@@ -41,7 +47,8 @@ public class MBRFSMv2 {
 	private int tick = 0;
 	private boolean holding = false;
 
-
+	private final ColorSensorV3 colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
+	private final ColorMatch colorMatcher = new ColorMatch();
 	private static final double MIN_TURN_SPEED = -0.4;
 	private static final double MAX_TURN_SPEED = 0.4;
 	private static final double PID_CONSTANT_PIVOT_P = 0.001;
@@ -49,6 +56,10 @@ public class MBRFSMv2 {
 	private static final double AMP_ENCODER_ROTATIONS = -500;
 	private static final double SHOOTER_ENCODER_ROTATIONS = 0;
 	private static final double INRANGE_VALUE = 15;
+	private static final double PROXIMIIY_THRESHOLD = 0.5;
+
+	private final Color kNoteColorTarget = new Color(0.361, 0.524, 0.113); //need to tweak vals
+
 
 	/* ======================== Private variables ======================== */
 	private MBRFSMState currentState;
@@ -87,6 +98,8 @@ public class MBRFSMv2 {
 		throughBore.reset();
 		timer = new Timer();
 		currLogs = new double[AVERAGE_SIZE];
+
+		colorMatcher.addColorMatch(kNoteColorTarget);
 		// Reset state machine
 		reset();
 	}
@@ -127,13 +140,15 @@ public class MBRFSMv2 {
 			return;
 		}
 
-		currLogs[tick % AVERAGE_SIZE] = intakeMotor.getSupplyCurrent().getValueAsDouble();
+
+		/*currLogs[tick % AVERAGE_SIZE] = intakeMotor.getSupplyCurrent().getValueAsDouble();
 		tick++;
 		double avgcone = 0;
 		for (int i = 0; i < AVERAGE_SIZE; i++) {
 			avgcone += currLogs[i];
 		}
-		avgcone /= AVERAGE_SIZE;
+		avgcone /= AVERAGE_SIZE;*/
+		
 		SmartDashboard.putBoolean("holding", holding);
 		SmartDashboard.putNumber("avg current", avgcone);
 		SmartDashboard.putString("Current State", getCurrentState().toString());
@@ -357,14 +372,22 @@ public class MBRFSMv2 {
 	 * @return if the intake is holding a note
 	 */
 	public boolean hasNote() {
-		double avgcone = 0;
+		/*double avgcone = 0;
 		for (int i = 0; i < AVERAGE_SIZE; i++) {
 			avgcone += currLogs[i];
 		}
 		avgcone /= AVERAGE_SIZE;
 		if (avgcone > CURRENT_THRESHOLD) {
 			holding = true;
+		}*/
+
+		Color dColor = colorSensor.getColor();
+		ColorMatchResult match = colorMatcher.matchClosestColor(dColor);
+		
+		if (match.color == kNoteColorTarget && colorSensor.getProximity() <= PROXIMIIY_THRESHOLD) {
+			holding = true;
 		}
+
 		return holding;
 	}
 

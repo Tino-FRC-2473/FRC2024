@@ -37,7 +37,7 @@ public class Robot extends TimedRobot {
 		input = new TeleopInput();
 		// Instantiate all systems here
 		autoPathChooser = new AutoPathChooser();
-		driveFSMSystem = new DriveFSMSystem();
+		//driveFSMSystem = new DriveFSMSystem();
 		mechFSMSystem = new MBRFSMv2();
 		autoHandler = new AutoHandlerSystem(driveFSMSystem, mechFSMSystem);
 
@@ -73,13 +73,13 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
-		driveFSMSystem.reset();
+		//driveFSMSystem.reset();
 		mechFSMSystem.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		driveFSMSystem.update(input);
+		//driveFSMSystem.update(input);
 		mechFSMSystem.update(input);
 	}
 
