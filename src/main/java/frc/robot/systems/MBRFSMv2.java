@@ -33,8 +33,9 @@ public class MBRFSMv2 {
 	private static final double AUTO_SHOOTING_TIME = 1.0;
 
 	private static final float INTAKE_POWER = 0.35f;
-	private static final float OUTTAKE_POWER = -0.65f;
-	private static final float AMP_SHOOT_POWER = -0.65f;
+	private static final float OUTTAKE_POWER = -0.7f;
+	private static final float HOLDING_POWER = 0.05f;
+	private static final float AMP_SHOOT_POWER = -0.95f;
 	private static final int AVERAGE_SIZE = 7;
 	private static final float CURRENT_THRESHOLD = 11.0f;
 	private double[] currLogs;
@@ -44,9 +45,9 @@ public class MBRFSMv2 {
 
 	private static final double MIN_TURN_SPEED = -0.4;
 	private static final double MAX_TURN_SPEED = 0.4;
-	private static final double PID_CONSTANT_PIVOT_P = 0.001;
+	private static final double PID_CONSTANT_PIVOT_P = 0.0005;
 	private static final double GROUND_ENCODER_ROTATIONS = -1200;
-	private static final double AMP_ENCODER_ROTATIONS = -500;
+	private static final double AMP_ENCODER_ROTATIONS = -550;
 	private static final double SHOOTER_ENCODER_ROTATIONS = 0;
 	private static final double INRANGE_VALUE = 15;
 
@@ -293,8 +294,10 @@ public class MBRFSMv2 {
 			intakeMotor.set(OUTTAKE_POWER);
 			holding = false;
 		} else {
-			intakeMotor.set(0);
+			intakeMotor.set(holding ? HOLDING_POWER : 0);
 		}
+
+
 	}
 
 	/**
