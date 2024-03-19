@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 
 // Robot Imports
+import frc.robot.LED;
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
 
@@ -57,6 +58,7 @@ public class MBRFSMv2 {
 	private CANSparkMax shooterRightMotor;
 	private TalonFX intakeMotor;
 	private TalonFX pivotMotor;
+	private LED led = new LED();
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -109,6 +111,7 @@ public class MBRFSMv2 {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
+		led.turnOff();
 		currentState = MBRFSMState.MOVE_TO_SHOOTER;
 		timer.stop();
 		timer.reset();
@@ -143,7 +146,7 @@ public class MBRFSMv2 {
 		SmartDashboard.putNumber("Left shooter power", shooterLeftMotor.get());
 		SmartDashboard.putNumber("Right shooter power", shooterRightMotor.get());
 		SmartDashboard.putNumber("Pivot encoder count", throughBore.getDistance());
-
+		
 		switch (currentState) {
 			case MOVE_TO_SHOOTER:
 				handleMoveShooterState(input);
