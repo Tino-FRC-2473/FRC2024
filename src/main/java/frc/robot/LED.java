@@ -10,18 +10,34 @@ public class LED {
 	private int greenVal = 0;
 	private boolean forward = true;
 	private static final int LED_PORT = 9;
-	private static final int LED_BUFFER_LENGTH = 30;
+	private static final int LED_BUFFER_LENGTH = 300;
 	private static final int ONE_HUNDRED_EIGHTY = 180;
 	private static final int ONE_HUNDRED = 100;
 	private static final int RAINBOW_PIXEL_INCREASE = 3;
 
-	private static final int GREEN_RGB_R = 135;
-	private static final int GREEN_RGB_G = 255;
-	private static final int GREEN_RGB_B = 8;
+  private static final int RED_RGB_R = 255;
+	private static final int RED_RGB_G = 0;
+	private static final int RED_RGB_B = 0;
 
-	private static final int ORANGE_RGB_R = 255;
-	private static final int ORANGE_RGB_G = 92;
-	private static final int ORANGE_RGB_B = 5;
+  private static final int ORANGE_RGB_R = 255;
+	private static final int ORANGE_RGB_G = 60;
+	private static final int ORANGE_RGB_B = 0;
+
+	private static final int GREEN_RGB_R = 0;
+	private static final int GREEN_RGB_G = 255;
+	private static final int GREEN_RGB_B = 0;
+
+  private static final int BLUE_RGB_R = 0;
+	private static final int BLUE_RGB_G = 0;
+	private static final int BLUE_RGB_B = 255;
+  
+  private static final int PURPLE_RGB_R = 166;
+	private static final int PURPLE_RGB_G = 99;
+	private static final int PURPLE_RGB_B = 255;
+
+  private static final int PINK_RGB_R = 255;
+	private static final int PINK_RGB_G = 0;
+	private static final int PINK_RGB_B = 90;
 
 	private static final int CR_RGB_R = 255;
 
@@ -38,17 +54,17 @@ public class LED {
 		led.start();
 	}
 
-	/**
-	 * Changes the LED color to green.
+  /**
+	 * Changes the LED color to red.
 	 */
-	public void greenLight() {
-		for (var i = 0; i < ledBuffer.getLength(); i++) {
-			ledBuffer.setRGB(i, GREEN_RGB_R, GREEN_RGB_G, GREEN_RGB_B);
-		}
-		led.setData(ledBuffer);
-	}
+  public void redLight() {
+    for (var i = 0; i < ledBuffer.getLength(); i++) {
+      ledBuffer.setRGB(i, RED_RGB_R, RED_RGB_G, RED_RGB_B);
+    }
+    led.setData(ledBuffer);
+  }
 
-	/**
+  /**
 	 * Changes the LED color to orange.
 	 */
 	public void orangeLight() {
@@ -57,6 +73,47 @@ public class LED {
 		}
 		led.setData(ledBuffer);
 	}
+
+	/**
+	 * Changes LED color to green.
+	 */
+	public void greenLight() {
+		for (var i = 0; i < ledBuffer.getLength(); i++) {
+			ledBuffer.setRGB(i, GREEN_RGB_R, GREEN_RGB_G, GREEN_RGB_B);
+		}
+		led.setData(ledBuffer);
+	}
+
+  /**
+	 * Changes the LED color to blue.
+	 */
+  public void blueLight() {
+    for (var i = 0; i < ledBuffer.getLength(); i++) {
+      ledBuffer.setRGB(i, BLUE_RGB_R, BLUE_RGB_G, BLUE_RGB_B);
+    }
+    led.setData(ledBuffer);
+  }
+
+  /**
+	 * Changes the LED color to purple.
+	 */
+  public void purpleLight() {
+    for (var i = 0; i < ledBuffer.getLength(); i++) {
+      ledBuffer.setRGB(i, PURPLE_RGB_R, PURPLE_RGB_G, PURPLE_RGB_B);
+    }
+    led.setData(ledBuffer);
+  }
+
+  /**
+	 * Changes the LED color to pink.
+	 */
+  public void pinkLight() {
+    for (var i = 0; i < ledBuffer.getLength(); i++) {
+      ledBuffer.setRGB(i, PINK_RGB_R, PINK_RGB_G, PINK_RGB_B);
+    }
+    led.setData(ledBuffer);
+  }
+
 
 	/**
 	 * Turns off the LEDs.
