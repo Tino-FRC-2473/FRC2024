@@ -255,8 +255,10 @@ public class MBRFSMv2 {
 				if (input.isIntakeButtonPressed() && !input.isShootButtonPressed()
 					&& !input.isRevButtonPressed() && !input.isAmpButtonPressed()) {
 					if (hasNote()) {
+						led.blueLight();
 						return MBRFSMState.MOVE_TO_SHOOTER;
 					} else {
+						led.turnOff();
 						return MBRFSMState.INTAKING;
 					}
 				}
@@ -264,6 +266,7 @@ public class MBRFSMv2 {
 			case SHOOTING:
 				if (!input.isIntakeButtonPressed() && (input.isShootButtonPressed()
 					|| input.isRevButtonPressed()) && !input.isAmpButtonPressed()) {
+					led.redLight();
 					return MBRFSMState.SHOOTING;
 				}
 				return MBRFSMState.MOVE_TO_SHOOTER;
