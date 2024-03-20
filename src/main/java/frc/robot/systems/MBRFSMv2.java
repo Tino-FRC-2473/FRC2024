@@ -1,22 +1,20 @@
 package frc.robot.systems;
 
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-
 // WPILib Imports
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
-//import com.revrobotics.SparkPIDController;
-
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
+import frc.robot.LED;
 
 public class MBRFSMv2 {
 	/* ======================== Constants ======================== */
@@ -31,6 +29,7 @@ public class MBRFSMv2 {
 
 	private static final float SHOOTING_POWER = 0.8f;
 	private static final double AUTO_SHOOTING_TIME = 0.7;
+	private static final double AUTO_PRELOAD_SHOOTING_TIME = 1.7;
 
 	private static final float INTAKE_POWER = 0.35f;
 	private static final float AUTO_INTAKE_POWER = 0.65f;
@@ -62,7 +61,7 @@ public class MBRFSMv2 {
 	private CANSparkMax shooterRightMotor;
 	private TalonFX intakeMotor;
 	private TalonFX pivotMotor;
-	// private LED led = new LED();
+	private LED led = new LED();
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -150,7 +149,7 @@ public class MBRFSMv2 {
 		SmartDashboard.putNumber("Left shooter power", shooterLeftMotor.get());
 		SmartDashboard.putNumber("Right shooter power", shooterRightMotor.get());
 		SmartDashboard.putNumber("Pivot encoder count", throughBore.getDistance());
-		
+
 		switch (currentState) {
 			case MOVE_TO_SHOOTER:
 				handleMoveShooterState(input);
@@ -465,7 +464,7 @@ public class MBRFSMv2 {
 			shooterLeftMotor.set(-SHOOTING_POWER);
 			shooterRightMotor.set(SHOOTING_POWER);
 			return false;
-		} else if (timer.get() < 1.7) {
+		} else if (timer.get() < AUTO_PRELOAD_SHOOTING_TIME) {
 			intakeMotor.set(OUTTAKE_POWER);
 			shooterLeftMotor.set(-SHOOTING_POWER);
 			shooterRightMotor.set(SHOOTING_POWER);
