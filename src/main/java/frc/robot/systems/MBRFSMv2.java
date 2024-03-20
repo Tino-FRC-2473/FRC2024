@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 
 // Robot Imports
-import frc.robot.LED;
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
 
@@ -31,13 +30,13 @@ public class MBRFSMv2 {
 	}
 
 	private static final float SHOOTING_POWER = 0.8f;
-	private static final double AUTO_SHOOTING_TIME = 1.0;
+	private static final double AUTO_SHOOTING_TIME = 0.7;
 
 	private static final float INTAKE_POWER = 0.35f;
 	private static final float AUTO_INTAKE_POWER = 0.65f;
 	private static final float OUTTAKE_POWER = -0.7f;
 	private static final float HOLDING_POWER = 0.05f;
-	private static final float AMP_SHOOT_POWER = -0.95f;
+	private static final float AMP_SHOOT_POWER = -0.85f;
 	private static final int AVERAGE_SIZE = 7;
 	private static final float CURRENT_THRESHOLD = 11.0f;
 	private double[] currLogs;
@@ -47,9 +46,13 @@ public class MBRFSMv2 {
 
 	private static final double MIN_TURN_SPEED = -0.4;
 	private static final double MAX_TURN_SPEED = 0.4;
+	private static final double MIN_TURN_SPEED_AUTO = -0.65;
+	private static final double MAX_TURN_SPEED_AUTO = 0.65;
 	private static final double PID_CONSTANT_PIVOT_P = 0.0005;
+	private static final double PID_CONSTANT_PIVOT_P_AUTO = 0.001;
+
 	private static final double GROUND_ENCODER_ROTATIONS = -1200;
-	private static final double AMP_ENCODER_ROTATIONS = -550;
+	private static final double AMP_ENCODER_ROTATIONS = -500;
 	private static final double SHOOTER_ENCODER_ROTATIONS = 0;
 	private static final double INRANGE_VALUE = 15;
 
@@ -59,7 +62,7 @@ public class MBRFSMv2 {
 	private CANSparkMax shooterRightMotor;
 	private TalonFX intakeMotor;
 	private TalonFX pivotMotor;
-	private LED led = new LED();
+	// private LED led = new LED();
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -112,7 +115,7 @@ public class MBRFSMv2 {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		led.turnOff();
+		// led.turnOff();
 		currentState = MBRFSMState.MOVE_TO_SHOOTER;
 		timer.stop();
 		timer.reset();
@@ -286,6 +289,11 @@ public class MBRFSMv2 {
 		return Math.min(MAX_TURN_SPEED, Math.max(MIN_TURN_SPEED, correction));
 	}
 
+	private double pidAuto(double currentEncoderPID, double targetEncoder) {
+		double correction = PID_CONSTANT_PIVOT_P_AUTO * (targetEncoder - currentEncoderPID);
+		return Math.min(MAX_TURN_SPEED_AUTO, Math.max(MIN_TURN_SPEED_AUTO, correction));
+	}
+
 	/**
 	 * Handles the moving to shooter state of the MBR Mech.
 	 * @param input
@@ -392,7 +400,7 @@ public class MBRFSMv2 {
 	 * @return if the pivot is at the correct position
 	 */
 	public boolean handleAutoMoveGround() {
-		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
+		pivotMotor.set(pidAuto(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
 		return inRange(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS);
 	}
 
@@ -401,8 +409,8 @@ public class MBRFSMv2 {
 	 * @return if the pivot is at the correct position
 	 */
 	public boolean handleAutoMoveShooter() {
-		intakeMotor.set(0);
-		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
+		intakeMotor.set(HOLDING_POWER);
+		pivotMotor.set(pidAuto(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		return inRange(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS);
 	}
 
@@ -454,7 +462,7 @@ public class MBRFSMv2 {
 			shooterLeftMotor.set(-SHOOTING_POWER);
 			shooterRightMotor.set(SHOOTING_POWER);
 			return false;
-		} else if (timer.get() < 2) {
+		} else if (timer.get() < 1.7) {
 			intakeMotor.set(OUTTAKE_POWER);
 			shooterLeftMotor.set(-SHOOTING_POWER);
 			shooterRightMotor.set(SHOOTING_POWER);

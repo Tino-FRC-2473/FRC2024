@@ -133,8 +133,8 @@ public final class SwerveConstants {
 		public static final double AUTO_DRIVE_METERS_MARGIN_OF_ERROR = 0.03;
 		public static final double AUTO_DRIVE_METERS_MARGIN_OF_ERROR_FAST = 0.05;
 		public static final double AUTO_DRIVE_DEGREES_MARGIN_OF_ERROR = 1.5;
-		public static final double AUTO_DRIVE_ANGULAR_SPEED_ACCEL_CONSTANT = 90;
-		public static final double AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT = 3;
+		public static final double AUTO_DRIVE_ANGULAR_SPEED_ACCEL_CONSTANT = 70;
+		public static final double AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT = 2;
 		public static final double CONSTANT_SPEED_THRESHOLD = 0.4; // meters
 		public static final double WAIT_TIME = 5; // seconds
 
