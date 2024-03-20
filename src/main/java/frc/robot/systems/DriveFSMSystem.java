@@ -986,7 +986,7 @@ public class DriveFSMSystem {
 			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND) : 0;
 
-		System.out.println(aSpeed/4);
+		System.out.println(aSpeed);
 		SmartDashboard.putNumber("yaw", rpi.getNoteYaw());
 
 		if (!isNoteAligned) {

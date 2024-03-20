@@ -189,7 +189,7 @@ public final class SwerveConstants {
 
 
 		public static final double NOTE_TRANSLATIONAL_ACCEL_CONSTANT = 1.5;
-		public static final double NOTE_ROTATIONAL_ACCEL_CONSTANT = 400;
+		public static final double NOTE_ROTATIONAL_ACCEL_CONSTANT = 120;
 		public static final double X_MARGIN_TO_NOTE = 0.03;
 		public static final double Y_MARGIN_TO_NOTE = 0.03;
 		public static final double ROT_MARGIN_TO_NOTE = 1;
