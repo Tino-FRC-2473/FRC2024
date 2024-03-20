@@ -12,6 +12,25 @@ class Detector:
 
     def bgr_to_rgb(self, image):
         return image[:,:,::-1]
+    
+    def bgr_to_hsv(self, img): # img with BGR format
+        maxc = img.max(-1)
+        minc = img.min(-1)
+
+        out = np.zeros(img.shape)
+        out[:,:,2] = maxc
+        out[:,:,1] = (maxc-minc) / maxc
+
+        divs = (maxc[...,None] - img)/ ((maxc-minc)[...,None])
+        cond1 = divs[...,0] - divs[...,1]
+        cond2 = 2.0 + divs[...,2] - divs[...,0]
+        h = 4.0 + divs[...,1] - divs[...,2]
+        h[img[...,2]==maxc] = cond1[img[...,2]==maxc]
+        h[img[...,1]==maxc] = cond2[img[...,1]==maxc]
+        out[:,:,0] = (h/6.0) % 1.0
+
+        out[minc == maxc,:2] = 0
+        return out
 
     def detectGameElement(self, frame, objectsToDetect: list):
 
@@ -29,7 +48,9 @@ class Detector:
             p = time.time()
             #Converts the color format of the frame from BGR to HSV for usage with cv2
             full_test_image = self.bgr_to_rgb(frame)
-            hsv_frame = skimage.color.rgb2hsv(full_test_image)
+            # hsv_frame = skimage.color.rgb2hsv(full_test_image)
+            hsv_frame = cv2.cvtColor(full_test_image, cv2.COLOR_BGR2HSV)
+            hsv_frame = self.bgr_to_hsv(frame)
             print("color conversion", str(time.time()-p))
 
             #Creates a mask which is a frame with only the range of colors inputed
