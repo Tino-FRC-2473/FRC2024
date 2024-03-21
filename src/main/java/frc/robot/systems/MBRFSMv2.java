@@ -14,7 +14,7 @@ import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
-import frc.robot.LED;
+// import frc.robot.LED;
 
 public class MBRFSMv2 {
 	/* ======================== Constants ======================== */
@@ -28,14 +28,15 @@ public class MBRFSMv2 {
 	}
 
 	private static final float SHOOTING_POWER = 0.8f;
-	private static final double AUTO_SHOOTING_TIME = 0.7;
+	private static final double AUTO_SHOOTING_TIME = 0.5;
 	private static final double AUTO_PRELOAD_SHOOTING_TIME = 1.7;
 
 	private static final float INTAKE_POWER = 0.35f;
-	private static final float AUTO_INTAKE_POWER = 0.65f;
+	private static final float AUTO_INTAKE_POWER = 0.85f;
 	private static final float OUTTAKE_POWER = -0.7f;
-	private static final float HOLDING_POWER = 0.05f;
-	private static final float AMP_SHOOT_POWER = -0.85f;
+	private static final float TELE_HOLDING_POWER = 0.05f;
+	private static final float AUTO_HOLDING_POWER = 0.05f;
+	private static final float AMP_SHOOT_POWER = -0.75f;
 	private static final int AVERAGE_SIZE = 7;
 	private static final float CURRENT_THRESHOLD = 11.0f;
 	private double[] currLogs;
@@ -45,13 +46,13 @@ public class MBRFSMv2 {
 
 	private static final double MIN_TURN_SPEED = -0.4;
 	private static final double MAX_TURN_SPEED = 0.4;
-	private static final double MIN_TURN_SPEED_AUTO = -0.65;
-	private static final double MAX_TURN_SPEED_AUTO = 0.65;
-	private static final double PID_CONSTANT_PIVOT_P = 0.0005;
+	private static final double MIN_TURN_SPEED_AUTO = -0.85;
+	private static final double MAX_TURN_SPEED_AUTO = 0.85;
+	private static final double PID_CONSTANT_PIVOT_P = 0.00075;
 	private static final double PID_CONSTANT_PIVOT_P_AUTO = 0.001;
 
 	private static final double GROUND_ENCODER_ROTATIONS = -1200;
-	private static final double AMP_ENCODER_ROTATIONS = -500;
+	private static final double AMP_ENCODER_ROTATIONS = -525;
 	private static final double SHOOTER_ENCODER_ROTATIONS = 0;
 	private static final double INRANGE_VALUE = 15;
 
@@ -61,7 +62,7 @@ public class MBRFSMv2 {
 	private CANSparkMax shooterRightMotor;
 	private TalonFX intakeMotor;
 	private TalonFX pivotMotor;
-	private LED led = new LED();
+	// private LED led = new LED();
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -254,10 +255,10 @@ public class MBRFSMv2 {
 				if (input.isIntakeButtonPressed() && !input.isShootButtonPressed()
 					&& !input.isRevButtonPressed() && !input.isAmpButtonPressed()) {
 					if (hasNote()) {
-						led.blueLight();
+						// led.blueLight();
 						return MBRFSMState.MOVE_TO_SHOOTER;
 					} else {
-						led.turnOff();
+						// led.turnOff();
 						return MBRFSMState.INTAKING;
 					}
 				}
@@ -265,7 +266,7 @@ public class MBRFSMv2 {
 			case SHOOTING:
 				if (!input.isIntakeButtonPressed() && (input.isShootButtonPressed()
 					|| input.isRevButtonPressed()) && !input.isAmpButtonPressed()) {
-					led.redLight();
+					// led.redLight();
 					return MBRFSMState.SHOOTING;
 				}
 				return MBRFSMState.MOVE_TO_SHOOTER;
@@ -311,7 +312,7 @@ public class MBRFSMv2 {
 			intakeMotor.set(OUTTAKE_POWER);
 			holding = false;
 		} else {
-			intakeMotor.set(holding ? HOLDING_POWER : 0);
+			intakeMotor.set(holding ? TELE_HOLDING_POWER : 0);
 		}
 
 
@@ -411,7 +412,7 @@ public class MBRFSMv2 {
 	 * @return if the pivot is at the correct position
 	 */
 	public boolean handleAutoMoveShooter() {
-		intakeMotor.set(HOLDING_POWER);
+		intakeMotor.set(AUTO_HOLDING_POWER);
 		pivotMotor.set(pidAuto(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		return inRange(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS);
 	}

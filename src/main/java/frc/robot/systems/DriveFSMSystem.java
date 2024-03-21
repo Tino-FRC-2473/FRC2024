@@ -27,7 +27,7 @@ import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 import frc.robot.utils.SwerveUtils;
 import frc.robot.HardwareMap;
 import frc.robot.RaspberryPI;
-import frc.robot.LED;
+// import frc.robot.LED;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.SwerveConstants.AutoConstants;
@@ -67,7 +67,7 @@ public class DriveFSMSystem {
 	private RaspberryPI rpi = new RaspberryPI();
 
 	// led
-	private LED led = new LED();
+	// private LED led = new LED();
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double currentRotation = 0.0;
@@ -175,7 +175,7 @@ public class DriveFSMSystem {
 	 */
 
 	public void reset() {
-		led.turnOff();
+		// led.turnOff();
 		currentState = FSMState.TELEOP_STATE;
 		gyro.reset();
 		resetOdometry(new Pose2d());
@@ -220,7 +220,7 @@ public class DriveFSMSystem {
 	 */
 
 	public void resetAutonomus() {
-		led.turnOff();
+		// led.turnOff();
 		currentPointInPath = 0;
 		gyro.reset();
 		/* --------------------------- SVR --------------------------- */
@@ -356,9 +356,9 @@ public class DriveFSMSystem {
 						(-1 - AutoConstants.N_0_5 + AutoConstants.N_0_10) * multiplier,
 						new Rotation2d(0)));
 				} else {
-					note1.add(new Pose2d(-1 - AutoConstants.N_0_25,
-						(-1 - AutoConstants.N_0_25) * multiplier,
-						new Rotation2d(AutoConstants.DEG_35 * multiplier)));
+					note1.add(new Pose2d(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10,
+						(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10) * multiplier,
+						new Rotation2d(AutoConstants.DEG_40 * multiplier)));
 				}
 				return driveAlongPath(note1);
 			case NOTE2:
@@ -373,45 +373,51 @@ public class DriveFSMSystem {
 						(1 + AutoConstants.N_0_5 - AutoConstants.N_0_10)
 						* multiplier, new Rotation2d(0)));
 				} else {
-					note3.add(new Pose2d(-1 - AutoConstants.N_0_25,
-						(1 + AutoConstants.N_0_25) * multiplier,
-						new Rotation2d(-AutoConstants.DEG_35 * multiplier)));
+					note3.add(new Pose2d(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10,
+						(1 + AutoConstants.N_0_25 + AutoConstants.N_0_10) * multiplier,
+						new Rotation2d(-AutoConstants.DEG_40 * multiplier)));
 				}
 				return driveAlongPath(note3);
 			case NOTE4:
 				ArrayList<Pose2d> note4 = new ArrayList<>();
 				note4.add(new Pose2d(-AutoConstants.N_2,
-					(-AutoConstants.N_3_5) * multiplier,
+					(-AutoConstants.N_4) * multiplier,
 					new Rotation2d(0)));
-				note4.add(new Pose2d(-AutoConstants.N_6_5,
-					(-AutoConstants.N_4_5) * multiplier,
+				note4.add(new Pose2d(-AutoConstants.N_6_5 - AutoConstants.N_0_25,
+					(-AutoConstants.N_5) * multiplier,
 					new Rotation2d(AutoConstants.DEG_45 * multiplier)));
 				note4.add(new Pose2d(-AutoConstants.N_2,
-					(-AutoConstants.N_3_5) * multiplier,
+					(-AutoConstants.N_4) * multiplier,
 					new Rotation2d(0)));
 				return driveAlongPath(note4);
 			case NOTE5:
 				ArrayList<Pose2d> note5 = new ArrayList<>();
-				note5.add(new Pose2d(-AutoConstants.N_6_5,
+				note5.add(new Pose2d(-AutoConstants.N_6_5 - AutoConstants.N_0_25,
 					(-AutoConstants.N_3) * multiplier,
 					new Rotation2d(AutoConstants.DEG_30 * multiplier)));
 				return driveAlongPath(note5);
 			case NOTE6:
 				ArrayList<Pose2d> note6 = new ArrayList<>();
-				note6.add(new Pose2d(-AutoConstants.N_6_5,
+				note6.add(new Pose2d(-AutoConstants.N_6_5 - AutoConstants.N_0_25,
 					(-AutoConstants.N_1_5) * multiplier,
 					new Rotation2d(AutoConstants.DEG_15 * multiplier)));
 				return driveAlongPath(note6);
 			case NOTE7:
 				ArrayList<Pose2d> note7 = new ArrayList<>();
-				note7.add(new Pose2d(-AutoConstants.N_6_5,
+				note7.add(new Pose2d(-AutoConstants.N_5,
+					multiplier,
+					new Rotation2d(0)));
+				note7.add(new Pose2d(-AutoConstants.N_6_5 - AutoConstants.N_0_25,
 					(AutoConstants.N_0_25) * multiplier,
 					new Rotation2d(AutoConstants.DEG_15 * multiplier)));
+				note7.add(new Pose2d(-AutoConstants.N_5,
+					multiplier,
+					new Rotation2d(0)));
 				return driveAlongPath(note7);
 			case NOTE8:
 				ArrayList<Pose2d> note8 = new ArrayList<>();
-				note8.add(new Pose2d(-AutoConstants.N_6_5,
-					(AutoConstants.N_1_5) * multiplier,
+				note8.add(new Pose2d(-AutoConstants.N_6_5 - AutoConstants.N_0_25,
+					(AutoConstants.N_1_5 + AutoConstants.N_0_25) * multiplier,
 					new Rotation2d(-AutoConstants.DEG_20 * multiplier)));
 				return driveAlongPath(note8);
 			default:
@@ -467,10 +473,10 @@ public class DriveFSMSystem {
 						== VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
 						&& rpi.getAprilTagZInv(VisionConstants.BLUE_SPEAKER_TAG_ID)
 						== VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT)) {
-				led.greenLight();
+				// led.greenLight();
 				SmartDashboard.putBoolean("Can see tag", true);
 			} else {
-				led.orangeLight();
+				// led.orangeLight();
 				SmartDashboard.putBoolean("Can see tag", false);
 			}
 		} else {
@@ -480,10 +486,10 @@ public class DriveFSMSystem {
 						== VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT
 						&& rpi.getAprilTagZInv(VisionConstants.RED_SPEAKER_TAG_ID)
 						== VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT)) {
-				led.greenLight();
+				// led.greenLight();
 				SmartDashboard.putBoolean("Can see tag", true);
 			} else {
-				led.orangeLight();
+				// led.orangeLight();
 				SmartDashboard.putBoolean("Can see tag", false);
 			}
 		}

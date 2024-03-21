@@ -125,7 +125,7 @@ public final class SwerveConstants {
 
 	public static final class AutoConstants {
 		//auto paths constants
-		public static final double MAX_SPEED_METERS_PER_SECOND = 0.2; // 0.5 decided
+		public static final double MAX_SPEED_METERS_PER_SECOND = 0.65; // 0.5 decided
 		public static final double MAX_SPEED_METERS_PER_SECOND_FAST = 0.75; // 0.5 decided
 
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 10;
@@ -134,8 +134,8 @@ public final class SwerveConstants {
 		public static final double AUTO_DRIVE_METERS_MARGIN_OF_ERROR_FAST = 0.05;
 		public static final double AUTO_DRIVE_DEGREES_MARGIN_OF_ERROR = 1.5;
 		public static final double AUTO_DRIVE_ANGULAR_SPEED_ACCEL_CONSTANT = 70;
-		public static final double AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT = 2;
-		public static final double CONSTANT_SPEED_THRESHOLD = 0.4; // meters
+		public static final double AUTO_DRIVE_TRANSLATIONAL_SPEED_ACCEL_CONSTANT = 2.5;
+		public static final double CONSTANT_SPEED_THRESHOLD = 0.3; // meters
 		public static final double WAIT_TIME = 5; // seconds
 
 		// constants for auto path points
@@ -163,6 +163,7 @@ public final class SwerveConstants {
 		public static final double DEG_20 = Math.toRadians(20);
 		public static final double DEG_30 = Math.toRadians(30);
 		public static final double DEG_35 = Math.toRadians(35);
+		public static final double DEG_40 = Math.toRadians(40);
 		public static final double DEG_45 = Math.toRadians(45);
 		public static final double DEG_55 = Math.toRadians(55);
 		public static final double DEG_90 = Math.toRadians(90);
