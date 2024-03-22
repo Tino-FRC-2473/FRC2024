@@ -33,7 +33,7 @@ public class MBRFSMv2 {
 
 	private static final float INTAKE_POWER = 0.35f;
 	private static final float AUTO_INTAKE_POWER = 0.85f;
-	private static final float OUTTAKE_POWER = -0.7f;
+	private static final float OUTTAKE_POWER = -0.8f;
 	private static final float TELE_HOLDING_POWER = 0.05f;
 	private static final float AUTO_HOLDING_POWER = 0.05f;
 	private static final float AMP_SHOOT_POWER = -0.75f;
