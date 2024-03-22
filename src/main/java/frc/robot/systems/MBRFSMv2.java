@@ -43,9 +43,11 @@ public class MBRFSMv2 {
 	private static final float AMP_SHOOT_POWER = -0.65f;
 	private static final int AVERAGE_SIZE = 7;
 	private static final float CURRENT_THRESHOLD = 11.0f;
+	private static final int NOTE_FRAMES_MIN = 15;
 	private double[] currLogs;
 	private int tick = 0;
 	private boolean holding = false;
+	private int noteColorFrames = 0;
 
 	private final ColorSensorV3 colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
 	private final ColorMatch colorMatcher = new ColorMatch();
@@ -150,7 +152,7 @@ public class MBRFSMv2 {
 		avgcone /= AVERAGE_SIZE;*/
 		
 		SmartDashboard.putBoolean("holding", holding);
-		SmartDashboard.putNumber("avg current", avgcone);
+		//SmartDashboard.putNumber("avg current", avgcone);
 		SmartDashboard.putString("Current State", getCurrentState().toString());
 		SmartDashboard.putNumber("Intake power", intakeMotor.get());
 		SmartDashboard.putNumber("Pivot power", pivotMotor.get());
@@ -385,6 +387,12 @@ public class MBRFSMv2 {
 		ColorMatchResult match = colorMatcher.matchClosestColor(dColor);
 		
 		if (match.color == kNoteColorTarget && colorSensor.getProximity() <= PROXIMIIY_THRESHOLD) {
+			noteColorFrames++;
+		} else {
+			noteColorFrames = 0;
+		}
+
+		if (noteColorFrames >= NOTE_FRAMES_MIN) {
 			holding = true;
 		}
 
