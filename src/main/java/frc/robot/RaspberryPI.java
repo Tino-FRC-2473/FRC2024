@@ -27,7 +27,7 @@ public class RaspberryPI {
 		fpsCounter = table.getDoubleTopic("x").subscribe(-1);
 		tagSubscriber = table.getDoubleArrayTopic("april_tag_data").subscribe(null);
 		noteY = table.getDoubleTopic("note_yaw").subscribe(-1);
-		noteD = table.getDoubleTopic("note_dist").subscribe(-1);
+		noteD = table.getDoubleTopic("note_distance").subscribe(-1);
 	}
 
 	/**Updates the values in SmartDashboard. */

@@ -53,10 +53,15 @@ public class Robot extends TimedRobot {
 		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
 
 		driverCam = CameraServer.startAutomaticCapture(0);
-		chainCam = CameraServer.startAutomaticCapture(1);
+		driverCam.setResolution(640, 480);
+		//driverCam.setFPS(30);
+		//driverCam.setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 30);
+
+
+		//chainCam = CameraServer.startAutomaticCapture(1);
 
 		driverCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
-		chainCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+		//chainCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
 
 		// videoSink = CameraServer.getServer();
 		// chainCamToggled = false;

@@ -975,6 +975,7 @@ public class DriveFSMSystem {
 	public void alignToNote() {
 		double xDiff = rpi.getNoteDistance();
 		double aDiff = rpi.getNoteYaw();
+		System.out.println(xDiff);
 
 		double ySpeed = 0;
 		double xSpeed = Math.abs(xDiff) > VisionConstants.X_MARGIN_TO_NOTE ? clamp(xDiff
@@ -986,13 +987,17 @@ public class DriveFSMSystem {
 			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
 			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND) : 0;
 
-		System.out.println(aSpeed);
+		//System.out.println(aSpeed);
 		SmartDashboard.putNumber("yaw", rpi.getNoteYaw());
 
 		if (!isNoteAligned) {
 			drive(0, 0, aSpeed, false, false);
 			if (aSpeed == 0) {
-				isNoteAligned = true;
+				System.out.println("HERE");
+				drive(xSpeed, 0, 0, false, false);
+				if (xSpeed == 0) {
+					isNoteAligned = true;
+				}
 			}
 		}
 		if (isNoteAligned) {
