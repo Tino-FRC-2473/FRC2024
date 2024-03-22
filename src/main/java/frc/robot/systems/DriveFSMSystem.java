@@ -332,7 +332,7 @@ public class DriveFSMSystem {
 			case SPEAKER:
 				ArrayList<Pose2d> speaker = new ArrayList<>();
 				if (placement.equals("SWCT")) {
-					speaker.add(new Pose2d(0,
+					speaker.add(new Pose2d(0.1,
 						0, new Rotation2d(0)));
 				} else if (placement.equals("SWSR")) {
 					speaker.add(new Pose2d(AutoConstants.N_0_5,
@@ -350,13 +350,13 @@ public class DriveFSMSystem {
 						new Rotation2d(0)));
 				} else {
 					note1.add(new Pose2d(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10,
-						(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10) * multiplier,
+						(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10 * 2) * multiplier,
 						new Rotation2d(AutoConstants.DEG_40 * multiplier)));
 				}
 				return driveAlongPath(note1);
 			case NOTE2:
 				ArrayList<Pose2d> note2 = new ArrayList<>();
-				note2.add(new Pose2d(-1 - AutoConstants.N_0_25,
+				note2.add(new Pose2d(-1 - AutoConstants.N_0_5,
 					0, new Rotation2d(0)));
 				return driveAlongPath(note2);
 			case NOTE3:
@@ -367,7 +367,7 @@ public class DriveFSMSystem {
 						* multiplier, new Rotation2d(0)));
 				} else {
 					note3.add(new Pose2d(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10,
-						(1 + AutoConstants.N_0_25 + AutoConstants.N_0_10) * multiplier,
+						(1 + AutoConstants.N_0_25 + AutoConstants.N_0_10 * 2) * multiplier,
 						new Rotation2d(-AutoConstants.DEG_40 * multiplier)));
 				}
 				return driveAlongPath(note3);

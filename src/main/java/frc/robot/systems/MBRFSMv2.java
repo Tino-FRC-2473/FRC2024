@@ -27,8 +27,8 @@ public class MBRFSMv2 {
 		MOVE_TO_AMP,
 	}
 
-	private static final float SHOOTING_POWER = 0.8f;
-	private static final double AUTO_SHOOTING_TIME = 0.5;
+	private static final float SHOOTING_POWER = 0.9f;
+	private static final double AUTO_SHOOTING_TIME = 0.75;
 	private static final double AUTO_PRELOAD_SHOOTING_TIME = 1.7;
 
 	private static final float INTAKE_POWER = 0.35f;
