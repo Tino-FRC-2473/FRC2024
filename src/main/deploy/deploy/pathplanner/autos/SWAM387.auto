@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.6766573533147066,
+      "y": 6.623409610455584
+    },
+    "rotation": 59.99507912917602
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SWAM3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SWAM8"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SWAM7"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

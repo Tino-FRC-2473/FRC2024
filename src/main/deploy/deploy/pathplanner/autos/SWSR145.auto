@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.6579998614542684,
+      "y": 4.459140554644746
+    },
+    "rotation": -60.06848815949217
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SWSR1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SWSR4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SWSR5"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
