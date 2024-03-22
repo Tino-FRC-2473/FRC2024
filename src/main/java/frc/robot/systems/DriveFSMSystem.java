@@ -181,7 +181,6 @@ public class DriveFSMSystem {
 		resetOdometry(new Pose2d());
 		if (AutoPathChooser.getAllianceChooser() != null) {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
-
 		} else {
 			blueAlliance = true;
 		}
@@ -223,18 +222,6 @@ public class DriveFSMSystem {
 		// led.turnOff();
 		currentPointInPath = 0;
 		gyro.reset();
-		/* --------------------------- SVR --------------------------- */
-		// if (AutoPathChooser.getMechChooser() != null) {
-		// 	svrMech = AutoPathChooser.getSelectedMech();
-		// } else {
-		// 	svrMech = true;
-		// }
-		// if (AutoPathChooser.getStartPosChooser() != null) {
-		// 	startingPos = AutoPathChooser.getStartingPos();
-		// } else {
-		// 	startingPos = 1;
-		// }
-		/* --------------------------- SVR --------------------------- */
 		if (AutoPathChooser.getAllianceChooser() != null) {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
 			multiplier = (blueAlliance ? -1 : 1);
@@ -265,8 +252,6 @@ public class DriveFSMSystem {
 			resetOdometry(new Pose2d(AutoConstants.N_0_5, 1 * multiplier,
 				new Rotation2d(0)));
 			gyro.setAngleAdjustment(Math.toDegrees(AutoConstants.DEG_55) * multiplier);
-			System.out.println("HERE");
-			System.out.println(getHeading());
 		} else {
 			resetOdometry(new Pose2d());
 		}
@@ -346,8 +331,16 @@ public class DriveFSMSystem {
 				return driveAlongPath(def);
 			case SPEAKER:
 				ArrayList<Pose2d> speaker = new ArrayList<>();
-				speaker.add(new Pose2d(0,
-					0, new Rotation2d(0)));
+				if (placement.equals("SWCT")) {
+					speaker.add(new Pose2d(0,
+						0, new Rotation2d(0)));
+				} else if (placement.equals("SWSR")) {
+					speaker.add(new Pose2d(AutoConstants.N_0_5,
+						-multiplier, new Rotation2d(AutoConstants.DEG_55 * multiplier)));
+				} else if (placement.equals("SWAM")) {
+					speaker.add(new Pose2d(AutoConstants.N_0_5,
+						multiplier, new Rotation2d(-AutoConstants.DEG_55 * multiplier)));
+				}
 				return driveAlongPath(speaker);
 			case NOTE1:
 				ArrayList<Pose2d> note1 = new ArrayList<>();
