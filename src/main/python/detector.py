@@ -33,12 +33,12 @@ class Detector:
         return out
 
     def detectGameElement(self, frame, objectsToDetect: list):
+        frame = frame[120:,:] #crop out top half of frame
+        #low_threshold = np.array([0.0442839, 0.1188894, 0.8963528]) #skimage
+        low_threshold = np.array([93.69053177, 5.15716888, 190.0313035 ]) #cv2.cvt
 
-        constant = 4.2
-        low_threshold = np.array([0.0442839, 0.1188894, 0.8963528])
-
-        # WRITE CODE HERE
-        high_threshold = np.array([0.18016434, 1.19385776, 1.0694635])
+        #high_threshold = np.array([0.18016434, 1.19385776, 1.0694635]) #skimage
+        high_threshold = np.array([272.20143511, 272.20143511, 268.11798425]) #cv2.cvt
 
         results = dict(zip(objectsToDetect, [None for i in range(len(objectsToDetect))]))
         colors = {
@@ -48,16 +48,18 @@ class Detector:
             p = time.time()
             #Converts the color format of the frame from BGR to HSV for usage with cv2
             full_test_image = self.bgr_to_rgb(frame)
-            # hsv_frame = skimage.color.rgb2hsv(full_test_image)
+            hsv_frame = skimage.color.rgb2hsv(full_test_image)
             hsv_frame = cv2.cvtColor(full_test_image, cv2.COLOR_BGR2HSV)
-            hsv_frame = self.bgr_to_hsv(frame)
+            #hsv_frame = self.bgr_to_hsv(frame)
             print("color conversion", str(time.time()-p))
 
             #Creates a mask which is a frame with only the range of colors inputed
+            p = time.time()
             mask = cv2.inRange(hsv_frame, colors[object][0], colors[object][1])
             print("simple mask", str(time.time()-p))
 
             #The following three functinos edits the mask in order to remove potential discrepencies in the frame
+            p = time.time()
             kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (12, 12))
             morph = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
             # mask = cv2.medianBlur(mask, 5)
