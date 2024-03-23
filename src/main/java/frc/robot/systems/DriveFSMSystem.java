@@ -268,7 +268,8 @@ public class DriveFSMSystem {
 			System.out.println("HERE");
 			System.out.println(getHeading());
 		} else {
-			resetOdometry(new Pose2d());		}
+			resetOdometry(new Pose2d());
+		}
 		if (blueAlliance) {
 			tagOrientationAngles = new Double[]
 				{null, VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
@@ -369,7 +370,8 @@ public class DriveFSMSystem {
 				ArrayList<Pose2d> note3 = new ArrayList<>();
 				if (placement.equals("SWAM")) {
 					note3.add(new Pose2d(-1 - AutoConstants.N_0_25,
-						(1 + AutoConstants.N_0_5 - AutoConstants.N_0_10) * multiplier, new Rotation2d(0)));
+						(1 + AutoConstants.N_0_5 - AutoConstants.N_0_10)
+							* multiplier, new Rotation2d(0)));
 				} else {
 					note3.add(new Pose2d(-1 - AutoConstants.N_0_25,
 						(1 + AutoConstants.N_0_25) * multiplier,

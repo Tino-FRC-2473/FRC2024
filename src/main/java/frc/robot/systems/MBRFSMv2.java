@@ -6,12 +6,9 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 // WPILib Imports
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ColorMatch;
-import com.revrobotics.ColorMatchResult;
 
 //import com.revrobotics.SparkPIDController;
 import edu.wpi.first.wpilibj.I2C;
@@ -39,11 +36,12 @@ public class MBRFSMv2 {
 	private static final double AUTO_SHOOTING_TIME = 1.0;
 
 	private static final float INTAKE_POWER = 0.35f;
+	private static final float AUTO_INTAKE_POWER = 0.65f;
 	private static final float OUTTAKE_POWER = -0.65f;
 	private static final float AMP_SHOOT_POWER = -0.65f;
 	private static final int AVERAGE_SIZE = 7;
 	private static final float CURRENT_THRESHOLD = 11.0f;
-	private static final int NOTE_FRAMES_MIN = 15;
+	private static final int NOTE_FRAMES_MIN = 5;
 	private double[] currLogs;
 	private int tick = 0;
 	private boolean holding = false;
@@ -51,7 +49,6 @@ public class MBRFSMv2 {
 	private int noteColorFrames = 0;
 
 	private final ColorSensorV3 colorSensor;
-	private final ColorMatch colorMatcher = new ColorMatch();
 	private static final double MIN_TURN_SPEED = -0.4;
 	private static final double MAX_TURN_SPEED = 0.4;
 	private static final double PID_CONSTANT_PIVOT_P = 0.001;
@@ -60,12 +57,14 @@ public class MBRFSMv2 {
 	private static final double SHOOTER_ENCODER_ROTATIONS = 0;
 	private static final double INRANGE_VALUE = 15;
 
-	private static final double PROXIMIIY_THRESHOLD = 1500;
-	private static final double GREEN_THRESHOLD = 0.250;
-	private static final double BLUE_THRESHOLD = 0.030;
-	private static final double RED_THRESHOLD = 0.650;
+	private static final double PROXIMIIY_THRESHOLD = 500;
+	private static final double GREEN_LOW = 0.18;
+	private static final double BLUE_LOW = 0.00;
+	private static final double RED_LOW = 0.6;
 
-	private final Color kNoteColorTarget = new Color(0.361, 0.524, 0.113); //need to tweak vals
+	private static final double GREEN_HIGH = 0.35;
+	private static final double BLUE_HIGH = 0.065;
+	private static final double RED_HIGH = 0.8;
 
 
 	/* ======================== Private variables ======================== */
@@ -90,7 +89,7 @@ public class MBRFSMv2 {
 	 * the constructor is called only once when the robot boots.
 	 */
 	public MBRFSMv2() {
-		/*shooterLeftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LSHOOTER_MOTOR,
+		shooterLeftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LSHOOTER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 
 		shooterRightMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_RSHOOTER_MOTOR,
@@ -100,14 +99,14 @@ public class MBRFSMv2 {
 
 		pivotMotor = new TalonFX(HardwareMap.DEVICE_ID_ARM_MOTOR);
 		pivotMotor.setNeutralMode(NeutralModeValue.Brake);
-		*/
-		//throughBore = new Encoder(0, 1);
-		//throughBore.reset();
+
+		throughBore = new Encoder(0, 1);
+		throughBore.reset();
 		timer = new Timer();
 		currLogs = new double[AVERAGE_SIZE];
 
 		colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
-		colorMatcher.addColorMatch(kNoteColorTarget);
+
 		// Reset state machine
 		reset();
 	}
@@ -158,7 +157,7 @@ public class MBRFSMv2 {
 			avgcone += currLogs[i];
 		}
 		avgcone /= AVERAGE_SIZE;
-		
+
 		SmartDashboard.putBoolean("holding", holding);
 		SmartDashboard.putBoolean("currentHolding", currentHolding);
 		SmartDashboard.putNumber("avg current", avgcone);
@@ -166,6 +165,7 @@ public class MBRFSMv2 {
 		SmartDashboard.putNumber("Blue", colorSensor.getColor().blue);
 		SmartDashboard.putNumber("Green", colorSensor.getColor().green);
 		SmartDashboard.putNumber("Proximity", colorSensor.getProximity());
+		SmartDashboard.putString("COLOR RGB", "" + colorSensor.getColor());
 		SmartDashboard.putNumber("CurrentNoteFrames", noteColorFrames);
 		SmartDashboard.putBoolean("HASNOTE --- ", hasNote());
 		SmartDashboard.putString("Current State", getCurrentState().toString());
@@ -249,11 +249,13 @@ public class MBRFSMv2 {
 					&& !input.isRevButtonPressed() && !holding && !input.isAmpButtonPressed()) {
 					return MBRFSMState.MOVE_TO_GROUND;
 				}
-				if (input.isAmpButtonPressed() && !input.isIntakeButtonPressed() && !input.isShootButtonPressed()
+				if (input.isAmpButtonPressed() && !input.isIntakeButtonPressed()
+					&& !input.isShootButtonPressed()
 					&& !input.isRevButtonPressed()) {
 					return MBRFSMState.MOVE_TO_AMP;
 				}
-				if (!input.isIntakeButtonPressed() && !input.isAmpButtonPressed() && (input.isShootButtonPressed()
+				if (!input.isIntakeButtonPressed() && !input.isAmpButtonPressed()
+					&& (input.isShootButtonPressed()
 					|| input.isRevButtonPressed())) {
 					if (inRange(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS)) {
 						holding = false;
@@ -293,7 +295,7 @@ public class MBRFSMv2 {
 			case MOVE_TO_AMP:
 				if (input.isAmpButtonPressed() && !input.isShootButtonPressed()
 					&& !input.isRevButtonPressed() && !input.isIntakeButtonPressed()) {
-						return MBRFSMState.MOVE_TO_AMP;
+					return MBRFSMState.MOVE_TO_AMP;
 				}
 				return MBRFSMState.MOVE_TO_SHOOTER;
 			default:
@@ -322,7 +324,8 @@ public class MBRFSMv2 {
 		shooterRightMotor.set(0);
 		if (input.isoverrideIntakeButtonPressed() && !input.isoverrideOuttakeButtonPressed()) {
 			intakeMotor.set(INTAKE_POWER);
-		} else if (!input.isoverrideIntakeButtonPressed() && input.isoverrideOuttakeButtonPressed()) {
+		} else if (!input.isoverrideIntakeButtonPressed()
+			&& input.isoverrideOuttakeButtonPressed()) {
 			intakeMotor.set(OUTTAKE_POWER);
 			holding = false;
 			currentHolding = false;
@@ -375,6 +378,10 @@ public class MBRFSMv2 {
 		}
 	}
 
+	/**
+	 * Handles the Move to Amp state.
+	 * @param input
+	 */
 	public void handleMoveAmpState(TeleopInput input) {
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
@@ -400,38 +407,62 @@ public class MBRFSMv2 {
 		if (avgcone > CURRENT_THRESHOLD) {
 			currentHolding = true;
 		}
-		
-		if (colorSensor.getRed() > RED_THRESHOLD 
-		&& colorSensor.getBlue() < BLUE_THRESHOLD
-		&& colorSensor.getGreen() > GREEN_THRESHOLD 
-		&& colorSensor.getProximity() >= PROXIMIIY_THRESHOLD) {
+		boolean isRed = colorSensor.getColor().red > RED_LOW
+			&& colorSensor.getColor().red < RED_HIGH;
+		boolean isGreen = colorSensor.getColor().green > GREEN_LOW
+			&& colorSensor.getColor().green < GREEN_HIGH;
+		boolean isBlue = colorSensor.getColor().blue > BLUE_LOW
+			&& colorSensor.getColor().blue < BLUE_HIGH;
+		boolean isInRange = colorSensor.getProximity() >= PROXIMIIY_THRESHOLD;
+		SmartDashboard.putBoolean("is red", isRed);
+		SmartDashboard.putBoolean("is green", isGreen);
+		SmartDashboard.putBoolean("is blue", isBlue);
+		SmartDashboard.putBoolean("is close enough", isInRange);
+
+		if (isRed && isGreen && isBlue && isInRange) {
 			noteColorFrames++;
 		} else {
 			noteColorFrames = 0;
 		}
 
-		holding = currentHolding && noteColorFrames >= NOTE_FRAMES_MIN;
+		holding = /*currentHolding &&*/ noteColorFrames >= NOTE_FRAMES_MIN;
 
 		return holding;
 	}
 
+	/**
+	 * Handles the Auto Move to Ground State.
+	 * @return if the action has ben completed
+	 */
 	public boolean handleAutoMoveGround() {
 		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
 		return inRange(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS);
 	}
 
+	/**
+	 * Handles the Auto Move to Shooter State.
+	 * @return if the action has ben completed
+	 */
 	public boolean handleAutoMoveShooter() {
 		intakeMotor.set(0);
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		return inRange(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS);
 	}
 
+	/**
+	 * Handles the Auto RevUp State.
+	 * @return if the action has ben completed
+	 */
 	public boolean handleAutoRev() {
 		shooterLeftMotor.set(-SHOOTING_POWER);
 		shooterRightMotor.set(SHOOTING_POWER);
 		return true;
 	}
 
+	/**
+	 * Handles the Auto Shoot State.
+	 * @return if the action has ben completed
+	 */
 	public boolean handleAutoShoot() {
 		if (timer.get() == 0) {
 			timer.start();
@@ -452,6 +483,10 @@ public class MBRFSMv2 {
 		}
 	}
 
+	/**
+	 * Handles the Auto Preloaded Shoot State.
+	 * @return if the action has ben completed
+	 */
 	public boolean handleAutoShootPreloaded() {
 		if (timer.get() == 0) {
 			timer.start();
@@ -462,7 +497,7 @@ public class MBRFSMv2 {
 			shooterLeftMotor.set(-SHOOTING_POWER);
 			shooterRightMotor.set(SHOOTING_POWER);
 			return false;
-		} else if (timer.get() < 2){
+		} else if (timer.get() < 2) {
 			intakeMotor.set(OUTTAKE_POWER);
 			shooterLeftMotor.set(-SHOOTING_POWER);
 			shooterRightMotor.set(SHOOTING_POWER);
@@ -477,8 +512,12 @@ public class MBRFSMv2 {
 		}
 	}
 
+	/**
+	 * Handles the Auto Intake State.
+	 * @return if the action has ben completed
+	 */
 	public boolean handleAutoIntake() {
-		intakeMotor.set(INTAKE_POWER + 0.3);
+		intakeMotor.set(AUTO_INTAKE_POWER);
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
 		return true;
