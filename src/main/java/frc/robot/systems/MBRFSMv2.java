@@ -47,9 +47,10 @@ public class MBRFSMv2 {
 	private double[] currLogs;
 	private int tick = 0;
 	private boolean holding = false;
+	private boolean currentHolding = false;
 	private int noteColorFrames = 0;
 
-	private final ColorSensorV3 colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
+	private final ColorSensorV3 colorSensor;
 	private final ColorMatch colorMatcher = new ColorMatch();
 	private static final double MIN_TURN_SPEED = -0.4;
 	private static final double MAX_TURN_SPEED = 0.4;
@@ -58,7 +59,11 @@ public class MBRFSMv2 {
 	private static final double AMP_ENCODER_ROTATIONS = -500;
 	private static final double SHOOTER_ENCODER_ROTATIONS = 0;
 	private static final double INRANGE_VALUE = 15;
-	private static final double PROXIMIIY_THRESHOLD = 0.5;
+
+	private static final double PROXIMIIY_THRESHOLD = 1500;
+	private static final double GREEN_THRESHOLD = 0.250;
+	private static final double BLUE_THRESHOLD = 0.030;
+	private static final double RED_THRESHOLD = 0.650;
 
 	private final Color kNoteColorTarget = new Color(0.361, 0.524, 0.113); //need to tweak vals
 
@@ -85,7 +90,7 @@ public class MBRFSMv2 {
 	 * the constructor is called only once when the robot boots.
 	 */
 	public MBRFSMv2() {
-		shooterLeftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LSHOOTER_MOTOR,
+		/*shooterLeftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LSHOOTER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 
 		shooterRightMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_RSHOOTER_MOTOR,
@@ -95,12 +100,13 @@ public class MBRFSMv2 {
 
 		pivotMotor = new TalonFX(HardwareMap.DEVICE_ID_ARM_MOTOR);
 		pivotMotor.setNeutralMode(NeutralModeValue.Brake);
-
-		throughBore = new Encoder(0, 1);
-		throughBore.reset();
+		*/
+		//throughBore = new Encoder(0, 1);
+		//throughBore.reset();
 		timer = new Timer();
 		currLogs = new double[AVERAGE_SIZE];
 
+		colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
 		colorMatcher.addColorMatch(kNoteColorTarget);
 		// Reset state machine
 		reset();
@@ -127,6 +133,7 @@ public class MBRFSMv2 {
 		timer.stop();
 		timer.reset();
 		holding = false;
+		currentHolding = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -143,16 +150,24 @@ public class MBRFSMv2 {
 		}
 
 
-		/*currLogs[tick % AVERAGE_SIZE] = intakeMotor.getSupplyCurrent().getValueAsDouble();
+		currLogs[tick % AVERAGE_SIZE] = intakeMotor.getSupplyCurrent().getValueAsDouble();
 		tick++;
+
 		double avgcone = 0;
 		for (int i = 0; i < AVERAGE_SIZE; i++) {
 			avgcone += currLogs[i];
 		}
-		avgcone /= AVERAGE_SIZE;*/
+		avgcone /= AVERAGE_SIZE;
 		
 		SmartDashboard.putBoolean("holding", holding);
-		//SmartDashboard.putNumber("avg current", avgcone);
+		SmartDashboard.putBoolean("currentHolding", currentHolding);
+		SmartDashboard.putNumber("avg current", avgcone);
+		SmartDashboard.putNumber("Red", colorSensor.getColor().red);
+		SmartDashboard.putNumber("Blue", colorSensor.getColor().blue);
+		SmartDashboard.putNumber("Green", colorSensor.getColor().green);
+		SmartDashboard.putNumber("Proximity", colorSensor.getProximity());
+		SmartDashboard.putNumber("CurrentNoteFrames", noteColorFrames);
+		SmartDashboard.putBoolean("HASNOTE --- ", hasNote());
 		SmartDashboard.putString("Current State", getCurrentState().toString());
 		SmartDashboard.putNumber("Intake power", intakeMotor.get());
 		SmartDashboard.putNumber("Pivot power", pivotMotor.get());
@@ -242,6 +257,7 @@ public class MBRFSMv2 {
 					|| input.isRevButtonPressed())) {
 					if (inRange(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS)) {
 						holding = false;
+						currentHolding = false;
 						return MBRFSMState.SHOOTING;
 					} else {
 						return MBRFSMState.MOVE_TO_SHOOTER;
@@ -309,6 +325,7 @@ public class MBRFSMv2 {
 		} else if (!input.isoverrideIntakeButtonPressed() && input.isoverrideOuttakeButtonPressed()) {
 			intakeMotor.set(OUTTAKE_POWER);
 			holding = false;
+			currentHolding = false;
 		} else {
 			intakeMotor.set(0);
 		}
@@ -364,6 +381,7 @@ public class MBRFSMv2 {
 		pivotMotor.set(pid(throughBore.getDistance(), AMP_ENCODER_ROTATIONS));
 		if (input.isShootAmpButtonPressed()) {
 			holding = false;
+			currentHolding = false;
 			intakeMotor.set(AMP_SHOOT_POWER);
 		} else {
 			intakeMotor.set(0);
@@ -374,27 +392,25 @@ public class MBRFSMv2 {
 	 * @return if the intake is holding a note
 	 */
 	public boolean hasNote() {
-		/*double avgcone = 0;
+		double avgcone = 0;
 		for (int i = 0; i < AVERAGE_SIZE; i++) {
 			avgcone += currLogs[i];
 		}
 		avgcone /= AVERAGE_SIZE;
 		if (avgcone > CURRENT_THRESHOLD) {
-			holding = true;
-		}*/
-
-		Color dColor = colorSensor.getColor();
-		ColorMatchResult match = colorMatcher.matchClosestColor(dColor);
+			currentHolding = true;
+		}
 		
-		if (match.color == kNoteColorTarget && colorSensor.getProximity() <= PROXIMIIY_THRESHOLD) {
+		if (colorSensor.getRed() > RED_THRESHOLD 
+		&& colorSensor.getBlue() < BLUE_THRESHOLD
+		&& colorSensor.getGreen() > GREEN_THRESHOLD 
+		&& colorSensor.getProximity() >= PROXIMIIY_THRESHOLD) {
 			noteColorFrames++;
 		} else {
 			noteColorFrames = 0;
 		}
 
-		if (noteColorFrames >= NOTE_FRAMES_MIN) {
-			holding = true;
-		}
+		holding = currentHolding && noteColorFrames >= NOTE_FRAMES_MIN;
 
 		return holding;
 	}
