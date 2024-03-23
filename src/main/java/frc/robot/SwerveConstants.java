@@ -185,7 +185,7 @@ public final class SwerveConstants {
 
 		public static final double SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT = 1.5;
 		public static final double SPEAKER_ROTATIONAL_ACCEL_CONSTANT = 1;
-		public static final double X_MARGIN_TO_SPEAKER = 0.1;
+		public static final double X_MARGIN_TO_SPEAKER = 0.03;
 		public static final double Y_MARGIN_TO_SPEAKER = 0.03;
 		public static final double ROT_MARGIN_TO_SPEAKER = 0.04;
 		public static final double SPEAKER_TARGET_DISTANCE = 1.2;
