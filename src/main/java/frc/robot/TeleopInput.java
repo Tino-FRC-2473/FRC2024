@@ -153,18 +153,26 @@ public class TeleopInput {
 	}
 
 	/**
-	 * Get the value of the L2 Button.
-	 * @return if L2 Button is pressed
+	 * Get the value of the synched climber button.
+	 * @return True if button is pressed
 	 */
-	public boolean isoverrideIntakeButtonPressed() {
-		return mechController.getL2Button();
+	public boolean synchClimberTrigger() {
+		return mechController.getCrossButton();
 	}
 
 	/**
-	 * Get the value of the R2 Button.
-	 * @return if R2 Button is pressed
+	 * Get the value of the left climber trigger.
+	 * @return True if button is pressed
 	 */
-	public boolean isoverrideOuttakeButtonPressed() {
-		return mechController.getR2Button();
+	public double leftClimberTrigger() {
+		return mechController.getL2Axis();
+	}
+
+	/**
+	 * Get the value of the right climber trigger.
+	 * @return True if button is pressed
+	 */
+	public double rightClimberTrigger() {
+		return mechController.getR2Axis();
 	}
 }

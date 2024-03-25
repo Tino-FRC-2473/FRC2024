@@ -9,8 +9,8 @@ public final class HardwareMap {
 	// public static final int CAN_ID_SPARK_SHOOTER_UPPER = 33;
 	// public static final int CAN_ID_SPARK_SHOOTER_LOWER = 34;
 
-	// public static final int CAN_ID_SPARK_LEFT_CLIMBER_MOTOR = 19;
-	// public static final int CAN_ID_SPARK_RIGHT_CLIMBER_MOTOR = 20;
+	public static final int CAN_ID_SPARK_LEFT_CLIMBER_MOTOR = 19;
+	public static final int CAN_ID_SPARK_RIGHT_CLIMBER_MOTOR = 20;
 
 	// NEW Chassis
 
