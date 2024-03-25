@@ -39,7 +39,7 @@ public class MBRFSMv2 {
 	private static final float INTAKE_POWER = 0.35f;
 	private static final float AUTO_INTAKE_POWER = 0.85f;
 	private static final float OUTTAKE_POWER = -0.8f;
-	private static final float TELE_HOLDING_POWER = 0.05f;
+	private static final float TELE_HOLDING_POWER = 0.0f;
 	private static final float AUTO_HOLDING_POWER = 0.05f;
 	private static final float AMP_SHOOT_POWER = -0.75f;
 	private static final int AVERAGE_SIZE = 7;
@@ -48,7 +48,6 @@ public class MBRFSMv2 {
 	private double[] currLogs;
 	private int tick = 0;
 	private boolean holding = false;
-	private boolean currentHolding = false;
 	private int noteColorFrames = 0;
 
 	private final ColorSensorV3 colorSensor;
@@ -64,13 +63,13 @@ public class MBRFSMv2 {
 	private static final double SHOOTER_ENCODER_ROTATIONS = 0;
 	private static final double INRANGE_VALUE = 15;
 
-	private static final double PROXIMIIY_THRESHOLD = 500;
+	private static final double PROXIMIIY_THRESHOLD = 200;
 	private static final double GREEN_LOW = 0.18;
 	private static final double BLUE_LOW = 0.00;
-	private static final double RED_LOW = 0.6;
+	private static final double RED_LOW = 0.58;
 
 	private static final double GREEN_HIGH = 0.35;
-	private static final double BLUE_HIGH = 0.065;
+	private static final double BLUE_HIGH = 0.1;
 	private static final double RED_HIGH = 0.8;
 
 
@@ -141,7 +140,6 @@ public class MBRFSMv2 {
 		timer.stop();
 		timer.reset();
 		holding = false;
-		currentHolding = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -168,7 +166,6 @@ public class MBRFSMv2 {
 		avgcone /= AVERAGE_SIZE;
 
 		SmartDashboard.putBoolean("holding", holding);
-		SmartDashboard.putBoolean("currentHolding", currentHolding);
 		SmartDashboard.putNumber("avg current", avgcone);
 		SmartDashboard.putNumber("Red", colorSensor.getColor().red);
 		SmartDashboard.putNumber("Blue", colorSensor.getColor().blue);
@@ -268,7 +265,6 @@ public class MBRFSMv2 {
 					|| input.isRevButtonPressed())) {
 					if (inRange(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS)) {
 						holding = false;
-						currentHolding = false;
 						return MBRFSMState.SHOOTING;
 					} else {
 						return MBRFSMState.MOVE_TO_SHOOTER;
@@ -339,18 +335,7 @@ public class MBRFSMv2 {
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
-		if (input.isoverrideIntakeButtonPressed() && !input.isoverrideOuttakeButtonPressed()) {
-			intakeMotor.set(INTAKE_POWER);
-		} else if (!input.isoverrideIntakeButtonPressed()
-			&& input.isoverrideOuttakeButtonPressed()) {
-			intakeMotor.set(OUTTAKE_POWER);
-			holding = false;
-			currentHolding = false;
-		} else {
-			intakeMotor.set(holding ? TELE_HOLDING_POWER : 0);
-		}
-
-
+		intakeMotor.set(holding ? TELE_HOLDING_POWER : 0);
 	}
 
 	/**
@@ -411,7 +396,6 @@ public class MBRFSMv2 {
 		pivotMotor.set(pid(throughBore.getDistance(), AMP_ENCODER_ROTATIONS));
 		if (input.isShootAmpButtonPressed()) {
 			holding = false;
-			currentHolding = false;
 			intakeMotor.set(AMP_SHOOT_POWER);
 		} else {
 			intakeMotor.set(0);
@@ -429,7 +413,7 @@ public class MBRFSMv2 {
 		}
 		avgcone /= AVERAGE_SIZE;
 		if (avgcone > CURRENT_THRESHOLD) {
-			currentHolding = true;
+			//update isCurrentHolding var
 		}
 		boolean isRed = colorSensor.getColor().red > RED_LOW
 			&& colorSensor.getColor().red < RED_HIGH;
@@ -449,7 +433,7 @@ public class MBRFSMv2 {
 			noteColorFrames = 0;
 		}
 
-		holding = /*currentHolding &&*/ noteColorFrames >= NOTE_FRAMES_MIN;
+		holding = noteColorFrames >= NOTE_FRAMES_MIN;
 
 		return holding;
 	}

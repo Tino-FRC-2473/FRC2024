@@ -498,6 +498,20 @@ public class DriveFSMSystem {
 				* ((input.getLeftTrigger() / 2) + DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT)
 				/ DriveConstants.ANGULAR_SPEED_LIMIT_CONSTANT), OIConstants.DRIVE_DEADBAND),
 				true, true);
+
+				// drive(MathUtil.applyDeadband((input.getControllerLeftJoystickY()
+				// * Math.abs(input.getControllerLeftJoystickY()))
+				// , OIConstants.DRIVE_DEADBAND) * (((input.getLeftTrigger() + 1)/2) + 1),
+
+				// MathUtil.applyDeadband((input.getControllerLeftJoystickX()
+				// * Math.abs(input.getControllerLeftJoystickX()))
+				// , OIConstants.DRIVE_DEADBAND) * (((input.getLeftTrigger() + 1)/2) + 1),
+
+				// -MathUtil.applyDeadband((input.getControllerRightJoystickX()
+				// * ((input.getLeftTrigger() / 2) + DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT)/ DriveConstants.ANGULAR_SPEED_LIMIT_CONSTANT)
+				// , OIConstants.DRIVE_DEADBAND),
+				// true, false);
+
 				if (input.isBackButtonPressed()) {
 					gyro.reset();
 					resetOdometry(new Pose2d(new Translation2d(getPose().getX(), getPose().getY()),
