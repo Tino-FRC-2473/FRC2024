@@ -17,13 +17,12 @@ public class ClimberMechFSMRight {
 	// FSM state definitions
 	public enum ClimberMechFSMState {
 		IDLE_STOP,
-		RETRACTING
+		CLIMBING,
+		HOOKS_UP
 	}
 
-	private static final float MOTOR_RUN_POWER = 0.3f;
-	private static final float SYNCH_MOTOR_POWER = 0.25f;
-	public static final double TRIGGER_DEADZONE = 0.05;
-
+	private static final float SYNCH_MOTOR_POWER = -0.1f;//-0.25
+	private static final float PEAK_ENCODER_POSITION = 3000f;
 	private boolean limitPressed = false;
 
 	/* ======================== Private variables ======================== */
@@ -45,9 +44,11 @@ public class ClimberMechFSMRight {
 		motor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_RIGHT_CLIMBER_MOTOR,
 						CANSparkMax.MotorType.kBrushless);
 		motor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+		motor.getEncoder().setPosition(0);
 
 		peakLimitSwitch = motor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
 		peakLimitSwitch.enableLimitSwitch(false);
+		limitPressed = false;
 
 		// Reset state machine
 		reset();
@@ -71,7 +72,6 @@ public class ClimberMechFSMRight {
 	 */
 	public void reset() {
 		currentState = ClimberMechFSMState.IDLE_STOP;
-		limitPressed = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -87,6 +87,7 @@ public class ClimberMechFSMRight {
 		if (input == null) {
 			return;
 		}
+
 		if (peakLimitSwitch.isPressed()) {
 			limitPressed = true;
 		}
@@ -94,16 +95,21 @@ public class ClimberMechFSMRight {
 			case IDLE_STOP:
 				handleIdleState(input);
 				break;
-			case RETRACTING:
-				handleRetractingState(input);
+			case CLIMBING:
+				handleClimbingState(input);
+				break;
+			case HOOKS_UP:
+				handleHooksUpState(input);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		SmartDashboard.putString("Right Climber State", currentState.toString());
 		SmartDashboard.putBoolean("Right Climber Limit Pressed", peakLimitSwitchHit());
-		currentState = nextState(input);
 
+		currentState = nextState(input);
+		SmartDashboard.putNumber("right output", motor.getAppliedOutput());
+		SmartDashboard.putNumber("right motor applied", motor.get());
 	}
 
 	/**
@@ -131,16 +137,22 @@ public class ClimberMechFSMRight {
 	private ClimberMechFSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case IDLE_STOP:
-				if ((input.rightClimberTrigger() > TRIGGER_DEADZONE
-					|| input.synchClimberTrigger()) && !peakLimitSwitchHit()) {
-					return ClimberMechFSMState.RETRACTING;
+				if (input.synchClimberTrigger() && !input.isHooksUpButtonPressed()) {
+					return ClimberMechFSMState.CLIMBING;
+				} else if (!input.synchClimberTrigger() && input.isHooksUpButtonPressed()) {
+					return ClimberMechFSMState.HOOKS_UP;
 				} else {
 					return ClimberMechFSMState.IDLE_STOP;
 				}
-			case RETRACTING:
-				if ((input.rightClimberTrigger() > TRIGGER_DEADZONE
-					|| input.synchClimberTrigger()) && !peakLimitSwitchHit()) {
-					return ClimberMechFSMState.RETRACTING;
+			case CLIMBING:
+				if (input.synchClimberTrigger() && !input.isHooksUpButtonPressed()) {
+					return ClimberMechFSMState.CLIMBING;
+				} else {
+					return ClimberMechFSMState.IDLE_STOP;
+				}
+			case HOOKS_UP:
+				if (!input.synchClimberTrigger() && input.isHooksUpButtonPressed()) {
+					return ClimberMechFSMState.HOOKS_UP;
 				} else {
 					return ClimberMechFSMState.IDLE_STOP;
 				}
@@ -163,11 +175,19 @@ public class ClimberMechFSMRight {
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-	private void handleRetractingState(TeleopInput input) {
-		if (input.synchClimberTrigger()) {
-			motor.set(-SYNCH_MOTOR_POWER);
+	private void handleClimbingState(TeleopInput input) {
+		if (!peakLimitSwitchHit()) {
+			motor.set(SYNCH_MOTOR_POWER);
 		} else {
-			motor.set(-MOTOR_RUN_POWER * input.rightClimberTrigger());
+			motor.set(0);
+		}
+	}
+
+	private void handleHooksUpState(TeleopInput input) {
+		if (motor.getEncoder().getPosition() >= PEAK_ENCODER_POSITION && !peakLimitSwitchHit()) {
+			motor.set(SYNCH_MOTOR_POWER);
+		} else {
+			motor.set(0);
 		}
 	}
 

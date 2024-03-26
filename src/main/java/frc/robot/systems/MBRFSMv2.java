@@ -72,7 +72,6 @@ public class MBRFSMv2 {
 	private static final double BLUE_HIGH = 0.1;
 	private static final double RED_HIGH = 0.8;
 
-
 	/* ======================== Private variables ======================== */
 	private MBRFSMState currentState;
 	private CANSparkMax shooterLeftMotor;
@@ -174,13 +173,19 @@ public class MBRFSMv2 {
 		SmartDashboard.putNumber("Proximity", colorSensor.getProximity());
 		SmartDashboard.putString("COLOR RGB", "" + colorSensor.getColor());
 		SmartDashboard.putNumber("CurrentNoteFrames", noteColorFrames);
-		SmartDashboard.putBoolean("HASNOTE --- ", hasNote());
 		SmartDashboard.putString("Current State", getCurrentState().toString());
 		SmartDashboard.putNumber("Intake power", intakeMotor.get());
 		SmartDashboard.putNumber("Pivot power", pivotMotor.get());
 		SmartDashboard.putNumber("Left shooter power", shooterLeftMotor.get());
 		SmartDashboard.putNumber("Right shooter power", shooterRightMotor.get());
 		SmartDashboard.putNumber("Pivot encoder count", throughBore.getDistance());
+		boolean hasNote = hasNote();
+		SmartDashboard.putBoolean("HASNOTE --- ", hasNote);
+		if (hasNote) {
+			led.orangeLight();
+		} else {
+			led.redLight();
+		}
 
 		switch (currentState) {
 			case MOVE_TO_SHOOTER:
@@ -286,10 +291,8 @@ public class MBRFSMv2 {
 				if (input.isIntakeButtonPressed() && !input.isShootButtonPressed()
 					&& !input.isRevButtonPressed() && !input.isAmpButtonPressed()) {
 					if (hasNote()) {
-						// led.blueLight();
 						return MBRFSMState.MOVE_TO_SHOOTER;
 					} else {
-						// led.turnOff();
 						return MBRFSMState.INTAKING;
 					}
 				}
@@ -297,7 +300,6 @@ public class MBRFSMv2 {
 			case SHOOTING:
 				if (!input.isIntakeButtonPressed() && (input.isShootButtonPressed()
 					|| input.isRevButtonPressed()) && !input.isAmpButtonPressed()) {
-					// led.redLight();
 					return MBRFSMState.SHOOTING;
 				}
 				return MBRFSMState.MOVE_TO_SHOOTER;

@@ -141,7 +141,7 @@ public class TeleopInput {
 	 * @return if Square Button is pressed
 	 */
 	public boolean isAmpButtonPressed() {
-		return mechController.getSquareButton();
+		return mechController.getShareButton();
 	}
 
 	/**
@@ -149,7 +149,7 @@ public class TeleopInput {
 	 * @return if Square Share is pressed
 	 */
 	public boolean isShootAmpButtonPressed() {
-		return mechController.getShareButton();
+		return mechController.getSquareButton();
 	}
 
 	/**
@@ -160,19 +160,7 @@ public class TeleopInput {
 		return mechController.getCrossButton();
 	}
 
-	/**
-	 * Get the value of the left climber trigger.
-	 * @return True if button is pressed
-	 */
-	public double leftClimberTrigger() {
-		return mechController.getL2Axis();
-	}
-
-	/**
-	 * Get the value of the right climber trigger.
-	 * @return True if button is pressed
-	 */
-	public double rightClimberTrigger() {
-		return mechController.getR2Axis();
+	public boolean isHooksUpButtonPressed() {
+		return mechController.getOptionsButton();
 	}
 }
