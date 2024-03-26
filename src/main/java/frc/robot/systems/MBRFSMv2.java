@@ -19,7 +19,7 @@ import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
-// import frc.robot.LED;
+import frc.robot.LED;
 
 public class MBRFSMv2 {
 	/* ======================== Constants ======================== */
@@ -79,7 +79,7 @@ public class MBRFSMv2 {
 	private CANSparkMax shooterRightMotor;
 	private TalonFX intakeMotor;
 	private TalonFX pivotMotor;
-	// private LED led = new LED();
+	private LED led = new LED();
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -135,8 +135,9 @@ public class MBRFSMv2 {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		// led.turnOff();
+		led.redLight();
 		currentState = MBRFSMState.MOVE_TO_SHOOTER;
+		
 		timer.stop();
 		timer.reset();
 		holding = false;
