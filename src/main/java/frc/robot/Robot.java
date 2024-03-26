@@ -3,6 +3,14 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoSink;
+import edu.wpi.first.cscore.MjpegServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -26,6 +34,8 @@ public class Robot extends TimedRobot {
 	private AutoHandlerSystem autoHandler;
 	private AutoPathChooser autoPathChooser;
 
+	private UsbCamera driverCam;
+
 	/**
 	 * This function is run when the robot is first started up and should be used for any
 	 * initialization code.
@@ -40,6 +50,8 @@ public class Robot extends TimedRobot {
 		mechFSMSystem = new MBRFSMv2();
 		autoHandler = new AutoHandlerSystem(driveFSMSystem, mechFSMSystem);
 
+		driverCam = CameraServer.startAutomaticCapture(0);
+		driverCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
 	}
 
 	@Override
