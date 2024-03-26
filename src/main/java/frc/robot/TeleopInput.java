@@ -153,13 +153,17 @@ public class TeleopInput {
 	}
 
 	/**
-	 * Get the value of the synched climber button.
-	 * @return True if button is pressed
+	 * Get the value of the Cross  button.
+	 * @return if Cross button is pressed
 	 */
 	public boolean synchClimberTrigger() {
 		return mechController.getCrossButton();
 	}
 
+	/**
+	 * Get the value of the Options Button.
+	 * @return if Options Button is pressed
+	 */
 	public boolean isHooksUpButtonPressed() {
 		return mechController.getOptionsButton();
 	}

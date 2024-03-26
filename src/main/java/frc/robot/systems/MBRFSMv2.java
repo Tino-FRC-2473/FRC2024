@@ -137,7 +137,7 @@ public class MBRFSMv2 {
 	public void reset() {
 		led.redLight();
 		currentState = MBRFSMState.MOVE_TO_SHOOTER;
-		
+
 		timer.stop();
 		timer.reset();
 		holding = false;
@@ -397,9 +397,9 @@ public class MBRFSMv2 {
 	public void handleMoveAmpState(TeleopInput input) {
 		// shooterLeftMotor.set(0);
 		// shooterRightMotor.set(0);
-		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS)); // change to amp encoder if using pivot
+		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		// if (input.isShootAmpButtonPressed()) {
-		 	holding = false;
+		holding = false;
 		// 	intakeMotor.set(AMP_SHOOT_POWER);
 		// } else {
 		// 	intakeMotor.set(0);
