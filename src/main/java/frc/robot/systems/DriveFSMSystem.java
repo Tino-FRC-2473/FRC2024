@@ -332,7 +332,7 @@ public class DriveFSMSystem {
 			case SPEAKER:
 				ArrayList<Pose2d> speaker = new ArrayList<>();
 				if (placement.equals("SWCT")) {
-					speaker.add(new Pose2d(0,
+					speaker.add(new Pose2d(AutoConstants.N_0_10,
 						0, new Rotation2d(0)));
 				} else if (placement.equals("SWSR")) {
 					speaker.add(new Pose2d(AutoConstants.N_0_5,
@@ -345,29 +345,29 @@ public class DriveFSMSystem {
 			case NOTE1:
 				ArrayList<Pose2d> note1 = new ArrayList<>();
 				if (placement.equals("SWSR")) {
-					note1.add(new Pose2d(-1 - AutoConstants.N_0_25,
+					note1.add(new Pose2d(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10,
 						(-1 - AutoConstants.N_0_5 + AutoConstants.N_0_10) * multiplier,
 						new Rotation2d(0)));
 				} else {
 					note1.add(new Pose2d(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10,
-						(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10) * multiplier,
+						(-1 - AutoConstants.N_0_5 + AutoConstants.N_0_05) * multiplier,
 						new Rotation2d(AutoConstants.DEG_40 * multiplier)));
 				}
 				return driveAlongPath(note1);
 			case NOTE2:
 				ArrayList<Pose2d> note2 = new ArrayList<>();
-				note2.add(new Pose2d(-1 - AutoConstants.N_0_25,
+				note2.add(new Pose2d(-1 - AutoConstants.N_0_5,
 					0, new Rotation2d(0)));
 				return driveAlongPath(note2);
 			case NOTE3:
 				ArrayList<Pose2d> note3 = new ArrayList<>();
 				if (placement.equals("SWAM")) {
-					note3.add(new Pose2d(-1 - AutoConstants.N_0_25,
+					note3.add(new Pose2d(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10,
 						(1 + AutoConstants.N_0_5 - AutoConstants.N_0_10)
 						* multiplier, new Rotation2d(0)));
 				} else {
 					note3.add(new Pose2d(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10,
-						(1 + AutoConstants.N_0_25 + AutoConstants.N_0_10) * multiplier,
+						(1 + AutoConstants.N_0_5 - AutoConstants.N_0_05) * multiplier,
 						new Rotation2d(-AutoConstants.DEG_40 * multiplier)));
 				}
 				return driveAlongPath(note3);
@@ -489,29 +489,15 @@ public class DriveFSMSystem {
 		switch (currentState) {
 			case TELEOP_STATE:
 				drive(-MathUtil.applyDeadband((input.getControllerLeftJoystickY()
-				* Math.abs(input.getControllerLeftJoystickY()) * ((input.getLeftTrigger() / 2)
-				+ DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT) / 2), OIConstants.DRIVE_DEADBAND),
-				-MathUtil.applyDeadband((input.getControllerLeftJoystickX()
-				* Math.abs(input.getControllerLeftJoystickX()) * ((input.getLeftTrigger() / 2)
-				+ DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT) / 2), OIConstants.DRIVE_DEADBAND),
-				-MathUtil.applyDeadband((input.getControllerRightJoystickX()
-				* ((input.getLeftTrigger() / 2) + DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT)
-				/ DriveConstants.ANGULAR_SPEED_LIMIT_CONSTANT), OIConstants.DRIVE_DEADBAND),
-				true, true);
-
-				// drive(MathUtil.applyDeadband((input.getControllerLeftJoystickY()
-				// * Math.abs(input.getControllerLeftJoystickY()))
-				// , OIConstants.DRIVE_DEADBAND) * (((input.getLeftTrigger() + 1)/2) + 1),
-
-				// MathUtil.applyDeadband((input.getControllerLeftJoystickX()
-				// * Math.abs(input.getControllerLeftJoystickX()))
-				// , OIConstants.DRIVE_DEADBAND) * (((input.getLeftTrigger() + 1)/2) + 1),
-
-				// -MathUtil.applyDeadband((input.getControllerRightJoystickX()
-				// * ((input.getLeftTrigger() / 2) + DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT)/ DriveConstants.ANGULAR_SPEED_LIMIT_CONSTANT)
-				// , OIConstants.DRIVE_DEADBAND),
-				// true, false);
-
+					* Math.abs(input.getControllerLeftJoystickY()) * ((input.getLeftTrigger() / 2)
+					+ DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT) / 2), OIConstants.DRIVE_DEADBAND),
+					-MathUtil.applyDeadband((input.getControllerLeftJoystickX()
+					* Math.abs(input.getControllerLeftJoystickX()) * ((input.getLeftTrigger() / 2)
+					+ DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT) / 2), OIConstants.DRIVE_DEADBAND),
+					-MathUtil.applyDeadband((input.getControllerRightJoystickX()
+					* ((input.getLeftTrigger() / 2) + DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT)
+					/ DriveConstants.ANGULAR_SPEED_LIMIT_CONSTANT), OIConstants.DRIVE_DEADBAND),
+					true, true);
 				if (input.isBackButtonPressed()) {
 					gyro.reset();
 					resetOdometry(new Pose2d(new Translation2d(getPose().getX(), getPose().getY()),
