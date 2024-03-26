@@ -22,9 +22,9 @@ public class AutoPathChooser {
 		SmartDashboard.putData("Alliance", allianceChooser);
 
 		pathChooser = new SendableChooser<>();
-		pathChooser.setDefaultOption("Target Protected", "PROT");
-		pathChooser.addOption("Target Miscellaneous", "MISC");
-		pathChooser.addOption("Target Midfield", "MIDF");
+		pathChooser.setDefaultOption("Speaker Scoring", "PROT");
+		// pathChooser.addOption("Target Miscellaneous", "MISC");
+		// pathChooser.addOption("Target Midfield", "MIDF");
 		pathChooser.addOption("AUTO DESTROYER", "AUTO");
 		pathChooser.addOption("Safety Path", "SAFE");
 		SmartDashboard.putData("Path Chooser", pathChooser);
