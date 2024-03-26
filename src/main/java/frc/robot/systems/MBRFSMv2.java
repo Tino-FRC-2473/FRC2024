@@ -33,6 +33,8 @@ public class MBRFSMv2 {
 	}
 
 	private static final float SHOOTING_POWER = 0.8f;
+	private static final float AMP_SHOOTER_POWER = 0.2f;
+	private static final float AMP_OUTTAKE_POWER = -0.4f; // -0.75
 	private static final double AUTO_SHOOTING_TIME = 0.5;
 	private static final double AUTO_PRELOAD_SHOOTING_TIME = 1.7;
 
@@ -41,7 +43,6 @@ public class MBRFSMv2 {
 	private static final float OUTTAKE_POWER = -0.8f;
 	private static final float TELE_HOLDING_POWER = 0.0f;
 	private static final float AUTO_HOLDING_POWER = 0.05f;
-	private static final float AMP_SHOOT_POWER = -0.75f;
 	private static final int AVERAGE_SIZE = 7;
 	private static final float CURRENT_THRESHOLD = 11.0f;
 	private static final int NOTE_FRAMES_MIN = 5;
@@ -394,14 +395,26 @@ public class MBRFSMv2 {
 	 *        the robot is in autonomous mode.
 	 */
 	public void handleMoveAmpState(TeleopInput input) {
-		shooterLeftMotor.set(0);
-		shooterRightMotor.set(0);
-		pivotMotor.set(pid(throughBore.getDistance(), AMP_ENCODER_ROTATIONS));
-		if (input.isShootAmpButtonPressed()) {
-			holding = false;
-			intakeMotor.set(AMP_SHOOT_POWER);
-		} else {
+		// shooterLeftMotor.set(0);
+		// shooterRightMotor.set(0);
+		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS)); // change to amp encoder if using pivot
+		// if (input.isShootAmpButtonPressed()) {
+		 	holding = false;
+		// 	intakeMotor.set(AMP_SHOOT_POWER);
+		// } else {
+		// 	intakeMotor.set(0);
+		// }
+
+		if (input.isAmpButtonPressed() && !input.isShootButtonPressed()) {
+			shooterLeftMotor.set(-AMP_SHOOTER_POWER); // dont forget the - sign
+			shooterRightMotor.set(AMP_SHOOTER_POWER);
 			intakeMotor.set(0);
+		}
+
+		if (input.isAmpButtonPressed() && input.isShootAmpButtonPressed()) {
+			shooterLeftMotor.set(-AMP_SHOOTER_POWER);
+			shooterRightMotor.set(AMP_SHOOTER_POWER);
+			intakeMotor.set(AMP_OUTTAKE_POWER);
 		}
 	}
 
