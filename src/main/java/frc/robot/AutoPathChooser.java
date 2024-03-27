@@ -9,6 +9,7 @@ public class AutoPathChooser {
 	private static SendableChooser<Boolean> allianceChooser;
 	private static SendableChooser<String> pathChooser;
 	private static SendableChooser<String> placementChooser;
+	private static SendableChooser<Boolean> cvOptionChooser;
 	private static ArrayList<SendableChooser<Integer>> noteChoosers;
 
 	/**
@@ -20,6 +21,11 @@ public class AutoPathChooser {
 		allianceChooser.setDefaultOption("Blue", true);
 		allianceChooser.addOption("Red", false);
 		SmartDashboard.putData("Alliance", allianceChooser);
+
+		cvOptionChooser = new SendableChooser<>();
+		cvOptionChooser.setDefaultOption("No", false);
+		cvOptionChooser.addOption("Yes", true);
+		SmartDashboard.putData("Using CV in Auto", cvOptionChooser);
 
 		pathChooser = new SendableChooser<>();
 		pathChooser.setDefaultOption("Speaker Scoring", "PROT");
@@ -116,5 +122,17 @@ public class AutoPathChooser {
 	 */
 	public static int getSelectedNote(int index) {
 		return noteChoosers.get(index).getSelected();
+	}
+
+	/**
+	 * Returns if we're using auto in CV.
+	 * @return True/False if we're using CV
+	 */
+	public static boolean isUsingCVAuto() {
+		if (cvOptionChooser != null) {
+			return cvOptionChooser.getSelected();
+		} else {
+			return false;
+		}
 	}
 }

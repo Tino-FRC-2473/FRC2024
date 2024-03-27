@@ -181,7 +181,7 @@ public final class SwerveConstants {
 	}
 	public static final class VisionConstants {
 		public static final double MAX_SPEED_METERS_PER_SECOND = 0.2;
-		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 40;
+		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 20;
 
 		public static final double SPEAKER_TRANSLATIONAL_ACCEL_CONSTANT = 1.5;
 		public static final double SPEAKER_ROTATIONAL_ACCEL_CONSTANT = 1;
@@ -196,7 +196,16 @@ public final class SwerveConstants {
 		public static final double ROT_MARGIN_TO_SOURCE = 0.04;
 		public static final double SOURCE_DRIVE_FORWARD_POWER = 0.35;
 
+
+		public static final double NOTE_TRANSLATIONAL_ACCEL_CONSTANT = 5;
+		public static final double NOTE_ROTATIONAL_ACCEL_CONSTANT = 70;
+		public static final double X_MARGIN_TO_NOTE = 0.03;
+		public static final double Y_MARGIN_TO_NOTE = 0.03;
+		public static final double ROT_MARGIN_TO_NOTE = 3;
+		public static final double NOTE_TARGET_DISTANCE = 1.2;
+
 		public static final double UNABLE_TO_SEE_TAG_CONSTANT = 4000;
+		public static final double UNABLE_TO_SEE_NOTE_CONSTANT = 5000;
 
 		public static final int RED_SPEAKER_TAG_ID = 4;
 		public static final int BLUE_SPEAKER_TAG_ID = 7;
@@ -209,6 +218,7 @@ public final class SwerveConstants {
 
 		public static final double SOURCE_TAG_ANGLE_DEGREES = 60.0;
 		public static final double SPEAKER_TAG_ANGLE_DEGREES = 180.0;
+		public static final double NOTE_ANGLE_DEGREES = 0.0;
 
 		public static final int DRIVER_CAM_WIDTH_PIXELS = 1280;
 		public static final int DRIVER_CAM_HEIGHT_PIXELS = 720;

@@ -116,6 +116,7 @@ public class DriveFSMSystem {
 	private boolean isSpeakerAligned;
 	private boolean isSpeakerPositionAligned;
 	private boolean isSourcePositionAligned;
+	private boolean isUsingCV;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -184,6 +185,7 @@ public class DriveFSMSystem {
 		} else {
 			blueAlliance = true;
 		}
+		isUsingCV = AutoPathChooser.isUsingCVAuto();
 		if (blueAlliance) {
 			tagOrientationAngles = new Double[]
 				{null, VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
@@ -760,6 +762,9 @@ public class DriveFSMSystem {
 			-AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, aDiff
 			/ AutoConstants.AUTO_DRIVE_ANGULAR_SPEED_ACCEL_CONSTANT)) : 0;
 
+		if (isUsingCV && getCVCalculatedSpeed() != VisionConstants.UNABLE_TO_SEE_NOTE_CONSTANT) {
+			aSpeed = getCVCalculatedSpeed();
+		}
 		drive(xSpeed, ySpeed, aSpeed, true, false);
 		if (xSpeed == 0 && ySpeed == 0 && aSpeed == 0) {
 			return true;
@@ -930,5 +935,30 @@ public class DriveFSMSystem {
 	 */
 	public static double clamp(double value, double lowerBound, double upperBound) {
 		return Math.min(Math.max(value, lowerBound), upperBound);
+	}
+
+	/**
+	 * Returns the calculated turn speed using note alignment.
+	 * @return rotational speed calculated using CV
+	 */
+	public double getCVCalculatedSpeed() {
+		if (rpi.getNoteYaw() != VisionConstants.UNABLE_TO_SEE_NOTE_CONSTANT) {
+			return VisionConstants.UNABLE_TO_SEE_NOTE_CONSTANT;
+		}
+		double xDiff = rpi.getNoteDistance();
+		double aDiff = rpi.getNoteYaw();
+		System.out.println(xDiff);
+
+		double ySpeed = 0;
+		double xSpeed = Math.abs(xDiff) > VisionConstants.X_MARGIN_TO_NOTE ? clamp(xDiff
+			/ VisionConstants.NOTE_TRANSLATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_SPEED_METERS_PER_SECOND,
+			VisionConstants.MAX_SPEED_METERS_PER_SECOND) : 0;
+		double aSpeed = Math.abs(aDiff) > VisionConstants.ROT_MARGIN_TO_NOTE
+			? -clamp(aDiff / VisionConstants.NOTE_ROTATIONAL_ACCEL_CONSTANT,
+			-VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+			VisionConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND) : 0;
+
+		return aSpeed;
 	}
 }
