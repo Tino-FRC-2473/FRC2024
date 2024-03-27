@@ -46,6 +46,7 @@ public class LED {
 	private static final int RAINBOW_S = 255;
 	private static final int RAIBOW_V = 128;
 
+	private static final int FLASH_INTERVAL = 25;
 	/**
 	 * Constructs LED object.
 	 */
@@ -60,11 +61,13 @@ public class LED {
 
 	/**
 	 * Changes the LED color to red.
+	 * @param flash if you want the LEDs to flash with this color.
 	 */
 	public void redLight(boolean flash) {
 		for (var i = 0; i < ledBuffer.getLength(); i++) {
 			if (flash) {
-				ledBuffer.setRGB(i, flashingOn ? RED_RGB_R:0, flashingOn ? RED_RGB_G:0, flashingOn ? RED_RGB_B:0);
+				ledBuffer.setRGB(i, flashingOn ? RED_RGB_R : 0, flashingOn
+					? RED_RGB_G : 0, flashingOn ? RED_RGB_B : 0);
 			} else {
 				ledBuffer.setRGB(i, RED_RGB_R, RED_RGB_G, RED_RGB_B);
 			}
@@ -72,7 +75,7 @@ public class LED {
 		led.setData(ledBuffer);
 		if (flash) {
 			tick++;
-			if (tick % 25 == 0) {
+			if (tick % FLASH_INTERVAL == 0) {
 				flashingOn = !flashingOn;
 			}
 		}
@@ -80,11 +83,13 @@ public class LED {
 
 	/**
 	 * Changes the LED color to orange.
+	 * @param flash if you want the LEDs to flash with this color.
 	 */
 	public void orangeLight(boolean flash) {
 		for (var i = 0; i < ledBuffer.getLength(); i++) {
 			if (flash) {
-				ledBuffer.setRGB(i, flashingOn ? ORANGE_RGB_R:0, flashingOn ? ORANGE_RGB_G:0, flashingOn ? ORANGE_RGB_B:0);
+				ledBuffer.setRGB(i, flashingOn ? ORANGE_RGB_R : 0, flashingOn
+					? ORANGE_RGB_G : 0, flashingOn ? ORANGE_RGB_B : 0);
 			} else {
 				ledBuffer.setRGB(i, ORANGE_RGB_R, ORANGE_RGB_G, ORANGE_RGB_B);
 			}
@@ -92,7 +97,7 @@ public class LED {
 		led.setData(ledBuffer);
 		if (flash) {
 			tick++;
-			if (tick % 25 == 0) {
+			if (tick % FLASH_INTERVAL == 0) {
 				flashingOn = !flashingOn;
 			}
 		}

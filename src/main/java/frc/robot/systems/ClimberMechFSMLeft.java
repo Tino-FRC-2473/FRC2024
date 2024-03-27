@@ -21,7 +21,7 @@ public class ClimberMechFSMLeft {
 		HOOKS_UP
 	}
 
-	private static final float SYNCH_MOTOR_POWER = 0.1f;//0.25
+	private static final float SYNCH_MOTOR_POWER = 0.1f; //0.25
 	private static final float PEAK_ENCODER_POSITION = -3000f;
 	private boolean limitPressed = false;
 
@@ -171,7 +171,7 @@ public class ClimberMechFSMLeft {
 		motor.set(0);
 	}
 	/**
-	 * Handle behavior in RETRACTING state.
+	 * Handle behavior in CLIMBING state.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
@@ -182,7 +182,11 @@ public class ClimberMechFSMLeft {
 			motor.set(0);
 		}
 	}
-
+	/**
+	 * Handle behavior in HOOKS_UP state.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 */
 	private void handleHooksUpState(TeleopInput input) {
 		if (motor.getEncoder().getPosition() <= PEAK_ENCODER_POSITION && !peakLimitSwitchHit()) {
 			motor.set(SYNCH_MOTOR_POWER);

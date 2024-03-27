@@ -419,14 +419,14 @@ public class MBRFSMv2 {
 	 * @return if the intake is holding a note
 	 */
 	public boolean hasNote() {
-		double avgcone = 0;
-		for (int i = 0; i < AVERAGE_SIZE; i++) {
-			avgcone += currLogs[i];
-		}
-		avgcone /= AVERAGE_SIZE;
-		if (avgcone > CURRENT_THRESHOLD) {
-			//update isCurrentHolding var
-		}
+		// double avgcone = 0;
+		// for (int i = 0; i < AVERAGE_SIZE; i++) {
+		// 	avgcone += currLogs[i];
+		// }
+		// avgcone /= AVERAGE_SIZE;
+		// if (avgcone > CURRENT_THRESHOLD) {
+		// 	//update isCurrentHolding var
+		// }
 		boolean isRed = colorSensor.getColor().red > RED_LOW
 			&& colorSensor.getColor().red < RED_HIGH;
 		boolean isGreen = colorSensor.getColor().green > GREEN_LOW
