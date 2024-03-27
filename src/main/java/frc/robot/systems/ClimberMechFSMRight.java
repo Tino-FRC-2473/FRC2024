@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkLimitSwitch;
 
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -21,9 +20,9 @@ public class ClimberMechFSMRight {
 		HOOKS_UP
 	}
 
-	private static final float SYNCH_MOTOR_POWER = -0.1f; //-0.25
-	private static final float PEAK_ENCODER_POSITION = 3000f;
-	private boolean limitPressed = false;
+	private static final float SYNCH_MOTOR_POWER = -0.05f; //-0.25
+	private static final float PEAK_ENCODER_POSITION = -3000f;
+	private static final float CLIMB_ENCODER_POSITION = -4000f;
 
 	/* ======================== Private variables ======================== */
 	private ClimberMechFSMState currentState;
@@ -31,7 +30,6 @@ public class ClimberMechFSMRight {
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax motor;
-	private SparkLimitSwitch peakLimitSwitch;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -45,10 +43,6 @@ public class ClimberMechFSMRight {
 						CANSparkMax.MotorType.kBrushless);
 		motor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		motor.getEncoder().setPosition(0);
-
-		peakLimitSwitch = motor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
-		peakLimitSwitch.enableLimitSwitch(false);
-		limitPressed = false;
 
 		// Reset state machine
 		reset();
@@ -88,9 +82,6 @@ public class ClimberMechFSMRight {
 			return;
 		}
 
-		if (peakLimitSwitch.isPressed()) {
-			limitPressed = true;
-		}
 		switch (currentState) {
 			case IDLE_STOP:
 				handleIdleState(input);
@@ -105,11 +96,12 @@ public class ClimberMechFSMRight {
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
 		SmartDashboard.putString("Right Climber State", currentState.toString());
-		SmartDashboard.putBoolean("Right Climber Limit Pressed", peakLimitSwitchHit());
 
 		currentState = nextState(input);
 		SmartDashboard.putNumber("right output", motor.getAppliedOutput());
 		SmartDashboard.putNumber("right motor applied", motor.get());
+		SmartDashboard.putNumber("right encoder position", motor.getEncoder().getPosition());
+
 	}
 
 	/**
@@ -176,7 +168,7 @@ public class ClimberMechFSMRight {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleClimbingState(TeleopInput input) {
-		if (!peakLimitSwitchHit()) {
+		if (motor.getEncoder().getPosition() >= CLIMB_ENCODER_POSITION) {
 			motor.set(SYNCH_MOTOR_POWER);
 		} else {
 			motor.set(0);
@@ -188,14 +180,10 @@ public class ClimberMechFSMRight {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleHooksUpState(TeleopInput input) {
-		if (motor.getEncoder().getPosition() >= PEAK_ENCODER_POSITION && !peakLimitSwitchHit()) {
+		if (motor.getEncoder().getPosition() >= PEAK_ENCODER_POSITION) {
 			motor.set(SYNCH_MOTOR_POWER);
 		} else {
 			motor.set(0);
 		}
-	}
-
-	private boolean peakLimitSwitchHit() {
-		return limitPressed;
 	}
 }
