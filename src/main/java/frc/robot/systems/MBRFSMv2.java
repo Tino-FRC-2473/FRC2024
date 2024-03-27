@@ -135,7 +135,7 @@ public class MBRFSMv2 {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		led.redLight();
+		led.redLight(holding);
 		currentState = MBRFSMState.MOVE_TO_SHOOTER;
 
 		timer.stop();
@@ -182,11 +182,7 @@ public class MBRFSMv2 {
 		SmartDashboard.putNumber("Pivot encoder count", throughBore.getDistance());
 		boolean hasNote = hasNote();
 		SmartDashboard.putBoolean("HASNOTE --- ", hasNote);
-		if (hasNote) {
-			led.orangeLight();
-		} else {
-			led.redLight();
-		}
+		led.redLight(holding);
 
 		switch (currentState) {
 			case MOVE_TO_SHOOTER:

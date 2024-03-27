@@ -4,11 +4,13 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 
 public class LED {
+	private int tick = 0;
 	private AddressableLED led;
 	private AddressableLEDBuffer ledBuffer;
 	private int rainbowFirstPixelHue = 0;
 	private int greenVal = 0;
 	private boolean forward = true;
+	private boolean flashingOn = false;
 	private static final int LED_PORT = 9;
 	private static final int LED_BUFFER_LENGTH = 300;
 	private static final int ONE_HUNDRED_EIGHTY = 180;
@@ -52,26 +54,48 @@ public class LED {
 		ledBuffer = new AddressableLEDBuffer(LED_BUFFER_LENGTH);
 		led.setLength(ledBuffer.getLength());
 		led.start();
+		tick = 0;
+		flashingOn = false;
 	}
 
 	/**
 	 * Changes the LED color to red.
 	 */
-	public void redLight() {
+	public void redLight(boolean flash) {
 		for (var i = 0; i < ledBuffer.getLength(); i++) {
-			ledBuffer.setRGB(i, RED_RGB_R, RED_RGB_G, RED_RGB_B);
+			if (flash) {
+				ledBuffer.setRGB(i, flashingOn ? RED_RGB_R:0, flashingOn ? RED_RGB_G:0, flashingOn ? RED_RGB_B:0);
+			} else {
+				ledBuffer.setRGB(i, RED_RGB_R, RED_RGB_G, RED_RGB_B);
+			}
 		}
 		led.setData(ledBuffer);
+		if (flash) {
+			tick++;
+			if (tick % 25 == 0) {
+				flashingOn = !flashingOn;
+			}
+		}
 	}
 
 	/**
 	 * Changes the LED color to orange.
 	 */
-	public void orangeLight() {
+	public void orangeLight(boolean flash) {
 		for (var i = 0; i < ledBuffer.getLength(); i++) {
-			ledBuffer.setRGB(i, ORANGE_RGB_R, ORANGE_RGB_G, ORANGE_RGB_B);
+			if (flash) {
+				ledBuffer.setRGB(i, flashingOn ? ORANGE_RGB_R:0, flashingOn ? ORANGE_RGB_G:0, flashingOn ? ORANGE_RGB_B:0);
+			} else {
+				ledBuffer.setRGB(i, ORANGE_RGB_R, ORANGE_RGB_G, ORANGE_RGB_B);
+			}
 		}
 		led.setData(ledBuffer);
+		if (flash) {
+			tick++;
+			if (tick % 25 == 0) {
+				flashingOn = !flashingOn;
+			}
+		}
 	}
 
 	/**
