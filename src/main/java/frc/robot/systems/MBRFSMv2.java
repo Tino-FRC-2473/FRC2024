@@ -405,7 +405,7 @@ public class MBRFSMv2 {
 		// 	intakeMotor.set(0);
 		// }
 
-		if (input.isAmpButtonPressed() && !input.isShootButtonPressed()) {
+		if (input.isAmpButtonPressed() && !input.isShootAmpButtonPressed()) {
 			shooterLeftMotor.set(-AMP_SHOOTER_POWER); // dont forget the - sign
 			shooterRightMotor.set(AMP_SHOOTER_POWER);
 			intakeMotor.set(0);
