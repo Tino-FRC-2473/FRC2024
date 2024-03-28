@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkLimitSwitch;
 
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -17,11 +16,14 @@ public class ClimberMechFSMLeft {
 	// FSM state definitions
 	public enum ClimberMechFSMState {
 		IDLE_STOP,
-		RETRACTING
+		CLIMBING,
+		HOOKS_UP
 	}
 
-	private static final float MOTOR_RUN_POWER = -0.4f;
-	private boolean limitPressed = false;
+	private static final float SYNCH_MOTOR_POWER = 0.05f; //0.25
+	private static final float PEAK_ENCODER_POSITION = 3000f;
+	private static final float CLIMB_ENCODER_POSITION = 4000f;
+
 
 	/* ======================== Private variables ======================== */
 	private ClimberMechFSMState currentState;
@@ -29,7 +31,6 @@ public class ClimberMechFSMLeft {
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private CANSparkMax motor;
-	private SparkLimitSwitch peakLimitSwitch;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -42,9 +43,7 @@ public class ClimberMechFSMLeft {
 		motor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LEFT_CLIMBER_MOTOR,
 						CANSparkMax.MotorType.kBrushless);
 		motor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-
-		peakLimitSwitch = motor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
-		peakLimitSwitch.enableLimitSwitch(false);
+		motor.getEncoder().setPosition(0);
 
 		// Reset state machine
 		reset();
@@ -68,7 +67,6 @@ public class ClimberMechFSMLeft {
 	 */
 	public void reset() {
 		currentState = ClimberMechFSMState.IDLE_STOP;
-		limitPressed = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -80,9 +78,6 @@ public class ClimberMechFSMLeft {
 	 *        the robot is in autonomous mode.
 	 */
 	public void update(TeleopInput input) {
-		if (peakLimitSwitch.isPressed()) {
-			limitPressed = true;
-		}
 
 		if (input == null) {
 			return;
@@ -92,18 +87,21 @@ public class ClimberMechFSMLeft {
 			case IDLE_STOP:
 				handleIdleState(input);
 				break;
-			case RETRACTING:
-				handleRetractingState(input);
+			case CLIMBING:
+				handleClimbingState(input);
+				break;
+			case HOOKS_UP:
+				handleHooksUpState(input);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
-		SmartDashboard.putString("Current State Left", currentState.toString());
-		SmartDashboard.putBoolean("Bottom Limit Left Switch Pressed", peakLimitSwitchHit());
-		SmartDashboard.putBoolean("Retract Button Pressed", input.isRetractClimberButtonPressed());
+		SmartDashboard.putString("Left Climber State", currentState.toString());
+
 		currentState = nextState(input);
 		SmartDashboard.putNumber("left output", motor.getAppliedOutput());
 		SmartDashboard.putNumber("left motor applied", motor.get());
+		SmartDashboard.putNumber("left encoder position", motor.getEncoder().getPosition());
 	}
 
 	/**
@@ -131,14 +129,22 @@ public class ClimberMechFSMLeft {
 	private ClimberMechFSMState nextState(TeleopInput input) {
 		switch (currentState) {
 			case IDLE_STOP:
-				if (input.isRetractClimberButtonPressed() && !peakLimitSwitchHit()) {
-					return ClimberMechFSMState.RETRACTING;
+				if (input.synchClimberTrigger() && !input.isHooksUpButtonPressed()) {
+					return ClimberMechFSMState.CLIMBING;
+				} else if (!input.synchClimberTrigger() && input.isHooksUpButtonPressed()) {
+					return ClimberMechFSMState.HOOKS_UP;
 				} else {
 					return ClimberMechFSMState.IDLE_STOP;
 				}
-			case RETRACTING:
-				if (input.isRetractClimberButtonPressed() && !peakLimitSwitchHit()) {
-					return ClimberMechFSMState.RETRACTING;
+			case CLIMBING:
+				if (input.synchClimberTrigger() && !input.isHooksUpButtonPressed()) {
+					return ClimberMechFSMState.CLIMBING;
+				} else {
+					return ClimberMechFSMState.IDLE_STOP;
+				}
+			case HOOKS_UP:
+				if (!input.synchClimberTrigger() && input.isHooksUpButtonPressed()) {
+					return ClimberMechFSMState.HOOKS_UP;
 				} else {
 					return ClimberMechFSMState.IDLE_STOP;
 				}
@@ -157,15 +163,27 @@ public class ClimberMechFSMLeft {
 		motor.set(0);
 	}
 	/**
-	 * Handle behavior in RETRACTING state.
+	 * Handle behavior in CLIMBING state.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-	private void handleRetractingState(TeleopInput input) {
-		motor.set(-MOTOR_RUN_POWER);
+	private void handleClimbingState(TeleopInput input) {
+		if (motor.getEncoder().getPosition() <= CLIMB_ENCODER_POSITION) {
+			motor.set(SYNCH_MOTOR_POWER);
+		} else {
+			motor.set(0);
+		}
 	}
-
-	private boolean peakLimitSwitchHit() {
-		return limitPressed;
+	/**
+	 * Handle behavior in HOOKS_UP state.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 */
+	private void handleHooksUpState(TeleopInput input) {
+		if (motor.getEncoder().getPosition() <= PEAK_ENCODER_POSITION) {
+			motor.set(SYNCH_MOTOR_POWER);
+		} else {
+			motor.set(0);
+		}
 	}
 }

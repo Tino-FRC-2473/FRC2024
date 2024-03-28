@@ -1,49 +1,80 @@
 package frc.robot.systems;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.SwerveConstants.AutoConstants;
+
+import java.util.ArrayList;
 
 public class AutoHandlerSystem {
 	/* ======================== Constants ======================== */
 	// Auto FSM state definitions
 	public enum AutoFSMState {
-		LEAVE,
-		DRIVE_TO_SCORE,
-		PICK_UP_1,
-		PICK_UP_2,
-		PICK_UP_3,
-		PICK_UP_4,
-		SHOOTER_STATE,
-		PENDING
+		/* --------------------------- SVR --------------------------- */
+		// LEAVE,
+		// DRIVE_TO_SCORE,
+		// PICK_UP_1,
+		// PICK_UP_2,
+		// PICK_UP_3,
+		// PICK_UP_4,
+		// SHOOTER_STATE,
+		// PENDING,
+		// SHOOTER_STATE_FAST,
+		// RUN_OVER_NOTES
+		/* --------------------------- SVR --------------------------- */
+		DEFAULT,
+		SPEAKER,
+		NOTE1,
+		NOTE2,
+		NOTE3,
+		NOTE4,
+		NOTE5,
+		NOTE6,
+		NOTE7,
+		NOTE8,
+		SHOOT,
+		SHOOT_PRELOADED
 	}
 
-	public enum AutoPath {
-		PATH1, // score and leave
-		PATH2, // score multiple times
-		PATH3 // tbd emergency path
-	}
+	/* --------------------------- SVR --------------------------- */
+	// public enum AutoPath {
+	// 	PATH1, // score and leave
+	// 	PATH2, // score multiple times
+	// 	PATH3, // tbd emergency path
+	// 	PATH4,
+	// 	PATH5
+	// }
+	/* --------------------------- SVR --------------------------- */
 
 	/* ======================== Private variables ======================== */
 	//Contains the sequential list of states in the current auto path that must be executed
-	private AutoFSMState[] currentStateList;
+	private ArrayList<AutoFSMState> currentStateList = new ArrayList<>();
 
 	//The index in the currentStateList where the currentState is at
 	private int currentStateIndex;
 
 	//FSM Systems that the autoHandlerFSM uses
 	private DriveFSMSystem driveSystem;
-	private KitBotShooterFSM shooterFSM;
+	private MBRFSMv2 mechSystem;
 
 	//Predefined auto paths
 
-	private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
-		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.LEAVE};
+	/* --------------------------- SVR --------------------------- */
+	// private static final AutoFSMState[] PATH1 = new AutoFSMState[]{
+	// 	AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.LEAVE};
 
-	private static final AutoFSMState[] PATH2 = new AutoFSMState[]{
-		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_1,
-		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_2,
-		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_3,
-		AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_4};
+	// private static final AutoFSMState[] PATH2 = new AutoFSMState[]{
+	// 	AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_1,
+	// 	AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_2,
+	// 	AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_3,
+	// 	AutoFSMState.DRIVE_TO_SCORE, AutoFSMState.SHOOTER_STATE, AutoFSMState.PICK_UP_4};
 
-	private static final AutoFSMState[] PATH3 = new AutoFSMState[]{AutoFSMState.SHOOTER_STATE};
+	// private static final AutoFSMState[] PATH3 = new AutoFSMState[]{AutoFSMState.DRIVE_TO_SCORE,
+	// 	AutoFSMState.SHOOTER_STATE};
+
+	// private static final AutoFSMState[] PATH4 = new AutoFSMState[]{AutoFSMState.DRIVE_TO_SCORE,
+	// 	AutoFSMState.SHOOTER_STATE_FAST, AutoFSMState.RUN_OVER_NOTES};
+
+	// private static final AutoFSMState[] PATH5 = new AutoFSMState[]{AutoFSMState.RUN_OVER_NOTES};
+	/* --------------------------- SVR --------------------------- */
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -52,9 +83,9 @@ public class AutoHandlerSystem {
 	 * @param fsm1 the first subsystem that the auto handler will call functions on
 	 * @param fsm2 the second subsystem that the auto handler will call functions on
 	 */
-	public AutoHandlerSystem(DriveFSMSystem fsm1, KitBotShooterFSM fsm2) {
+	public AutoHandlerSystem(DriveFSMSystem fsm1, MBRFSMv2 fsm2) {
 		driveSystem = fsm1;
-		shooterFSM = fsm2;
+		mechSystem = fsm2;
 	}
 
 	/* ======================== Public methods ======================== */
@@ -63,7 +94,7 @@ public class AutoHandlerSystem {
 	 * @return Current FSM state
 	 */
 	public AutoFSMState getCurrentState() {
-		return currentStateList[currentStateIndex];
+		return currentStateList.get(currentStateIndex);
 	}
 
 	/**
@@ -75,17 +106,57 @@ public class AutoHandlerSystem {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 * @param path the auto path to be executed
 	 */
-	public void reset(AutoPath path) {
+	public void reset(String path) {
 		driveSystem.resetAutonomus();
-		shooterFSM.reset();
+		mechSystem.reset();
 
-		if (path == AutoPath.PATH1) {
-			currentStateList = PATH1;
-		} else if (path == AutoPath.PATH2) {
-			currentStateList = PATH2;
-		} else if (path == AutoPath.PATH3) {
-			currentStateList = PATH3;
+		/* --------------------------- SVR --------------------------- */
+		// if (path == AutoPath.PATH1) {
+		// 	currentStateList = PATH1;
+		// } else if (path == AutoPath.PATH2) {
+		// 	currentStateList = PATH2;
+		// } else if (path == AutoPath.PATH3) {
+		// 	currentStateList = PATH3;
+		// } else if (path == AutoPath.PATH4) {
+		// 	currentStateList = PATH4;
+		// } else if (path == AutoPath.PATH5) {
+		// 	currentStateList = PATH5;
+		// }
+		// currentStateIndex = 0;
+		/* --------------------------- SVR --------------------------- */
+
+		currentStateList.clear();
+		currentStateList.add(AutoFSMState.SHOOT_PRELOADED);
+		currentStateList.add(AutoFSMState.DEFAULT);
+		if (path.contains("PROT") || path.contains("MISC") || path.contains("MIDF")) {
+			if (!path.contains("PROT")) {
+				currentStateList.add(AutoFSMState.SPEAKER);
+			}
+			String notes = path.substring((int) AutoConstants.N_8 + 1 + 1); // 10
+			for (int i = 0; i < notes.length(); i++) {
+				int id = notes.charAt(i) - '0';
+				if (id == 1) {
+					currentStateList.add(AutoFSMState.NOTE1);
+				} else if (id == 2) {
+					currentStateList.add(AutoFSMState.NOTE2);
+				} else if (id == AutoConstants.N_3) {
+					currentStateList.add(AutoFSMState.NOTE3);
+				} else if (id == AutoConstants.N_4) {
+					currentStateList.add(AutoFSMState.NOTE4);
+				} else if (id == AutoConstants.N_5) {
+					currentStateList.add(AutoFSMState.NOTE5);
+				} else if (id == AutoConstants.N_6) {
+					currentStateList.add(AutoFSMState.NOTE6);
+				} else if (id == AutoConstants.N_7) {
+					currentStateList.add(AutoFSMState.NOTE7);
+				} else if (id == AutoConstants.N_8) {
+					currentStateList.add(AutoFSMState.NOTE8);
+				}
+				currentStateList.add(AutoFSMState.SPEAKER);
+				currentStateList.add(AutoFSMState.SHOOT);
+			}
 		}
+		//add <LEAVE ZONE> Path to currentStateList
 		currentStateIndex = 0;
 	}
 
@@ -93,41 +164,56 @@ public class AutoHandlerSystem {
 	 * This function runs the auto's current state.
 	 */
 	public void update() {
-		if (currentStateIndex >= currentStateList.length) {
+		if (currentStateIndex >= currentStateList.size()) {
 			return;
 		}
 		boolean isCurrentStateFinished;
 		SmartDashboard.putString("In Auto State: ", "" + getCurrentState());
 		switch (getCurrentState()) {
-			case LEAVE:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.LEAVE);
+			case DEFAULT:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.DEFAULT);
 				break;
-			case PICK_UP_1:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.PICK_UP_1);
+			case SPEAKER:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.SPEAKER)
+					& mechSystem.updateAutonomous(AutoFSMState.SPEAKER);
 				break;
-			case DRIVE_TO_SCORE:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.DRIVE_TO_SCORE);
+			case NOTE1:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE1)
+					& mechSystem.updateAutonomous(AutoFSMState.NOTE1);
 				break;
-			case PICK_UP_2:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.PICK_UP_2);
+			case NOTE2:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE2)
+					& mechSystem.updateAutonomous(AutoFSMState.NOTE2);
 				break;
-			case PICK_UP_3:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.PICK_UP_3);
+			case NOTE3:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE3)
+					& mechSystem.updateAutonomous(AutoFSMState.NOTE3);
 				break;
-			case PICK_UP_4:
-				isCurrentStateFinished = driveSystem.updateAutonomous(
-					AutoFSMState.PICK_UP_4);
+			case NOTE4:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE4)
+					& mechSystem.updateAutonomous(AutoFSMState.NOTE4);
 				break;
-			case SHOOTER_STATE:
-				isCurrentStateFinished = shooterFSM.updateAutonomous(AutoFSMState.SHOOTER_STATE);
+			case NOTE5:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE5)
+					& mechSystem.updateAutonomous(AutoFSMState.NOTE5);
 				break;
-			case PENDING:
-				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.PENDING);
+			case NOTE6:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE6)
+					& mechSystem.updateAutonomous(AutoFSMState.NOTE6);
+				break;
+			case NOTE7:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE7)
+					& mechSystem.updateAutonomous(AutoFSMState.NOTE7);
+				break;
+			case NOTE8:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE8)
+					& mechSystem.updateAutonomous(AutoFSMState.NOTE8);
+				break;
+			case SHOOT:
+				isCurrentStateFinished = mechSystem.updateAutonomous(AutoFSMState.SHOOT);
+				break;
+			case SHOOT_PRELOADED:
+				isCurrentStateFinished = mechSystem.updateAutonomous(AutoFSMState.SHOOT_PRELOADED);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());

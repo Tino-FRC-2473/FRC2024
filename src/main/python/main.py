@@ -38,8 +38,8 @@ while True:
         tagDataPub = table.getDoubleArrayTopic("april_tag_data").publish()
         tagDataPub.set(pose_list)
         
-        outputStreamPub = table.getDoubleArrayTopic("output_stream").publish()
-        outputStreamPub.set(annotated_frame.flatten().tolist())
+        # outputStreamPub = table.getDoubleArrayTopic("output_stream").publish()
+        # outputStreamPub.set(annotated_frame.flatten().tolist())
 
         cv2.imshow('result', annotated_frame)
         key = cv2.waitKey(1) & 0xFF

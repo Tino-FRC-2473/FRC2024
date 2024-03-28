@@ -3,15 +3,22 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoMode;
+import edu.wpi.first.util.PixelFormat;
+
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Systems
 import frc.robot.systems.DriveFSMSystem;
-import frc.robot.systems.KitBotShooterFSM;
+import frc.robot.systems.MBRFSMv2;
+import frc.robot.SwerveConstants.AutoConstants;
 import frc.robot.systems.AutoHandlerSystem;
 import frc.robot.systems.ClimberMechFSMLeft;
 import frc.robot.systems.ClimberMechFSMRight;
-import frc.robot.systems.AutoHandlerSystem.AutoPath;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -20,13 +27,14 @@ import frc.robot.systems.AutoHandlerSystem.AutoPath;
 public class Robot extends TimedRobot {
 	private TeleopInput input;
 	// Systems
-	private KitBotShooterFSM shooterFSM;
-	private ClimberMechFSMLeft climberMechLeftFSM;
-	private ClimberMechFSMRight climberMechRightFSM;
 	private DriveFSMSystem driveFSMSystem;
-
+	private MBRFSMv2 mechFSMSystem;
+	private ClimberMechFSMLeft leftChainMech;
+	private ClimberMechFSMRight rightChainMech;
 	private AutoHandlerSystem autoHandler;
 	private AutoPathChooser autoPathChooser;
+
+	private UsbCamera driverCam;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -39,19 +47,36 @@ public class Robot extends TimedRobot {
 		// Instantiate all systems here
 		autoPathChooser = new AutoPathChooser();
 		driveFSMSystem = new DriveFSMSystem();
-		shooterFSM = new KitBotShooterFSM();
-		climberMechLeftFSM = new ClimberMechFSMLeft();
-		climberMechRightFSM = new ClimberMechFSMRight();
-		autoHandler = new AutoHandlerSystem(driveFSMSystem, shooterFSM);
+		mechFSMSystem = new MBRFSMv2();
+		leftChainMech = new ClimberMechFSMLeft();
+		rightChainMech = new ClimberMechFSMRight();
+		autoHandler = new AutoHandlerSystem(driveFSMSystem, mechFSMSystem);
+
+		driverCam = CameraServer.startAutomaticCapture(0);
+		VideoMode videoMode = new VideoMode(PixelFormat.kMJPEG, 256, 144, 60);
+		driverCam.setVideoMode(videoMode);
+		driverCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
 	}
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		AutoPath path = AutoPath.PATH1;
+		String path = "PROT";
 		if (AutoPathChooser.getSelectedPath() != null) {
 			path = AutoPathChooser.getSelectedPath();
 		}
+		String placement = "SWCT";
+		if (AutoPathChooser.getSelectedPlacement() != null) {
+			placement = AutoPathChooser.getSelectedPlacement();
+		}
+		String notes = "";
+		for (int i = 0; i < AutoConstants.N_5; i++) {
+			if (AutoPathChooser.getSelectedNote(i) != 0) {
+				notes += AutoPathChooser.getSelectedNote(i);
+			}
+		}
+		path += "_" + placement + "_" + notes;
+		SmartDashboard.putString("AUTO PATH", path);
 		autoHandler.reset(path);
 	}
 
@@ -64,17 +89,13 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
 		driveFSMSystem.reset();
-		climberMechLeftFSM.reset();
-		climberMechRightFSM.reset();
-		shooterFSM.reset();
+		mechFSMSystem.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		driveFSMSystem.update(input);
-		climberMechLeftFSM.update(input);
-		climberMechRightFSM.update(input);
-		shooterFSM.update(input);
+		mechFSMSystem.update(input);
 	}
 
 	@Override

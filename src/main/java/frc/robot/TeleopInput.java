@@ -48,14 +48,14 @@ public class TeleopInput {
 		return driverController.getLeftX();
 	}
 	/**
-	 * Get Y axis of Left Joystick.
+	 * Get Y axis of Right Joystick.
 	 * @return Axis value
 	 */
 	public double getControllerRightJoystickY() {
 		return driverController.getRightY();
 	}
 	/**
-	 * Get Y axis of Left Joystick.
+	 * Get X axis of Right Joystick.
 	 * @return Axis value
 	 */
 	public double getControllerRightJoystickX() {
@@ -90,7 +90,7 @@ public class TeleopInput {
 		return driverController.getTriangleButtonPressed();
 	}
 	/**
-	 * Get the value of the Circle button.
+	 * Get the value of the Triangle button.
 	 * @return True if button is released
 	 */
 	public boolean isTriangleButtonReleased() {
@@ -112,36 +112,59 @@ public class TeleopInput {
 	}
 
 	/* ------------------------ Mech Controller ------------------------ */
+		/**
+	 * Get the value of the Triangle Button.
+	 * @return if Triangle Button is pressed
+	 */
+	public boolean isShootButtonPressed() {
+		return mechController.getTriangleButton();
+	}
+
 	/**
-	 * Get the value of the intake button.
-	 * @return True if button is pressed
+	 * Get the value of the Circle Button.
+	 * @return if Circle Button is pressed
 	 */
 	public boolean isIntakeButtonPressed() {
 		return mechController.getCircleButton();
 	}
 
 	/**
-	 * Get the value of the shoot button.
-	 * @return True if button is pressed
+	 * Get the value of the L1 Button.
+	 * @return if L1 Button is pressed
 	 */
-	public boolean isShootButtonPressed() {
-		return mechController.getR2Button();
+	public boolean isRevButtonPressed() {
+		return mechController.getL1Button();
 	}
 
 	/**
-	 * Get the value of the rev button for the shooter.
-	 * @return True if button is pressed
+	 * Get the value of the Share Button.
+	 * @return if Share Button is pressed
 	 */
-	public boolean isRevOuttakeButtonPressed() {
-		return mechController.getL2Button();
+	public boolean isAmpButtonPressed() {
+		return mechController.getShareButton();
 	}
 
 	/**
-	 * Get the value of the retract button.
-	 * @return True if button is pressed
+	 * Get the value of the Square Button.
+	 * @return if Square Button is pressed
 	 */
-	public boolean isRetractClimberButtonPressed() {
+	public boolean isShootAmpButtonPressed() {
+		return mechController.getSquareButton();
+	}
+
+	/**
+	 * Get the value of the Cross  button.
+	 * @return if Cross button is pressed
+	 */
+	public boolean synchClimberTrigger() {
 		return mechController.getCrossButton();
 	}
 
+	/**
+	 * Get the value of the Options Button.
+	 * @return if Options Button is pressed
+	 */
+	public boolean isHooksUpButtonPressed() {
+		return mechController.getOptionsButton();
+	}
 }
