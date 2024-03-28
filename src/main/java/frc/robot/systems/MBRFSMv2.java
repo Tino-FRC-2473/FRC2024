@@ -38,14 +38,14 @@ public class MBRFSMv2 {
 	private static final double AUTO_SHOOTING_TIME = 0.5;
 	private static final double AUTO_PRELOAD_SHOOTING_TIME = 1.7;
 
-	private static final float INTAKE_POWER = 0.35f;
+	private static final float INTAKE_POWER = 0.2f; //0.25
 	private static final float AUTO_INTAKE_POWER = 0.85f;
 	private static final float OUTTAKE_POWER = -0.8f;
 	private static final float TELE_HOLDING_POWER = 0.0f;
 	private static final float AUTO_HOLDING_POWER = 0.05f;
 	private static final int AVERAGE_SIZE = 7;
 	private static final float CURRENT_THRESHOLD = 11.0f;
-	private static final int NOTE_FRAMES_MIN = 5;
+	private static final int NOTE_FRAMES_MIN = 1;
 	private double[] currLogs;
 	private int tick = 0;
 	private boolean holding = false;
@@ -62,12 +62,12 @@ public class MBRFSMv2 {
 	private static final double GROUND_ENCODER_ROTATIONS = -1200;
 	private static final double AMP_ENCODER_ROTATIONS = -525;
 	private static final double SHOOTER_ENCODER_ROTATIONS = 0;
-	private static final double INRANGE_VALUE = 15;
+	private static final double INRANGE_VALUE = 10;
 
 	private static final double PROXIMIIY_THRESHOLD = 200;
 	private static final double GREEN_LOW = 0.18;
 	private static final double BLUE_LOW = 0.00;
-	private static final double RED_LOW = 0.58;
+	private static final double RED_LOW = 0.54;
 
 	private static final double GREEN_HIGH = 0.35;
 	private static final double BLUE_HIGH = 0.1;
@@ -135,12 +135,12 @@ public class MBRFSMv2 {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		led.redLight(holding);
+		holding = false;
+		led.greenLight(holding);
 		currentState = MBRFSMState.MOVE_TO_SHOOTER;
 
 		timer.stop();
 		timer.reset();
-		holding = false;
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
 	}
@@ -156,6 +156,17 @@ public class MBRFSMv2 {
 			return;
 		}
 
+		if (input.isManualIntakeButtonPressed()) {
+			intakeMotor.set(0.2);
+		} else {
+			intakeMotor.set(0);
+		}
+
+		if (input.isManualOuttakeButtonPressed()) {
+			intakeMotor.set(-0.2);
+		} else {
+			intakeMotor.set(0);
+		}
 
 		currLogs[tick % AVERAGE_SIZE] = intakeMotor.getSupplyCurrent().getValueAsDouble();
 		tick++;
@@ -182,7 +193,7 @@ public class MBRFSMv2 {
 		SmartDashboard.putNumber("Pivot encoder count", throughBore.getDistance());
 		boolean hasNote = hasNote();
 		SmartDashboard.putBoolean("HASNOTE --- ", hasNote);
-		led.redLight(holding);
+		led.greenLight(holding);
 
 		switch (currentState) {
 			case MOVE_TO_SHOOTER:

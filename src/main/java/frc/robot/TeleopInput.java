@@ -167,4 +167,12 @@ public class TeleopInput {
 	public boolean isHooksUpButtonPressed() {
 		return mechController.getOptionsButton();
 	}
+
+	public boolean isManualIntakeButtonPressed() {
+		return mechController.getL2Button();
+	}
+
+	public boolean isManualOuttakeButtonPressed() {
+		return mechController.getR2Button();
+	}
 }

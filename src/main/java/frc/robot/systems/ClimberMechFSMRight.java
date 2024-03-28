@@ -98,8 +98,8 @@ public class ClimberMechFSMRight {
 		SmartDashboard.putString("Right Climber State", currentState.toString());
 
 		currentState = nextState(input);
-		SmartDashboard.putNumber("right output", motor.getAppliedOutput());
-		SmartDashboard.putNumber("right motor applied", motor.get());
+		// SmartDashboard.putNumber("right output", motor.getAppliedOutput());
+		// SmartDashboard.putNumber("right motor applied", motor.get());
 		SmartDashboard.putNumber("right encoder position", motor.getEncoder().getPosition());
 
 	}

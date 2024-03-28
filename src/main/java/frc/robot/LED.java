@@ -82,6 +82,27 @@ public class LED {
 	}
 
 	/**
+	 * Changes LED color to green.
+	 */
+	public void greenLight(boolean flash) {
+		for (var i = 0; i < ledBuffer.getLength(); i++) {
+			if (flash) {
+				ledBuffer.setRGB(i, flashingOn ? GREEN_RGB_R : 0, flashingOn
+					? GREEN_RGB_G : 0, flashingOn ? GREEN_RGB_B : 0);
+			} else {
+				ledBuffer.setRGB(i, GREEN_RGB_R, GREEN_RGB_G, GREEN_RGB_B);
+			}
+		}
+		led.setData(ledBuffer);
+		if (flash) {
+			tick++;
+			if (tick % FLASH_INTERVAL == 0) {
+				flashingOn = !flashingOn;
+			}
+		}
+	}
+
+	/**
 	 * Changes the LED color to orange.
 	 * @param flash if you want the LEDs to flash with this color.
 	 */
