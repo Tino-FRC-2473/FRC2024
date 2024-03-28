@@ -6,6 +6,8 @@ package frc.robot;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
 import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoMode;
+import edu.wpi.first.util.PixelFormat;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -15,7 +17,8 @@ import frc.robot.systems.DriveFSMSystem;
 import frc.robot.systems.MBRFSMv2;
 import frc.robot.SwerveConstants.AutoConstants;
 import frc.robot.systems.AutoHandlerSystem;
-
+import frc.robot.systems.ClimberMechFSMLeft;
+import frc.robot.systems.ClimberMechFSMRight;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -26,6 +29,8 @@ public class Robot extends TimedRobot {
 	// Systems
 	private DriveFSMSystem driveFSMSystem;
 	private MBRFSMv2 mechFSMSystem;
+	private ClimberMechFSMLeft leftChainMech;
+	private ClimberMechFSMRight rightChainMech;
 	private AutoHandlerSystem autoHandler;
 	private AutoPathChooser autoPathChooser;
 
@@ -43,9 +48,13 @@ public class Robot extends TimedRobot {
 		autoPathChooser = new AutoPathChooser();
 		driveFSMSystem = new DriveFSMSystem();
 		mechFSMSystem = new MBRFSMv2();
+		leftChainMech = new ClimberMechFSMLeft();
+		rightChainMech = new ClimberMechFSMRight();
 		autoHandler = new AutoHandlerSystem(driveFSMSystem, mechFSMSystem);
 
 		driverCam = CameraServer.startAutomaticCapture(0);
+		VideoMode videoMode = new VideoMode(PixelFormat.kMJPEG, 256, 144, 60);
+		driverCam.setVideoMode(videoMode);
 		driverCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
 	}
 
