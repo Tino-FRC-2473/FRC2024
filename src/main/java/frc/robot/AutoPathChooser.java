@@ -39,8 +39,8 @@ public class AutoPathChooser {
 		placementChooser.setDefaultOption("Subwoofer Center", "SWCT");
 		placementChooser.addOption("Subwoofer Source", "SWSR");
 		placementChooser.addOption("Subwoofer Amp", "SWAM");
-		placementChooser.addOption("Source", "BYSR");
-		placementChooser.addOption("Amp", "BYAM");
+		// placementChooser.addOption("Source", "BYSR");
+		// placementChooser.addOption("Amp", "BYAM");
 		SmartDashboard.putData("Starting Position", placementChooser);
 
 		noteChoosers = new ArrayList<>();

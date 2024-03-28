@@ -323,12 +323,19 @@ public class DriveFSMSystem {
 						def.add(new Pose2d(-AutoConstants.N_7, multiplier, new Rotation2d(0)));
 					}
 				} else if (path.equals("SAFE")) {
-					if (placement.equals("SWCT")) {
-						def.add(new Pose2d(0, 2 + AutoConstants.N_0_25, new Rotation2d(0)));
-						def.add(new Pose2d(-AutoConstants.N_5, 2 + AutoConstants.N_0_25,
+					if (placement.equals("SWCT") || placement.equals("SWAM")
+						|| placement.equals("BYAM")) {
+						def.add(new Pose2d(0, (2 + AutoConstants.N_0_25) * multiplier,
 							new Rotation2d(0)));
-						def.add(new Pose2d(-AutoConstants.N_6_5, 2, new Rotation2d(0)));
+						def.add(new Pose2d(-AutoConstants.N_5, (2 + AutoConstants.N_0_25)
+							* multiplier, new Rotation2d(0)));
+						def.add(new Pose2d(-AutoConstants.N_6_5, 2 * multiplier,
+							new Rotation2d(0)));
 					}
+				} else if (path.equals("AUTO")) {
+					// if (placement.equals("SWSR")) {
+
+					// } else if (placement.equals(def))
 				}
 				return driveAlongPath(def);
 			case SPEAKER:
