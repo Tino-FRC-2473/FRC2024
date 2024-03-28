@@ -45,7 +45,7 @@ public class MBRFSMv2 {
 	private static final float AUTO_HOLDING_POWER = 0.05f;
 	private static final int AVERAGE_SIZE = 7;
 	private static final float CURRENT_THRESHOLD = 11.0f;
-	private static final int NOTE_FRAMES_MIN = 1;
+	private static final int NOTE_FRAMES_MIN = 8;
 	private double[] currLogs;
 	private int tick = 0;
 	private boolean holding = false;
@@ -62,7 +62,7 @@ public class MBRFSMv2 {
 	private static final double GROUND_ENCODER_ROTATIONS = -1200;
 	private static final double AMP_ENCODER_ROTATIONS = -525;
 	private static final double SHOOTER_ENCODER_ROTATIONS = 0;
-	private static final double INRANGE_VALUE = 10;
+	private static final double INRANGE_VALUE = 20;
 
 	private static final double PROXIMIIY_THRESHOLD = 200;
 	private static final double GREEN_LOW = 0.18;
@@ -346,7 +346,9 @@ public class MBRFSMv2 {
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
-		intakeMotor.set(holding ? TELE_HOLDING_POWER : 0);
+		if (!input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
+			intakeMotor.set(holding ? TELE_HOLDING_POWER : 0);
+		}
 	}
 
 	/**
@@ -358,7 +360,9 @@ public class MBRFSMv2 {
 		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
-		intakeMotor.set(0);
+		if (!input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
+			intakeMotor.set(0);
+		}
 	}
 
 	/**
@@ -370,10 +374,12 @@ public class MBRFSMv2 {
 		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
-		if (!holding) {
-			intakeMotor.set(INTAKE_POWER);
-		} else {
-			intakeMotor.set(0);
+		if (!input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
+			if (!holding) {
+				intakeMotor.set(INTAKE_POWER);
+			} else {
+				intakeMotor.set(0);
+			}
 		}
 	}
 
