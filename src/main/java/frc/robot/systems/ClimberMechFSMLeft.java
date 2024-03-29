@@ -20,9 +20,10 @@ public class ClimberMechFSMLeft {
 		HOOKS_UP
 	}
 
-	private static final float SYNCH_MOTOR_POWER = 0.05f; //0.25
-	private static final float PEAK_ENCODER_POSITION = 3000f;
-	private static final float CLIMB_ENCODER_POSITION = 4000f;
+	private static final float SYNCH_MOTOR_POWER = 0.5f; //0.25
+	private static final float UP_MOTOR_POWER = 0.25f;
+	private static final float PEAK_ENCODER_POSITION = 11.00f;
+	private static final float CLIMB_ENCODER_POSITION = 35.57f;
 
 
 	/* ======================== Private variables ======================== */
@@ -181,7 +182,7 @@ public class ClimberMechFSMLeft {
 	 */
 	private void handleHooksUpState(TeleopInput input) {
 		if (motor.getEncoder().getPosition() <= PEAK_ENCODER_POSITION) {
-			motor.set(SYNCH_MOTOR_POWER);
+			motor.set(UP_MOTOR_POWER);
 		} else {
 			motor.set(0);
 		}
