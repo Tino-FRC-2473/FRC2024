@@ -48,8 +48,8 @@ public class Robot extends TimedRobot {
 		autoPathChooser = new AutoPathChooser();
 		driveFSMSystem = new DriveFSMSystem();
 		mechFSMSystem = new MBRFSMv2();
-		//leftChainMech = new ClimberMechFSMLeft();
-		//rightChainMech = new ClimberMechFSMRight();
+		leftChainMech = new ClimberMechFSMLeft();
+		rightChainMech = new ClimberMechFSMRight();
 		autoHandler = new AutoHandlerSystem(driveFSMSystem, mechFSMSystem);
 
 		driverCam = CameraServer.startAutomaticCapture(0);
