@@ -25,7 +25,7 @@ while True:
         noteD = table.getDoubleTopic("note_distance").publish()
 
         frame = input.getFrame()
-        results = d.detectGameElement(np.asarray(frame)[:,0:], ["RING"])
+        results = d.detectGameElement(np.asarray(frame)[60:150,40:-40], ["RING"])
 
         if results is not None:
             for type, target in results.items():
