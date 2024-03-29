@@ -179,6 +179,7 @@ public class DriveFSMSystem {
 		// led.turnOff();
 		currentState = FSMState.TELEOP_STATE;
 		gyro.reset();
+		gyro.setAngleAdjustment(0);
 		resetOdometry(new Pose2d());
 		if (AutoPathChooser.getAllianceChooser() != null) {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
@@ -199,7 +200,7 @@ public class DriveFSMSystem {
 					VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null, null,
 					-VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
 					-VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null, null, null, null, null,
-					null};
+					null};	
 		}
 		lockedSourceId = -1;
 		lockedSpeakerId = -1;

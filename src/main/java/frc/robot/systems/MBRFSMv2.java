@@ -33,25 +33,24 @@ public class MBRFSMv2 {
 	}
 
 	private static final float SHOOTING_POWER = 0.8f;
-	private static final float AMP_SHOOTER_POWER = 0.2f;
-	private static final float AMP_OUTTAKE_POWER = -0.4f; // -0.75
+	private static final float AMP_SHOOTER_POWER = 0.1f;
+	private static final float AMP_OUTTAKE_POWER = -0.6f; // -0.75
 	private static final double AUTO_SHOOTING_TIME = 0.5;
 	private static final double AUTO_PRELOAD_SHOOTING_TIME = 1.7;
 
-	private static final float INTAKE_POWER = 0.25f; //0.25
-	private static final float AUTO_INTAKE_POWER = 0.85f;
+	private static final float INTAKE_POWER = 0.4f; //0.25
+	private static final float AUTO_INTAKE_POWER = 0.4f;
 	private static final float OUTTAKE_POWER = -0.8f;
 	private static final float TELE_HOLDING_POWER = 0.0f;
 	private static final float AUTO_HOLDING_POWER = 0.05f;
 	private static final int AVERAGE_SIZE = 7;
 	private static final float CURRENT_THRESHOLD = 11.0f;
-	private static final int NOTE_FRAMES_MIN = 8;
+	private static final int NOTE_FRAMES_MIN = 2;
 	private double[] currLogs;
 	private int tick = 0;
-	private boolean holding = false;
 	private int noteColorFrames = 0;
 
-	private final ColorSensorV3 colorSensor;
+	//private final ColorSensorV3 colorSensor;
 	private static final double MIN_TURN_SPEED = -0.4;
 	private static final double MAX_TURN_SPEED = 0.4;
 	private static final double MIN_TURN_SPEED_AUTO = -0.85;
@@ -79,7 +78,7 @@ public class MBRFSMv2 {
 	private CANSparkMax shooterRightMotor;
 	private TalonFX intakeMotor;
 	private TalonFX pivotMotor;
-	// private LED led = new LED();
+	private LED led = new LED();
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -112,7 +111,7 @@ public class MBRFSMv2 {
 		timer = new Timer();
 		currLogs = new double[AVERAGE_SIZE];
 
-		colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
+		//colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
 
 		// Reset state machine
 		reset();
@@ -135,8 +134,7 @@ public class MBRFSMv2 {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		holding = false;
-		// led.greenLight(holding);
+		led.greenLight(false);
 		currentState = MBRFSMState.MOVE_TO_SHOOTER;
 
 		timer.stop();
@@ -155,7 +153,7 @@ public class MBRFSMv2 {
 		if (input == null) {
 			return;
 		}
-		
+
 		currLogs[tick % AVERAGE_SIZE] = intakeMotor.getSupplyCurrent().getValueAsDouble();
 		tick++;
 
@@ -165,19 +163,8 @@ public class MBRFSMv2 {
 		}
 		avgcone /= AVERAGE_SIZE;
 
-		if (input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
-			intakeMotor.set(0.2);
-		}
-		if (!input.isManualIntakeButtonPressed() && input.isManualOuttakeButtonPressed()) {
-			intakeMotor.set(-0.2);
-		}
-		SmartDashboard.putBoolean("holding", holding);
 		SmartDashboard.putNumber("avg current", avgcone);
-		SmartDashboard.putNumber("Red", colorSensor.getColor().red);
-		SmartDashboard.putNumber("Blue", colorSensor.getColor().blue);
-		SmartDashboard.putNumber("Green", colorSensor.getColor().green);
-		SmartDashboard.putNumber("Proximity", colorSensor.getProximity());
-		SmartDashboard.putString("COLOR RGB", "" + colorSensor.getColor());
+
 		SmartDashboard.putNumber("CurrentNoteFrames", noteColorFrames);
 		SmartDashboard.putString("Current State", getCurrentState().toString());
 		SmartDashboard.putNumber("Intake power", intakeMotor.get());
@@ -185,9 +172,7 @@ public class MBRFSMv2 {
 		SmartDashboard.putNumber("Left shooter power", shooterLeftMotor.get());
 		SmartDashboard.putNumber("Right shooter power", shooterRightMotor.get());
 		SmartDashboard.putNumber("Pivot encoder count", throughBore.getDistance());
-		boolean hasNote = hasNote();
-		SmartDashboard.putBoolean("HASNOTE --- ", hasNote);
-		// led.greenLight(holding);
+
 
 		switch (currentState) {
 			case MOVE_TO_SHOOTER:
@@ -260,7 +245,7 @@ public class MBRFSMv2 {
 		switch (currentState) {
 			case MOVE_TO_SHOOTER:
 				if (input.isIntakeButtonPressed() && !input.isShootButtonPressed()
-					&& !input.isRevButtonPressed() && !holding && !input.isAmpButtonPressed()) {
+					&& !input.isRevButtonPressed()&& !input.isAmpButtonPressed()) {
 					return MBRFSMState.MOVE_TO_GROUND;
 				}
 				if (input.isAmpButtonPressed() && !input.isIntakeButtonPressed()
@@ -291,11 +276,7 @@ public class MBRFSMv2 {
 			case INTAKING:
 				if (input.isIntakeButtonPressed() && !input.isShootButtonPressed()
 					&& !input.isRevButtonPressed() && !input.isAmpButtonPressed()) {
-					if (holding) {
-						return MBRFSMState.MOVE_TO_SHOOTER;
-					} else {
-						return MBRFSMState.INTAKING;
-					}
+					return MBRFSMState.INTAKING;
 				}
 				return MBRFSMState.MOVE_TO_SHOOTER;
 			case SHOOTING:
@@ -336,12 +317,28 @@ public class MBRFSMv2 {
 	 * @param input
 	 */
 	public void handleMoveShooterState(TeleopInput input) {
+		led.greenLight(false);
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
 		if (!input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
-			intakeMotor.set(holding ? TELE_HOLDING_POWER : 0);
+			intakeMotor.set(0);
+		} else if (input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
+			intakeMotor.set(0.2);
+		} else if (input.isManualOuttakeButtonPressed() && !input.isManualIntakeButtonPressed()) {
+			intakeMotor.set(-0.2);
 		}
+		// if (input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
+		// 	intakeMotor.set(0.2);
+		// } else {
+		// 	intakeMotor.set(0);
+		// }
+
+		// if (input.isManualOuttakeButtonPressed() && !input.isManualIntakeButtonPressed()) {
+		// 	intakeMotor.set(-0.2);
+		// } else {
+		// 	intakeMotor.set(0);
+		// }
 	}
 
 	/**
@@ -350,11 +347,17 @@ public class MBRFSMv2 {
 	 *        the robot is in autonomous mode.
 	 */
 	public void handleMoveGroundState(TeleopInput input) {
+		led.greenLight(true);
 		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
+
 		if (!input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
 			intakeMotor.set(0);
+		} else if (input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
+			intakeMotor.set(0.2);
+		} else if (input.isManualOuttakeButtonPressed() && !input.isManualIntakeButtonPressed()) {
+			intakeMotor.set(-0.2);
 		}
 	}
 
@@ -364,15 +367,16 @@ public class MBRFSMv2 {
 	 *        the robot is in autonomous mode.
 	 */
 	public void handleIntakingState(TeleopInput input) {
+		led.greenLight(true);
 		pivotMotor.set(pid(throughBore.getDistance(), GROUND_ENCODER_ROTATIONS));
 		shooterLeftMotor.set(0);
 		shooterRightMotor.set(0);
 		if (!input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
-			if (!holding) {
-				intakeMotor.set(INTAKE_POWER);
-			} else {
-				intakeMotor.set(0);
-			}
+			intakeMotor.set(INTAKE_POWER);
+		} else if (input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
+			intakeMotor.set(0.2);
+		} else if (input.isManualOuttakeButtonPressed() && !input.isManualIntakeButtonPressed()) {
+			intakeMotor.set(-0.2);
 		}
 	}
 
@@ -382,6 +386,7 @@ public class MBRFSMv2 {
 	 *        the robot is in autonomous mode.
 	 */
 	public void handleShootingState(TeleopInput input) {
+		led.greenLight(false);
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		if (input.isRevButtonPressed() && !input.isShootButtonPressed()) {
 			shooterLeftMotor.set(-SHOOTING_POWER);
@@ -401,11 +406,11 @@ public class MBRFSMv2 {
 	 *        the robot is in autonomous mode.
 	 */
 	public void handleMoveAmpState(TeleopInput input) {
+		led.greenLight(false);
 		// shooterLeftMotor.set(0);
 		// shooterRightMotor.set(0);
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
 		// if (input.isShootAmpButtonPressed()) {
-		holding = false;
 		// 	intakeMotor.set(AMP_SHOOT_POWER);
 		// } else {
 		// 	intakeMotor.set(0);
@@ -424,41 +429,6 @@ public class MBRFSMv2 {
 		}
 	}
 
-	/**
-	 * Checks if the intake is holding a note.
-	 * @return if the intake is holding a note
-	 */
-	public boolean hasNote() {
-		// double avgcone = 0;
-		// for (int i = 0; i < AVERAGE_SIZE; i++) {
-		// 	avgcone += currLogs[i];
-		// }
-		// avgcone /= AVERAGE_SIZE;
-		// if (avgcone > CURRENT_THRESHOLD) {
-		// 	//update isCurrentHolding var
-		// }
-		boolean isRed = colorSensor.getColor().red > RED_LOW
-			&& colorSensor.getColor().red < RED_HIGH;
-		boolean isGreen = colorSensor.getColor().green > GREEN_LOW
-			&& colorSensor.getColor().green < GREEN_HIGH;
-		boolean isBlue = colorSensor.getColor().blue > BLUE_LOW
-			&& colorSensor.getColor().blue < BLUE_HIGH;
-		boolean isInRange = colorSensor.getProximity() >= PROXIMIIY_THRESHOLD;
-		SmartDashboard.putBoolean("is red", isRed);
-		SmartDashboard.putBoolean("is green", isGreen);
-		SmartDashboard.putBoolean("is blue", isBlue);
-		SmartDashboard.putBoolean("is close enough", isInRange);
-
-		if (isRed && isGreen && isBlue && isInRange) {
-			noteColorFrames++;
-		} else {
-			noteColorFrames = 0;
-		}
-
-		holding = noteColorFrames >= NOTE_FRAMES_MIN;
-
-		return holding;
-	}
 
 	/**
 	 * Handles the Auto Move to Ground state of the MBR Mech.

@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
 		autoHandler = new AutoHandlerSystem(driveFSMSystem, mechFSMSystem);
 
 		driverCam = CameraServer.startAutomaticCapture(0);
-		VideoMode videoMode = new VideoMode(PixelFormat.kMJPEG, 256, 144, 60);
+		VideoMode videoMode = new VideoMode(PixelFormat.kMJPEG, 256, 144, 20);
 		driverCam.setVideoMode(videoMode);
 		driverCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
 	}
@@ -90,12 +90,16 @@ public class Robot extends TimedRobot {
 		System.out.println("-------- Teleop Init --------");
 		driveFSMSystem.reset();
 		mechFSMSystem.reset();
+		leftChainMech.reset();
+		rightChainMech.reset();
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		driveFSMSystem.update(input);
 		mechFSMSystem.update(input);
+		leftChainMech.update(input);
+		rightChainMech.update(input);
 	}
 
 	@Override
