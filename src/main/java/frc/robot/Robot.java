@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
 		autoHandler = new AutoHandlerSystem(driveFSMSystem, mechFSMSystem);
 
 		driverCam = CameraServer.startAutomaticCapture(0);
-		VideoMode videoMode = new VideoMode(PixelFormat.kMJPEG, 256, 144, 60);
+		VideoMode videoMode = new VideoMode(PixelFormat.kMJPEG, 256, 144, 20);
 		driverCam.setVideoMode(videoMode);
 		driverCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
 	}

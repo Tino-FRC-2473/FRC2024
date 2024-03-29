@@ -48,10 +48,9 @@ public class MBRFSMv2 {
 	private static final int NOTE_FRAMES_MIN = 2;
 	private double[] currLogs;
 	private int tick = 0;
-	private boolean holding = false;
 	private int noteColorFrames = 0;
 
-	private final ColorSensorV3 colorSensor;
+	//private final ColorSensorV3 colorSensor;
 	private static final double MIN_TURN_SPEED = -0.4;
 	private static final double MAX_TURN_SPEED = 0.4;
 	private static final double MIN_TURN_SPEED_AUTO = -0.85;
@@ -112,7 +111,7 @@ public class MBRFSMv2 {
 		timer = new Timer();
 		currLogs = new double[AVERAGE_SIZE];
 
-		colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
+		//colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
 
 		// Reset state machine
 		reset();
@@ -135,7 +134,6 @@ public class MBRFSMv2 {
 	 * Ex. if the robot is enabled, disabled, then reenabled.
 	 */
 	public void reset() {
-		holding = false;
 		led.greenLight(false);
 		currentState = MBRFSMState.MOVE_TO_SHOOTER;
 
@@ -165,13 +163,8 @@ public class MBRFSMv2 {
 		}
 		avgcone /= AVERAGE_SIZE;
 
-		SmartDashboard.putBoolean("holding", holding);
 		SmartDashboard.putNumber("avg current", avgcone);
-		SmartDashboard.putNumber("Red", colorSensor.getColor().red);
-		SmartDashboard.putNumber("Blue", colorSensor.getColor().blue);
-		SmartDashboard.putNumber("Green", colorSensor.getColor().green);
-		SmartDashboard.putNumber("Proximity", colorSensor.getProximity());
-		SmartDashboard.putString("COLOR RGB", "" + colorSensor.getColor());
+
 		SmartDashboard.putNumber("CurrentNoteFrames", noteColorFrames);
 		SmartDashboard.putString("Current State", getCurrentState().toString());
 		SmartDashboard.putNumber("Intake power", intakeMotor.get());
@@ -179,8 +172,7 @@ public class MBRFSMv2 {
 		SmartDashboard.putNumber("Left shooter power", shooterLeftMotor.get());
 		SmartDashboard.putNumber("Right shooter power", shooterRightMotor.get());
 		SmartDashboard.putNumber("Pivot encoder count", throughBore.getDistance());
-		boolean hasNote = hasNote();
-		SmartDashboard.putBoolean("HASNOTE --- ", hasNote);
+
 
 		switch (currentState) {
 			case MOVE_TO_SHOOTER:
@@ -437,41 +429,6 @@ public class MBRFSMv2 {
 		}
 	}
 
-	/**
-	 * Checks if the intake is holding a note.
-	 * @return if the intake is holding a note
-	 */
-	public boolean hasNote() {
-		// double avgcone = 0;
-		// for (int i = 0; i < AVERAGE_SIZE; i++) {
-		// 	avgcone += currLogs[i];
-		// }
-		// avgcone /= AVERAGE_SIZE;
-		// if (avgcone > CURRENT_THRESHOLD) {
-		// 	//update isCurrentHolding var
-		// }
-		boolean isRed = colorSensor.getColor().red > RED_LOW
-			&& colorSensor.getColor().red < RED_HIGH;
-		boolean isGreen = colorSensor.getColor().green > GREEN_LOW
-			&& colorSensor.getColor().green < GREEN_HIGH;
-		boolean isBlue = colorSensor.getColor().blue > BLUE_LOW
-			&& colorSensor.getColor().blue < BLUE_HIGH;
-		boolean isInRange = colorSensor.getProximity() >= PROXIMIIY_THRESHOLD;
-		SmartDashboard.putBoolean("is red", isRed);
-		SmartDashboard.putBoolean("is green", isGreen);
-		SmartDashboard.putBoolean("is blue", isBlue);
-		SmartDashboard.putBoolean("is close enough", isInRange);
-
-		if (isRed && isGreen && isBlue && isInRange) {
-			noteColorFrames++;
-		} else {
-			noteColorFrames = 0;
-		}
-
-		holding = noteColorFrames >= NOTE_FRAMES_MIN;
-
-		return holding;
-	}
 
 	/**
 	 * Handles the Auto Move to Ground state of the MBR Mech.
