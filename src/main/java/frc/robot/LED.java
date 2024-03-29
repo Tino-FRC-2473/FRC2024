@@ -46,7 +46,7 @@ public class LED {
 	private static final int RAINBOW_S = 255;
 	private static final int RAIBOW_V = 128;
 
-	private static final int FLASH_INTERVAL = 25;
+	private static final int FLASH_INTERVAL = 12;
 	/**
 	 * Constructs LED object.
 	 */

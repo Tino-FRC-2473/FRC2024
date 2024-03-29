@@ -38,7 +38,7 @@ public class MBRFSMv2 {
 	private static final double AUTO_SHOOTING_TIME = 0.5;
 	private static final double AUTO_PRELOAD_SHOOTING_TIME = 1.7;
 
-	private static final float INTAKE_POWER = 0.2f; //0.25
+	private static final float INTAKE_POWER = 0.25f; //0.25
 	private static final float AUTO_INTAKE_POWER = 0.85f;
 	private static final float OUTTAKE_POWER = -0.8f;
 	private static final float TELE_HOLDING_POWER = 0.0f;
@@ -79,7 +79,7 @@ public class MBRFSMv2 {
 	private CANSparkMax shooterRightMotor;
 	private TalonFX intakeMotor;
 	private TalonFX pivotMotor;
-	private LED led = new LED();
+	// private LED led = new LED();
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
@@ -136,7 +136,7 @@ public class MBRFSMv2 {
 	 */
 	public void reset() {
 		holding = false;
-		led.greenLight(holding);
+		// led.greenLight(holding);
 		currentState = MBRFSMState.MOVE_TO_SHOOTER;
 
 		timer.stop();
@@ -155,19 +155,7 @@ public class MBRFSMv2 {
 		if (input == null) {
 			return;
 		}
-
-		if (input.isManualIntakeButtonPressed()) {
-			intakeMotor.set(0.2);
-		} else {
-			intakeMotor.set(0);
-		}
-
-		if (input.isManualOuttakeButtonPressed()) {
-			intakeMotor.set(-0.2);
-		} else {
-			intakeMotor.set(0);
-		}
-
+		
 		currLogs[tick % AVERAGE_SIZE] = intakeMotor.getSupplyCurrent().getValueAsDouble();
 		tick++;
 
@@ -177,6 +165,12 @@ public class MBRFSMv2 {
 		}
 		avgcone /= AVERAGE_SIZE;
 
+		if (input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
+			intakeMotor.set(0.2);
+		}
+		if (!input.isManualIntakeButtonPressed() && input.isManualOuttakeButtonPressed()) {
+			intakeMotor.set(-0.2);
+		}
 		SmartDashboard.putBoolean("holding", holding);
 		SmartDashboard.putNumber("avg current", avgcone);
 		SmartDashboard.putNumber("Red", colorSensor.getColor().red);
@@ -193,7 +187,7 @@ public class MBRFSMv2 {
 		SmartDashboard.putNumber("Pivot encoder count", throughBore.getDistance());
 		boolean hasNote = hasNote();
 		SmartDashboard.putBoolean("HASNOTE --- ", hasNote);
-		led.greenLight(holding);
+		// led.greenLight(holding);
 
 		switch (currentState) {
 			case MOVE_TO_SHOOTER:
@@ -278,7 +272,6 @@ public class MBRFSMv2 {
 					&& (input.isShootButtonPressed()
 					|| input.isRevButtonPressed())) {
 					if (inRange(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS)) {
-						holding = false;
 						return MBRFSMState.SHOOTING;
 					} else {
 						return MBRFSMState.MOVE_TO_SHOOTER;
@@ -298,7 +291,7 @@ public class MBRFSMv2 {
 			case INTAKING:
 				if (input.isIntakeButtonPressed() && !input.isShootButtonPressed()
 					&& !input.isRevButtonPressed() && !input.isAmpButtonPressed()) {
-					if (hasNote()) {
+					if (holding) {
 						return MBRFSMState.MOVE_TO_SHOOTER;
 					} else {
 						return MBRFSMState.INTAKING;
