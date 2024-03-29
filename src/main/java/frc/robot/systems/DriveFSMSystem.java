@@ -179,6 +179,7 @@ public class DriveFSMSystem {
 		// led.turnOff();
 		currentState = FSMState.TELEOP_STATE;
 		gyro.reset();
+		gyro.setAngleAdjustment(0);
 		resetOdometry(new Pose2d());
 		if (AutoPathChooser.getAllianceChooser() != null) {
 			blueAlliance = AutoPathChooser.getSelectedAlliance();
