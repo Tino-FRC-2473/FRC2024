@@ -510,7 +510,7 @@ public class DriveFSMSystem {
 					-MathUtil.applyDeadband((input.getControllerRightJoystickX()
 					* ((input.getLeftTrigger() / 2) + DriveConstants.LEFT_TRIGGER_DRIVE_CONSTANT)
 					/ DriveConstants.ANGULAR_SPEED_LIMIT_CONSTANT), OIConstants.DRIVE_DEADBAND),
-					true, true);
+					true, false);
 				if (input.isBackButtonPressed()) {
 					gyro.reset();
 					resetOdometry(new Pose2d(new Translation2d(getPose().getX(), getPose().getY()),

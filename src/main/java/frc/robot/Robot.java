@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
 	private AutoHandlerSystem autoHandler;
 	private AutoPathChooser autoPathChooser;
 
-	private UsbCamera driverCam;
+	// private UsbCamera driverCam;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -52,10 +52,10 @@ public class Robot extends TimedRobot {
 		rightChainMech = new ClimberMechFSMRight();
 		autoHandler = new AutoHandlerSystem(driveFSMSystem, mechFSMSystem);
 
-		driverCam = CameraServer.startAutomaticCapture(0);
-		VideoMode videoMode = new VideoMode(PixelFormat.kMJPEG, 256, 144, 20);
-		driverCam.setVideoMode(videoMode);
-		driverCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+		// driverCam = CameraServer.startAutomaticCapture(0);
+		// VideoMode videoMode = new VideoMode(PixelFormat.kMJPEG, 256, 144, 20);
+		// driverCam.setVideoMode(videoMode);
+		// driverCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
 	}
 
 	@Override
