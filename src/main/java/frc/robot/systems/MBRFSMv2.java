@@ -9,10 +9,6 @@ import com.revrobotics.CANSparkMax;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-//import com.revrobotics.SparkPIDController;
-import edu.wpi.first.wpilibj.I2C;
-import com.revrobotics.ColorSensorV3;
-
 import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 
@@ -50,7 +46,6 @@ public class MBRFSMv2 {
 	private int tick = 0;
 	private int noteColorFrames = 0;
 
-	//private final ColorSensorV3 colorSensor;
 	private static final double MIN_TURN_SPEED = -0.4;
 	private static final double MAX_TURN_SPEED = 0.4;
 	private static final double MIN_TURN_SPEED_AUTO = -0.85;
@@ -245,7 +240,7 @@ public class MBRFSMv2 {
 		switch (currentState) {
 			case MOVE_TO_SHOOTER:
 				if (input.isIntakeButtonPressed() && !input.isShootButtonPressed()
-					&& !input.isRevButtonPressed()&& !input.isAmpButtonPressed()) {
+					&& !input.isRevButtonPressed() && !input.isAmpButtonPressed()) {
 					return MBRFSMState.MOVE_TO_GROUND;
 				}
 				if (input.isAmpButtonPressed() && !input.isIntakeButtonPressed()
@@ -328,17 +323,6 @@ public class MBRFSMv2 {
 		} else if (input.isManualOuttakeButtonPressed() && !input.isManualIntakeButtonPressed()) {
 			intakeMotor.set(-0.2);
 		}
-		// if (input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
-		// 	intakeMotor.set(0.2);
-		// } else {
-		// 	intakeMotor.set(0);
-		// }
-
-		// if (input.isManualOuttakeButtonPressed() && !input.isManualIntakeButtonPressed()) {
-		// 	intakeMotor.set(-0.2);
-		// } else {
-		// 	intakeMotor.set(0);
-		// }
 	}
 
 	/**
