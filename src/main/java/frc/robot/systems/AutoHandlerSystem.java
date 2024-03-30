@@ -31,7 +31,8 @@ public class AutoHandlerSystem {
 		NOTE7,
 		NOTE8,
 		SHOOT,
-		SHOOT_PRELOADED
+		SHOOT_PRELOADED,
+		NOTE2_STOP_FAR
 	}
 
 	/* --------------------------- SVR --------------------------- */
@@ -151,9 +152,13 @@ public class AutoHandlerSystem {
 					currentStateList.add(AutoFSMState.NOTE7);
 				} else if (id == AutoConstants.N_8) {
 					currentStateList.add(AutoFSMState.NOTE8);
+				} else if (id == 9) {
+					currentStateList.add(AutoFSMState.NOTE2_STOP_FAR);
 				}
-				currentStateList.add(AutoFSMState.SPEAKER);
-				currentStateList.add(AutoFSMState.SHOOT);
+				if (id != 9) {
+					currentStateList.add(AutoFSMState.SPEAKER);
+					currentStateList.add(AutoFSMState.SHOOT);
+				}
 			}
 		}
 		//add <LEAVE ZONE> Path to currentStateList
@@ -214,6 +219,9 @@ public class AutoHandlerSystem {
 				break;
 			case SHOOT_PRELOADED:
 				isCurrentStateFinished = mechSystem.updateAutonomous(AutoFSMState.SHOOT_PRELOADED);
+				break;
+			case NOTE2_STOP_FAR:
+				isCurrentStateFinished = driveSystem.updateAutonomous(AutoFSMState.NOTE2_STOP_FAR);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());

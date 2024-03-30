@@ -49,7 +49,7 @@ public class AutoPathChooser {
 			SendableChooser<Integer> noteChooser = new SendableChooser<>();
 			if (noteChooser != null) {
 				noteChooser.setDefaultOption("N/A", 0);
-				for (int j = 1; j <= AutoConstants.N_8; j++) {
+				for (int j = 1; j <= 9; j++) {
 					noteChooser.addOption("Note " + j, j);
 				}
 				SmartDashboard.putData(key[i] + "Note", noteChooser);

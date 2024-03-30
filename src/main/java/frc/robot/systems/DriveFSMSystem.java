@@ -369,6 +369,11 @@ public class DriveFSMSystem {
 				note2.add(new Pose2d(-1 - AutoConstants.N_0_5,
 					0, new Rotation2d(0)));
 				return driveAlongPath(note2);
+			case NOTE2_STOP_FAR:
+				ArrayList<Pose2d> note2stop = new ArrayList<>();
+				note2stop.add(new Pose2d(-1 - AutoConstants.N_0_5 - AutoConstants.N_0_25,
+					0, new Rotation2d(0)));
+				return driveAlongPath(note2stop);
 			case NOTE3:
 				ArrayList<Pose2d> note3 = new ArrayList<>();
 				if (placement.equals("SWAM")) {
