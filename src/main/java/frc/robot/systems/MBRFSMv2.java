@@ -34,8 +34,8 @@ public class MBRFSMv2 {
 	private static final double AUTO_SHOOTING_TIME = 0.5;
 	private static final double AUTO_PRELOAD_SHOOTING_TIME = 1.7;
 
-	private static final float INTAKE_POWER = 0.4f; //0.25
-	private static final float AUTO_INTAKE_POWER = 0.4f;
+	private static final float INTAKE_POWER = 0.3f; //0.4
+	private static final float AUTO_INTAKE_POWER = 0.37f;
 	private static final float OUTTAKE_POWER = -0.8f;
 	private static final float TELE_HOLDING_POWER = 0.0f;
 	private static final float AUTO_HOLDING_POWER = 0.05f;
