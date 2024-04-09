@@ -476,12 +476,12 @@ public class MBRFSMv2 {
 			timer.start();
 		}
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
-		if (timer.get() < 1) {
+		if (timer.get() < 1 + 0.5) {
 			intakeMotor.set(0);
 			shooterLeftMotor.set(-SHOOTING_POWER);
 			shooterRightMotor.set(SHOOTING_POWER);
 			return false;
-		} else if (timer.get() < AUTO_PRELOAD_SHOOTING_TIME) {
+		} else if (timer.get() < AUTO_PRELOAD_SHOOTING_TIME + 0.5) {
 			intakeMotor.set(OUTTAKE_POWER);
 			shooterLeftMotor.set(-SHOOTING_POWER);
 			shooterRightMotor.set(SHOOTING_POWER);

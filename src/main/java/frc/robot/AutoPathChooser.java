@@ -18,8 +18,8 @@ public class AutoPathChooser {
 	 */
 	public AutoPathChooser() {
 		allianceChooser = new SendableChooser<>();
-		allianceChooser.setDefaultOption("Blue", true);
-		allianceChooser.addOption("Red", false);
+		allianceChooser.setDefaultOption("Red", false);
+		allianceChooser.addOption("Blue", true);
 		SmartDashboard.putData("Alliance", allianceChooser);
 
 		cvOptionChooser = new SendableChooser<>();
