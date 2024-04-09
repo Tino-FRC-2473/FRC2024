@@ -61,28 +61,30 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		String path = "PROT";
-		if (AutoPathChooser.getSelectedPath() != null) {
-			path = AutoPathChooser.getSelectedPath();
-		}
-		String placement = "SWCT";
-		if (AutoPathChooser.getSelectedPlacement() != null) {
-			placement = AutoPathChooser.getSelectedPlacement();
-		}
-		String notes = "";
-		for (int i = 0; i < AutoConstants.N_5; i++) {
-			if (AutoPathChooser.getSelectedNote(i) != 0) {
-				notes += AutoPathChooser.getSelectedNote(i);
-			}
-		}
-		path += "_" + placement + "_" + notes;
-		SmartDashboard.putString("AUTO PATH", path);
-		autoHandler.reset(path);
+		// String path = "PROT";
+		// if (AutoPathChooser.getSelectedPath() != null) {
+		// 	path = AutoPathChooser.getSelectedPath();
+		// }
+		// String placement = "SWCT";
+		// if (AutoPathChooser.getSelectedPlacement() != null) {
+		// 	placement = AutoPathChooser.getSelectedPlacement();
+		// }
+		// String notes = "";
+		// for (int i = 0; i < AutoConstants.N_5; i++) {
+		// 	if (AutoPathChooser.getSelectedNote(i) != 0) {
+		// 		notes += AutoPathChooser.getSelectedNote(i);
+		// 	}
+		// }
+		// path += "_" + placement + "_" + notes;
+		// SmartDashboard.putString("AUTO PATH", path);
+		// autoHandler.reset(path);
+		driveFSMSystem.resetAutonomus();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		autoHandler.update();
+		// autoHandler.update();
+		driveFSMSystem.updateAutonomous(null);
 	}
 
 	@Override

@@ -15,10 +15,15 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.Timer;
 
 // Robot Imports
@@ -117,6 +122,12 @@ public class DriveFSMSystem {
 	private boolean isSpeakerPositionAligned;
 	private boolean isSourcePositionAligned;
 	private boolean isUsingCV;
+	HolonomicDriveController controller = new HolonomicDriveController(
+		new PIDController(1, 0, 0), new PIDController(1, 0, 0),
+		new ProfiledPIDController(1, 0, 0,
+			new TrapezoidProfile.Constraints(6.28, 3.14)));
+	Trajectory trajectory = new Trajectory();
+	private double startTime;
 	/* ======================== Constructor ======================== */
 	/**
 	 * Create FSMSystem and initialize to starting state. Also perform any
@@ -222,64 +233,66 @@ public class DriveFSMSystem {
 	 */
 
 	public void resetAutonomus() {
-		// led.turnOff();
-		currentPointInPath = 0;
-		gyro.reset();
-		if (AutoPathChooser.getAllianceChooser() != null) {
-			blueAlliance = AutoPathChooser.getSelectedAlliance();
-			multiplier = (blueAlliance ? -1 : 1);
-		} else {
-			blueAlliance = true;
-			multiplier = -1;
-		}
-		if (AutoPathChooser.getPathChooser() != null) {
-			path = AutoPathChooser.getSelectedPath();
-		} else {
-			path = "PROT";
-		}
-		if (AutoPathChooser.getPlacementChooser() != null) {
-			placement = AutoPathChooser.getSelectedPlacement();
-		} else {
-			placement = "SWCT";
-		}
-		for (int i = 0; i < AutoConstants.N_5; i++) {
-			if (AutoPathChooser.getNoteChooser(i) != null) {
-				notes.add(AutoPathChooser.getSelectedNote(i));
-			}
-		}
-		if (placement.equals("SWSR")) {
-			resetOdometry(new Pose2d(AutoConstants.N_0_5, -1 * multiplier,
-				new Rotation2d(0)));
-			gyro.setAngleAdjustment(Math.toDegrees(-AutoConstants.DEG_55) * multiplier);
-		} else if (placement.equals("SWAM")) {
-			resetOdometry(new Pose2d(AutoConstants.N_0_5, 1 * multiplier,
-				new Rotation2d(0)));
-			gyro.setAngleAdjustment(Math.toDegrees(AutoConstants.DEG_55) * multiplier);
-		} else {
-			resetOdometry(new Pose2d());
-		}
-		if (blueAlliance) {
-			tagOrientationAngles = new Double[]
-				{null, VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
-					VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null,
-					null, null, null, VisionConstants.SPEAKER_TAG_ANGLE_DEGREES,
-					VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null,
-					null, null, null, null, null};
-		} else {
-			tagOrientationAngles = new Double[]
-				{null, null, null, VisionConstants.SPEAKER_TAG_ANGLE_DEGREES,
-					VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null, null,
-					-VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
-					-VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null, null, null, null, null,
-					null};
-		}
-		lockedSourceId = -1;
-		lockedSpeakerId = -1;
-		isSourceAligned = false;
-		isSourcePositionAligned = false;
-		isSpeakerPositionAligned = false;
-		// Call one tick of update to ensure outputs reflect start state
-		update(null);
+		resetOdometry(trajectory.getInitialPose());
+		startTime = Timer.getFPGATimestamp();
+		// // led.turnOff();
+		// currentPointInPath = 0;
+		// gyro.reset();
+		// if (AutoPathChooser.getAllianceChooser() != null) {
+		// 	blueAlliance = AutoPathChooser.getSelectedAlliance();
+		// 	multiplier = (blueAlliance ? -1 : 1);
+		// } else {
+		// 	blueAlliance = true;
+		// 	multiplier = -1;
+		// }
+		// if (AutoPathChooser.getPathChooser() != null) {
+		// 	path = AutoPathChooser.getSelectedPath();
+		// } else {
+		// 	path = "PROT";
+		// }
+		// if (AutoPathChooser.getPlacementChooser() != null) {
+		// 	placement = AutoPathChooser.getSelectedPlacement();
+		// } else {
+		// 	placement = "SWCT";
+		// }
+		// for (int i = 0; i < AutoConstants.N_5; i++) {
+		// 	if (AutoPathChooser.getNoteChooser(i) != null) {
+		// 		notes.add(AutoPathChooser.getSelectedNote(i));
+		// 	}
+		// }
+		// if (placement.equals("SWSR")) {
+		// 	resetOdometry(new Pose2d(AutoConstants.N_0_5, -1 * multiplier,
+		// 		new Rotation2d(0)));
+		// 	gyro.setAngleAdjustment(Math.toDegrees(-AutoConstants.DEG_55) * multiplier);
+		// } else if (placement.equals("SWAM")) {
+		// 	resetOdometry(new Pose2d(AutoConstants.N_0_5, 1 * multiplier,
+		// 		new Rotation2d(0)));
+		// 	gyro.setAngleAdjustment(Math.toDegrees(AutoConstants.DEG_55) * multiplier);
+		// } else {
+		// 	resetOdometry(new Pose2d());
+		// }
+		// if (blueAlliance) {
+		// 	tagOrientationAngles = new Double[]
+		// 		{null, VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
+		// 			VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null,
+		// 			null, null, null, VisionConstants.SPEAKER_TAG_ANGLE_DEGREES,
+		// 			VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null,
+		// 			null, null, null, null, null};
+		// } else {
+		// 	tagOrientationAngles = new Double[]
+		// 		{null, null, null, VisionConstants.SPEAKER_TAG_ANGLE_DEGREES,
+		// 			VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null, null,
+		// 			-VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
+		// 			-VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null, null, null, null, null,
+		// 			null};
+		// }
+		// lockedSourceId = -1;
+		// lockedSpeakerId = -1;
+		// isSourceAligned = false;
+		// isSourcePositionAligned = false;
+		// isSpeakerPositionAligned = false;
+		// // Call one tick of update to ensure outputs reflect start state
+		// update(null);
 	}
 
 	/**
@@ -298,139 +311,152 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("Y Pos", getPose().getY());
 		SmartDashboard.putNumber("Heading", getPose().getRotation().getDegrees());
 		SmartDashboard.putNumber("Gyro Angle", getHeading());
-		switch (autoState) {
-			case DEFAULT:
-				ArrayList<Pose2d> def = new ArrayList<>();
-				if (path.equals("MISC")) {
-					if (placement.equals("SWSR")) {
-						def.add(new Pose2d(-AutoConstants.N_0_5, multiplier, new Rotation2d(0)));
-					} else if (placement.equals("SWAM")) {
-						def.add(new Pose2d(-AutoConstants.N_1_5, 0,
-							new Rotation2d(-AutoConstants.DEG_45 * multiplier)));
-					}
-				} else if (path.equals("MIDF")) {
-					if (placement.equals("SWSR")) {
-						def.add(new Pose2d(-AutoConstants.N_2_5, -AutoConstants.N_2_5 * multiplier,
-							new Rotation2d(0)));
-						def.add(new Pose2d(-AutoConstants.N_7, -AutoConstants.N_3_5 * multiplier,
-							new Rotation2d(AutoConstants.DEG_45 * multiplier)));
-						def.add(new Pose2d(-AutoConstants.N_2_5, -AutoConstants.N_2_5 * multiplier,
-							new Rotation2d(0)));
-					} else if (placement.equals("SWAM")) {
-						def.add(new Pose2d(-AutoConstants.N_1_5,
-							(1 + AutoConstants.N_0_25) * multiplier, new Rotation2d(0)));
-						def.add(new Pose2d(-AutoConstants.N_5_5,
-							(1 + AutoConstants.N_0_25) * multiplier, new Rotation2d(0)));
-						def.add(new Pose2d(-AutoConstants.N_7, multiplier, new Rotation2d(0)));
-					}
-				} else if (path.equals("SAFE")) {
-					if (placement.equals("SWCT") || placement.equals("SWAM")
-						|| placement.equals("BYAM")) {
-						def.add(new Pose2d(0, (2 + AutoConstants.N_0_25) * multiplier,
-							new Rotation2d(0)));
-						def.add(new Pose2d(-AutoConstants.N_5, (2 + AutoConstants.N_0_25)
-							* multiplier, new Rotation2d(0)));
-						def.add(new Pose2d(-AutoConstants.N_6_5, 2 * multiplier,
-							new Rotation2d(0)));
-					}
-				} else if (path.equals("AUTO")) {
-					// if (placement.equals("SWSR")) {
 
-					// } else if (placement.equals(def))
-				}
-				return driveAlongPath(def);
-			case SPEAKER:
-				ArrayList<Pose2d> speaker = new ArrayList<>();
-				if (placement.equals("SWCT")) {
-					speaker.add(new Pose2d(AutoConstants.N_0_10,
-						0, new Rotation2d(0)));
-				} else if (placement.equals("SWSR")) {
-					speaker.add(new Pose2d(AutoConstants.N_0_5,
-						-multiplier, new Rotation2d(AutoConstants.DEG_55 * multiplier)));
-				} else if (placement.equals("SWAM")) {
-					speaker.add(new Pose2d(AutoConstants.N_0_5,
-						multiplier, new Rotation2d(-AutoConstants.DEG_55 * multiplier)));
-				}
-				return driveAlongPath(speaker);
-			case NOTE1:
-				ArrayList<Pose2d> note1 = new ArrayList<>();
-				if (placement.equals("SWSR")) {
-					note1.add(new Pose2d(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10,
-						(-1 - AutoConstants.N_0_5 + AutoConstants.N_0_10) * multiplier,
-						new Rotation2d(0)));
-				} else {
-					note1.add(new Pose2d(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10,
-						(-1 - AutoConstants.N_0_5 + AutoConstants.N_0_05) * multiplier,
-						new Rotation2d(AutoConstants.DEG_40 * multiplier)));
-				}
-				return driveAlongPath(note1);
-			case NOTE2:
-				ArrayList<Pose2d> note2 = new ArrayList<>();
-				note2.add(new Pose2d(-1 - AutoConstants.N_0_5,
-					0, new Rotation2d(0)));
-				return driveAlongPath(note2);
-			case NOTE2_STOP_FAR:
-				ArrayList<Pose2d> note2stop = new ArrayList<>();
-				note2stop.add(new Pose2d(-1 - AutoConstants.N_0_5 - AutoConstants.N_0_25,
-					0, new Rotation2d(0)));
-				return driveAlongPath(note2stop);
-			case NOTE3:
-				ArrayList<Pose2d> note3 = new ArrayList<>();
-				if (placement.equals("SWAM")) {
-					note3.add(new Pose2d(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10,
-						(1 + AutoConstants.N_0_5 - AutoConstants.N_0_10)
-						* multiplier, new Rotation2d(0)));
-				} else {
-					note3.add(new Pose2d(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10,
-						(1 + AutoConstants.N_0_5 - AutoConstants.N_0_05) * multiplier,
-						new Rotation2d(-AutoConstants.DEG_40 * multiplier)));
-				}
-				return driveAlongPath(note3);
-			case NOTE4:
-				ArrayList<Pose2d> note4 = new ArrayList<>();
-				note4.add(new Pose2d(-AutoConstants.N_2,
-					(-AutoConstants.N_4) * multiplier,
-					new Rotation2d(0)));
-				note4.add(new Pose2d(-AutoConstants.N_6_5 - AutoConstants.N_0_25,
-					(-AutoConstants.N_5) * multiplier,
-					new Rotation2d(AutoConstants.DEG_45 * multiplier)));
-				note4.add(new Pose2d(-AutoConstants.N_2,
-					(-AutoConstants.N_4) * multiplier,
-					new Rotation2d(0)));
-				return driveAlongPath(note4);
-			case NOTE5:
-				ArrayList<Pose2d> note5 = new ArrayList<>();
-				note5.add(new Pose2d(-AutoConstants.N_6_5 - AutoConstants.N_0_25,
-					(-AutoConstants.N_3) * multiplier,
-					new Rotation2d(AutoConstants.DEG_30 * multiplier)));
-				return driveAlongPath(note5);
-			case NOTE6:
-				ArrayList<Pose2d> note6 = new ArrayList<>();
-				note6.add(new Pose2d(-AutoConstants.N_6_5 - AutoConstants.N_0_25,
-					(-AutoConstants.N_1_5) * multiplier,
-					new Rotation2d(AutoConstants.DEG_15 * multiplier)));
-				return driveAlongPath(note6);
-			case NOTE7:
-				ArrayList<Pose2d> note7 = new ArrayList<>();
-				note7.add(new Pose2d(-AutoConstants.N_5,
-					multiplier,
-					new Rotation2d(0)));
-				note7.add(new Pose2d(-AutoConstants.N_6_5 - AutoConstants.N_0_25,
-					(AutoConstants.N_0_25) * multiplier,
-					new Rotation2d(AutoConstants.DEG_15 * multiplier)));
-				note7.add(new Pose2d(-AutoConstants.N_5,
-					multiplier,
-					new Rotation2d(0)));
-				return driveAlongPath(note7);
-			case NOTE8:
-				ArrayList<Pose2d> note8 = new ArrayList<>();
-				note8.add(new Pose2d(-AutoConstants.N_6_5 - AutoConstants.N_0_25,
-					(AutoConstants.N_1_5 + AutoConstants.N_0_25) * multiplier,
-					new Rotation2d(-AutoConstants.DEG_20 * multiplier)));
-				return driveAlongPath(note8);
-			default:
-				return false;
-		}
+		Trajectory.State goal = trajectory.sample(Timer.getFPGATimestamp() - startTime);
+		
+		ChassisSpeeds adjustedSpeeds = controller.calculate(
+			getPose(), goal, Rotation2d.fromDegrees(0));
+
+		var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(adjustedSpeeds);
+
+		frontLeft.setDesiredState(swerveModuleStates[0]);
+		frontRight.setDesiredState(swerveModuleStates[1]);
+		rearLeft.setDesiredState(swerveModuleStates[2]);
+		rearRight.setDesiredState(swerveModuleStates[(2 + 1)]);
+		return false;
+		// switch (autoState) {
+		// 	case DEFAULT:
+		// 		ArrayList<Pose2d> def = new ArrayList<>();
+		// 		if (path.equals("MISC")) {
+		// 			if (placement.equals("SWSR")) {
+		// 				def.add(new Pose2d(-AutoConstants.N_0_5, multiplier, new Rotation2d(0)));
+		// 			} else if (placement.equals("SWAM")) {
+		// 				def.add(new Pose2d(-AutoConstants.N_1_5, 0,
+		// 					new Rotation2d(-AutoConstants.DEG_45 * multiplier)));
+		// 			}
+		// 		} else if (path.equals("MIDF")) {
+		// 			if (placement.equals("SWSR")) {
+		// 				def.add(new Pose2d(-AutoConstants.N_2_5, -AutoConstants.N_2_5 * multiplier,
+		// 					new Rotation2d(0)));
+		// 				def.add(new Pose2d(-AutoConstants.N_7, -AutoConstants.N_3_5 * multiplier,
+		// 					new Rotation2d(AutoConstants.DEG_45 * multiplier)));
+		// 				def.add(new Pose2d(-AutoConstants.N_2_5, -AutoConstants.N_2_5 * multiplier,
+		// 					new Rotation2d(0)));
+		// 			} else if (placement.equals("SWAM")) {
+		// 				def.add(new Pose2d(-AutoConstants.N_1_5,
+		// 					(1 + AutoConstants.N_0_25) * multiplier, new Rotation2d(0)));
+		// 				def.add(new Pose2d(-AutoConstants.N_5_5,
+		// 					(1 + AutoConstants.N_0_25) * multiplier, new Rotation2d(0)));
+		// 				def.add(new Pose2d(-AutoConstants.N_7, multiplier, new Rotation2d(0)));
+		// 			}
+		// 		} else if (path.equals("SAFE")) {
+		// 			if (placement.equals("SWCT") || placement.equals("SWAM")
+		// 				|| placement.equals("BYAM")) {
+		// 				def.add(new Pose2d(0, (2 + AutoConstants.N_0_25) * multiplier,
+		// 					new Rotation2d(0)));
+		// 				def.add(new Pose2d(-AutoConstants.N_5, (2 + AutoConstants.N_0_25)
+		// 					* multiplier, new Rotation2d(0)));
+		// 				def.add(new Pose2d(-AutoConstants.N_6_5, 2 * multiplier,
+		// 					new Rotation2d(0)));
+		// 			}
+		// 		} else if (path.equals("AUTO")) {
+		// 			// if (placement.equals("SWSR")) {
+
+		// 			// } else if (placement.equals(def))
+		// 		}
+		// 		return driveAlongPath(def);
+		// 	case SPEAKER:
+		// 		ArrayList<Pose2d> speaker = new ArrayList<>();
+		// 		if (placement.equals("SWCT")) {
+		// 			speaker.add(new Pose2d(AutoConstants.N_0_10,
+		// 				0, new Rotation2d(0)));
+		// 		} else if (placement.equals("SWSR")) {
+		// 			speaker.add(new Pose2d(AutoConstants.N_0_5,
+		// 				-multiplier, new Rotation2d(AutoConstants.DEG_55 * multiplier)));
+		// 		} else if (placement.equals("SWAM")) {
+		// 			speaker.add(new Pose2d(AutoConstants.N_0_5,
+		// 				multiplier, new Rotation2d(-AutoConstants.DEG_55 * multiplier)));
+		// 		}
+		// 		return driveAlongPath(speaker);
+		// 	case NOTE1:
+		// 		ArrayList<Pose2d> note1 = new ArrayList<>();
+		// 		if (placement.equals("SWSR")) {
+		// 			note1.add(new Pose2d(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10,
+		// 				(-1 - AutoConstants.N_0_5 + AutoConstants.N_0_10) * multiplier,
+		// 				new Rotation2d(0)));
+		// 		} else {
+		// 			note1.add(new Pose2d(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10,
+		// 				(-1 - AutoConstants.N_0_5 + AutoConstants.N_0_05) * multiplier,
+		// 				new Rotation2d(AutoConstants.DEG_40 * multiplier)));
+		// 		}
+		// 		return driveAlongPath(note1);
+		// 	case NOTE2:
+		// 		ArrayList<Pose2d> note2 = new ArrayList<>();
+		// 		note2.add(new Pose2d(-1 - AutoConstants.N_0_5,
+		// 			0, new Rotation2d(0)));
+		// 		return driveAlongPath(note2);
+		// 	case NOTE2_STOP_FAR:
+		// 		ArrayList<Pose2d> note2stop = new ArrayList<>();
+		// 		note2stop.add(new Pose2d(-1 - AutoConstants.N_0_5 - AutoConstants.N_0_25,
+		// 			0, new Rotation2d(0)));
+		// 		return driveAlongPath(note2stop);
+		// 	case NOTE3:
+		// 		ArrayList<Pose2d> note3 = new ArrayList<>();
+		// 		if (placement.equals("SWAM")) {
+		// 			note3.add(new Pose2d(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10,
+		// 				(1 + AutoConstants.N_0_5 - AutoConstants.N_0_10)
+		// 				* multiplier, new Rotation2d(0)));
+		// 		} else {
+		// 			note3.add(new Pose2d(-1 - AutoConstants.N_0_25 - AutoConstants.N_0_10,
+		// 				(1 + AutoConstants.N_0_5 - AutoConstants.N_0_05) * multiplier,
+		// 				new Rotation2d(-AutoConstants.DEG_40 * multiplier)));
+		// 		}
+		// 		return driveAlongPath(note3);
+		// 	case NOTE4:
+		// 		ArrayList<Pose2d> note4 = new ArrayList<>();
+		// 		note4.add(new Pose2d(-AutoConstants.N_2,
+		// 			(-AutoConstants.N_4) * multiplier,
+		// 			new Rotation2d(0)));
+		// 		note4.add(new Pose2d(-AutoConstants.N_6_5 - AutoConstants.N_0_25,
+		// 			(-AutoConstants.N_5) * multiplier,
+		// 			new Rotation2d(AutoConstants.DEG_45 * multiplier)));
+		// 		note4.add(new Pose2d(-AutoConstants.N_2,
+		// 			(-AutoConstants.N_4) * multiplier,
+		// 			new Rotation2d(0)));
+		// 		return driveAlongPath(note4);
+		// 	case NOTE5:
+		// 		ArrayList<Pose2d> note5 = new ArrayList<>();
+		// 		note5.add(new Pose2d(-AutoConstants.N_6_5 - AutoConstants.N_0_25,
+		// 			(-AutoConstants.N_3) * multiplier,
+		// 			new Rotation2d(AutoConstants.DEG_30 * multiplier)));
+		// 		return driveAlongPath(note5);
+		// 	case NOTE6:
+		// 		ArrayList<Pose2d> note6 = new ArrayList<>();
+		// 		note6.add(new Pose2d(-AutoConstants.N_6_5 - AutoConstants.N_0_25,
+		// 			(-AutoConstants.N_1_5) * multiplier,
+		// 			new Rotation2d(AutoConstants.DEG_15 * multiplier)));
+		// 		return driveAlongPath(note6);
+		// 	case NOTE7:
+		// 		ArrayList<Pose2d> note7 = new ArrayList<>();
+		// 		note7.add(new Pose2d(-AutoConstants.N_5,
+		// 			multiplier,
+		// 			new Rotation2d(0)));
+		// 		note7.add(new Pose2d(-AutoConstants.N_6_5 - AutoConstants.N_0_25,
+		// 			(AutoConstants.N_0_25) * multiplier,
+		// 			new Rotation2d(AutoConstants.DEG_15 * multiplier)));
+		// 		note7.add(new Pose2d(-AutoConstants.N_5,
+		// 			multiplier,
+		// 			new Rotation2d(0)));
+		// 		return driveAlongPath(note7);
+		// 	case NOTE8:
+		// 		ArrayList<Pose2d> note8 = new ArrayList<>();
+		// 		note8.add(new Pose2d(-AutoConstants.N_6_5 - AutoConstants.N_0_25,
+		// 			(AutoConstants.N_1_5 + AutoConstants.N_0_25) * multiplier,
+		// 			new Rotation2d(-AutoConstants.DEG_20 * multiplier)));
+		// 		return driveAlongPath(note8);
+		// 	default:
+		// 		return false;
+		//}
 	}
 //PROT_SWCT_213
 //PROT_SWSR_38
