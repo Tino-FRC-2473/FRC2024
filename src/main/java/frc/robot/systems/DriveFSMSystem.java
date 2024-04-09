@@ -4,6 +4,7 @@ package frc.robot.systems;
 import com.kauailabs.navx.frc.AHRS;
 import java.util.ArrayList;
 //import com.revrobotics.CANSparkMax;
+import java.util.List;
 
 // WPILib Imports
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -16,7 +17,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -126,7 +130,11 @@ public class DriveFSMSystem {
 		new PIDController(1, 0, 0), new PIDController(1, 0, 0),
 		new ProfiledPIDController(1, 0, 0,
 			new TrapezoidProfile.Constraints(6.28, 3.14)));
-	Trajectory trajectory = new Trajectory();
+	Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
+		new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+		List.of(new Translation2d(1, 1), new Translation2d(1, 1)),
+		new Pose2d(1, 0, Rotation2d.fromDegrees(0)),
+		new TrajectoryConfig(Units.feetToMeters(1.0), Units.feetToMeters(1.0)));
 	private double startTime;
 	/* ======================== Constructor ======================== */
 	/**
@@ -313,7 +321,7 @@ public class DriveFSMSystem {
 		SmartDashboard.putNumber("Gyro Angle", getHeading());
 
 		Trajectory.State goal = trajectory.sample(Timer.getFPGATimestamp() - startTime);
-		
+
 		ChassisSpeeds adjustedSpeeds = controller.calculate(
 			getPose(), goal, Rotation2d.fromDegrees(0));
 
