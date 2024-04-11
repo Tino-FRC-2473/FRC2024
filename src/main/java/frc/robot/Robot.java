@@ -3,22 +3,43 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import java.util.List;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.revrobotics.REVPhysicsSim;
+
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.cscore.VideoMode;
 import edu.wpi.first.util.PixelFormat;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import frc.robot.SwerveConstants.AutoConstants;
+import frc.robot.SwerveConstants.DriveConstants;
+
 // Systems
 import frc.robot.systems.DriveFSMSystem;
-import frc.robot.systems.MBRFSMv2;
-import frc.robot.SwerveConstants.AutoConstants;
-import frc.robot.systems.AutoHandlerSystem;
-import frc.robot.systems.ClimberMechFSMLeft;
-import frc.robot.systems.ClimberMechFSMRight;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -28,13 +49,9 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 	// Systems
 	private DriveFSMSystem driveFSMSystem;
-	private MBRFSMv2 mechFSMSystem;
-	private ClimberMechFSMLeft leftChainMech;
-	private ClimberMechFSMRight rightChainMech;
-	private AutoHandlerSystem autoHandler;
-	private AutoPathChooser autoPathChooser;
-
-	// private UsbCamera driverCam;
+	SendableChooser<Command> autoChooser;
+	Command autonomousCommand;
+	private final Field2d m_field = new Field2d();
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -44,64 +61,51 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		System.out.println("robotInit");
 		input = new TeleopInput();
-		// Instantiate all systems here
-		autoPathChooser = new AutoPathChooser();
 		driveFSMSystem = new DriveFSMSystem();
-		mechFSMSystem = new MBRFSMv2();
-		leftChainMech = new ClimberMechFSMLeft();
-		rightChainMech = new ClimberMechFSMRight();
-		autoHandler = new AutoHandlerSystem(driveFSMSystem, mechFSMSystem);
+		autoChooser = AutoBuilder.buildAutoChooser();
+		SmartDashboard.putData("Auto Chooser", autoChooser);
+		SmartDashboard.putData("Field", m_field);
+		// NamedCommands.registerCommand("autoBalance", swerve.autoBalanceCommand());
+        // NamedCommands.registerCommand("exampleCommand", exampleSubsystem.exampleCommand());
+        // NamedCommands.registerCommand("someOtherCommand", new SomeOtherCommand());
 
-		// driverCam = CameraServer.startAutomaticCapture(0);
-		// VideoMode videoMode = new VideoMode(PixelFormat.kMJPEG, 256, 144, 20);
-		// driverCam.setVideoMode(videoMode);
-		// driverCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+		// Instantiate all systems here
 	}
+
 
 	@Override
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
-		// String path = "PROT";
-		// if (AutoPathChooser.getSelectedPath() != null) {
-		// 	path = AutoPathChooser.getSelectedPath();
-		// }
-		// String placement = "SWCT";
-		// if (AutoPathChooser.getSelectedPlacement() != null) {
-		// 	placement = AutoPathChooser.getSelectedPlacement();
-		// }
-		// String notes = "";
-		// for (int i = 0; i < AutoConstants.N_5; i++) {
-		// 	if (AutoPathChooser.getSelectedNote(i) != 0) {
-		// 		notes += AutoPathChooser.getSelectedNote(i);
-		// 	}
-		// }
-		// path += "_" + placement + "_" + notes;
-		// SmartDashboard.putString("AUTO PATH", path);
-		// autoHandler.reset(path);
 		driveFSMSystem.resetAutonomus();
+		autonomousCommand = getAutonomousCommand();
+		if (autonomousCommand != null) {
+			autonomousCommand.cancel();
+		  }
+		// schedule the autonomous command (example)
+		if (autonomousCommand != null) {
+			autonomousCommand.schedule();
+		}
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		// autoHandler.update();
-		driveFSMSystem.updateAutonomous(null);
+		CommandScheduler.getInstance().run();
+		// driveFSMSystem.updateAutonomous();
+		m_field.setRobotPose(driveFSMSystem.getPose());
 	}
 
 	@Override
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
 		driveFSMSystem.reset();
-		mechFSMSystem.reset();
-		leftChainMech.reset();
-		rightChainMech.reset();
+		if (autonomousCommand != null) {
+			autonomousCommand.cancel();
+		  }
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		driveFSMSystem.update(input);
-		mechFSMSystem.update(input);
-		leftChainMech.update(input);
-		rightChainMech.update(input);
 	}
 
 	@Override
@@ -126,4 +130,8 @@ public class Robot extends TimedRobot {
 	// Do not use robotPeriodic. Use mode specific periodic methods instead.
 	@Override
 	public void robotPeriodic() { }
+
+	public Command getAutonomousCommand() {
+		return autoChooser.getSelected();
+	}
 }

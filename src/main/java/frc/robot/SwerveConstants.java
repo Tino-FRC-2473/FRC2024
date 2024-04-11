@@ -127,6 +127,7 @@ public final class SwerveConstants {
 		//auto paths constants
 		public static final double MAX_SPEED_METERS_PER_SECOND = 0.65; // 0.5 decided
 		public static final double MAX_SPEED_METERS_PER_SECOND_FAST = 0.75; // 0.5 decided
+		public static final double MAX_ACCEL_METERS_PER_SECOND = 0.7;
 
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI / 10;
 		public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI / 2;
