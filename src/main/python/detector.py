@@ -121,3 +121,7 @@ class Detector:
         results = []
 
         return results
+    
+    def detectOrange(self, frame, threshold):
+        return np.where(frame > threshold, 255, frame)
+        
