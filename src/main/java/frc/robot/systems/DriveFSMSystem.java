@@ -88,8 +88,9 @@ public class DriveFSMSystem extends SubsystemBase{
 	 * one-time initialization or configuration of hardware required. Note
 	 * the constructor is called only once when the robot boots.
 	 */
-	public DriveFSMSystem() {gyro = new AHRS(SPI.Port.kMXP);
-	
+	public DriveFSMSystem() {
+		gyro = new AHRS(SPI.Port.kMXP);
+
 		AutoBuilder.configureHolonomic(
 				this::getPose, // Robot pose supplier
 				this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)

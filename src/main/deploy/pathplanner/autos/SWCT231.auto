@@ -20,19 +20,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SWCT3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
             "pathName": "SWCT1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SWCT8"
+            "pathName": "TEMP"
           }
         }
       ]
