@@ -53,6 +53,6 @@ while True:
         print("An exception occurred:", error)
         input.close()
         break
-    print("loop time: ", str(time.time() - p))
+
 
    
