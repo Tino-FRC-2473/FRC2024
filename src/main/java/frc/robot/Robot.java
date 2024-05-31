@@ -38,6 +38,7 @@ import frc.robot.SwerveConstants.DriveConstants;
 
 // Systems
 import frc.robot.systems.DriveFSMSystem;
+import frc.robot.systems.MBRFSMv2;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -49,6 +50,7 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 	// Systems
 	private DriveFSMSystem driveFSMSystem;
+	private MBRFSMv2 mbrfsMv2;
 	SendableChooser<Command> autoChooser;
 	Command autonomousCommand;
 	private final Field2d m_field = new Field2d();
@@ -62,12 +64,13 @@ public class Robot extends TimedRobot {
 		System.out.println("robotInit");
 		input = new TeleopInput();
 		driveFSMSystem = new DriveFSMSystem();
+		mbrfsMv2 = new MBRFSMv2();
 		autoChooser = AutoBuilder.buildAutoChooser();
 		SmartDashboard.putData("Auto Chooser", autoChooser);
 		SmartDashboard.putData("Field", m_field);
 		// NamedCommands.registerCommand("autoBalance", swerve.autoBalanceCommand());
-        // NamedCommands.registerCommand("exampleCommand", exampleSubsystem.exampleCommand());
-        // NamedCommands.registerCommand("someOtherCommand", new SomeOtherCommand());
+		// NamedCommands.registerCommand("exampleCommand", exampleSubsystem.exampleCommand());
+		// NamedCommands.registerCommand("someOtherCommand", new SomeOtherCommand());
 
 		// Instantiate all systems here
 	}
@@ -80,7 +83,7 @@ public class Robot extends TimedRobot {
 		autonomousCommand = getAutonomousCommand();
 		if (autonomousCommand != null) {
 			autonomousCommand.cancel();
-		  }
+		}
 		// schedule the autonomous command (example)
 		if (autonomousCommand != null) {
 			autonomousCommand.schedule();
@@ -98,14 +101,16 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 		System.out.println("-------- Teleop Init --------");
 		driveFSMSystem.reset();
+		mbrfsMv2.reset();
 		if (autonomousCommand != null) {
 			autonomousCommand.cancel();
-		  }
+		}
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		driveFSMSystem.update(input);
+		mbrfsMv2.update(input);
 	}
 
 	@Override
