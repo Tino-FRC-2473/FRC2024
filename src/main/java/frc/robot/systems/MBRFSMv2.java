@@ -3,6 +3,7 @@ package frc.robot.systems;
 // WPILib Imports
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 
 // Third party Hardware Imports
 import com.revrobotics.CANSparkMax;
@@ -86,6 +87,7 @@ public class MBRFSMv2 {
 
 	private Encoder throughBore;
 	private Timer timer;
+	private Color color;
 
 
 
@@ -94,12 +96,12 @@ public class MBRFSMv2 {
 	 * Create PivotFSM and initialize to starting state. Also perform any
 	 * one-time initialization or configuration of hardware required. Note
 	 * the constructor is called only once when the robot boots.
-	 */
+	 */Max.MotorType.kBrushless);
+
+		shooterRightMotor = new CANSparkMax(Hardware
 	public MBRFSMv2() {
 		shooterLeftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LSHOOTER_MOTOR,
-										CANSparkMax.MotorType.kBrushless);
-
-		shooterRightMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_RSHOOTER_MOTOR,
+										CANSparkMap.CAN_ID_SPARK_RSHOOTER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
 		intakeMotor = new TalonFX(HardwareMap.DEVICE_ID_INTAKE_MOTOR);
 		intakeMotor.setNeutralMode(NeutralModeValue.Brake);
@@ -165,13 +167,16 @@ public class MBRFSMv2 {
 		}
 		avgcone /= AVERAGE_SIZE;
 
+		color = colorSensor.getColor();
+
+
 		SmartDashboard.putBoolean("holding", holding);
 		SmartDashboard.putNumber("avg current", avgcone);
-		SmartDashboard.putNumber("Red", colorSensor.getColor().red);
-		SmartDashboard.putNumber("Blue", colorSensor.getColor().blue);
-		SmartDashboard.putNumber("Green", colorSensor.getColor().green);
+		SmartDashboard.putNumber("Red", color.red);
+		SmartDashboard.putNumber("Blue", color.blue);
+		SmartDashboard.putNumber("Green", color.green);
 		SmartDashboard.putNumber("Proximity", colorSensor.getProximity());
-		SmartDashboard.putString("COLOR RGB", "" + colorSensor.getColor());
+		SmartDashboard.putString("COLOR RGB", "" + color);
 		SmartDashboard.putNumber("CurrentNoteFrames", noteColorFrames);
 		SmartDashboard.putString("Current State", getCurrentState().toString());
 		SmartDashboard.putNumber("Intake power", intakeMotor.get());
@@ -450,12 +455,12 @@ public class MBRFSMv2 {
 		// if (avgcone > CURRENT_THRESHOLD) {
 		// 	//update isCurrentHolding var
 		// }
-		boolean isRed = colorSensor.getColor().red > RED_LOW
-			&& colorSensor.getColor().red < RED_HIGH;
-		boolean isGreen = colorSensor.getColor().green > GREEN_LOW
-			&& colorSensor.getColor().green < GREEN_HIGH;
-		boolean isBlue = colorSensor.getColor().blue > BLUE_LOW
-			&& colorSensor.getColor().blue < BLUE_HIGH;
+		boolean isRed = color.red > RED_LOW
+			&& color.red < RED_HIGH;
+		boolean isGreen = color.green > GREEN_LOW
+			&& color.green < GREEN_HIGH;
+		boolean isBlue = color.blue > BLUE_LOW
+			&& color.blue < BLUE_HIGH;
 		boolean isInRange = colorSensor.getProximity() >= PROXIMIIY_THRESHOLD;
 		SmartDashboard.putBoolean("is red", isRed);
 		SmartDashboard.putBoolean("is green", isGreen);
