@@ -39,7 +39,7 @@ public class MBRFSMv2 {
 	private static final double AUTO_SHOOTING_TIME = 0.5;
 	private static final double AUTO_PRELOAD_SHOOTING_TIME = 1.7;
 
-	private static final float INTAKE_POWER = 0.4f; //0.25
+	private static final float INTAKE_POWER = 0.25f; //0.4
 	private static final float AUTO_INTAKE_POWER = 0.4f;
 	private static final float OUTTAKE_POWER = -0.8f;
 	private static final float TELE_HOLDING_POWER = 0.0f;
@@ -53,6 +53,7 @@ public class MBRFSMv2 {
 	private int noteColorFrames = 0;
 
 	private final ColorSensorV3 colorSensor;
+	
 	private static final double MIN_TURN_SPEED = -0.4;
 	private static final double MAX_TURN_SPEED = 0.4;
 	private static final double MIN_TURN_SPEED_AUTO = -0.85;
@@ -96,13 +97,15 @@ public class MBRFSMv2 {
 	 * Create PivotFSM and initialize to starting state. Also perform any
 	 * one-time initialization or configuration of hardware required. Note
 	 * the constructor is called only once when the robot boots.
-	 */Max.MotorType.kBrushless);
+	 */
 
-		shooterRightMotor = new CANSparkMax(Hardware
 	public MBRFSMv2() {
-		shooterLeftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LSHOOTER_MOTOR,
-										CANSparkMap.CAN_ID_SPARK_RSHOOTER_MOTOR,
+		shooterRightMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_RSHOOTER_MOTOR,
 										CANSparkMax.MotorType.kBrushless);
+
+		shooterLeftMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_LSHOOTER_MOTOR,
+										CANSparkMax.MotorType.kBrushless);
+
 		intakeMotor = new TalonFX(HardwareMap.DEVICE_ID_INTAKE_MOTOR);
 		intakeMotor.setNeutralMode(NeutralModeValue.Brake);
 
@@ -258,7 +261,7 @@ public class MBRFSMv2 {
 		switch (currentState) {
 			case MOVE_TO_SHOOTER:
 				if (input.isIntakeButtonPressed() && !input.isShootButtonPressed()
-					&& !input.isRevButtonPressed()&& !input.isAmpButtonPressed()) {
+					&& !input.isRevButtonPressed() && !input.isAmpButtonPressed()) {
 					return MBRFSMState.MOVE_TO_GROUND;
 				}
 				if (input.isAmpButtonPressed() && !input.isIntakeButtonPressed()
