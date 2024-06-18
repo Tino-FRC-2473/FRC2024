@@ -46,14 +46,14 @@ public class MBRFSMv2 {
 	private static final float AUTO_HOLDING_POWER = 0.05f;
 	private static final int AVERAGE_SIZE = 7;
 	private static final float CURRENT_THRESHOLD = 11.0f;
-	private static final int NOTE_FRAMES_MIN = 2;
+	private static final int NOTE_FRAMES_MIN = 3;
 	private double[] currLogs;
 	private int tick = 0;
 	private boolean holding = false;
 	private int noteColorFrames = 0;
 
 	private final ColorSensorV3 colorSensor;
-	
+
 	private static final double MIN_TURN_SPEED = -0.4;
 	private static final double MAX_TURN_SPEED = 0.4;
 	private static final double MIN_TURN_SPEED_AUTO = -0.85;
@@ -291,7 +291,7 @@ public class MBRFSMv2 {
 				return MBRFSMState.MOVE_TO_SHOOTER;
 			case INTAKING:
 				if (input.isIntakeButtonPressed() && !input.isShootButtonPressed()
-					&& !input.isRevButtonPressed() && !input.isAmpButtonPressed()) {
+					&& !input.isRevButtonPressed() && !input.isAmpButtonPressed() && !hasNote()) {
 					return MBRFSMState.INTAKING;
 				}
 				return MBRFSMState.MOVE_TO_SHOOTER;
@@ -340,9 +340,9 @@ public class MBRFSMv2 {
 		if (!input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
 			intakeMotor.set(0);
 		} else if (input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
-			intakeMotor.set(0.2);
+			intakeMotor.set(INTAKE_POWER);
 		} else if (input.isManualOuttakeButtonPressed() && !input.isManualIntakeButtonPressed()) {
-			intakeMotor.set(-0.2);
+			intakeMotor.set(-INTAKE_POWER);
 		}
 		// if (input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
 		// 	intakeMotor.set(0.2);
@@ -371,9 +371,9 @@ public class MBRFSMv2 {
 		if (!input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
 			intakeMotor.set(0);
 		} else if (input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
-			intakeMotor.set(0.2);
+			intakeMotor.set(INTAKE_POWER);
 		} else if (input.isManualOuttakeButtonPressed() && !input.isManualIntakeButtonPressed()) {
-			intakeMotor.set(-0.2);
+			intakeMotor.set(-INTAKE_POWER);
 		}
 	}
 
@@ -390,9 +390,9 @@ public class MBRFSMv2 {
 		if (!input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
 			intakeMotor.set(INTAKE_POWER);
 		} else if (input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
-			intakeMotor.set(0.2);
+			intakeMotor.set(INTAKE_POWER);
 		} else if (input.isManualOuttakeButtonPressed() && !input.isManualIntakeButtonPressed()) {
-			intakeMotor.set(-0.2);
+			intakeMotor.set(-INTAKE_POWER);
 		}
 	}
 
@@ -470,7 +470,7 @@ public class MBRFSMv2 {
 		SmartDashboard.putBoolean("is blue", isBlue);
 		SmartDashboard.putBoolean("is close enough", isInRange);
 
-		if (isRed && isGreen && isBlue && isInRange) {
+		if (isInRange) {
 			noteColorFrames++;
 		} else {
 			noteColorFrames = 0;
