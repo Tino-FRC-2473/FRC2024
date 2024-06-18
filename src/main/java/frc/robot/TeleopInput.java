@@ -31,7 +31,7 @@ public class TeleopInput {
 
 	/* ------------------------ Mech Controller ------------------------ */
 	/**
-	 * Get the value of the intake button.
+	 * Get the value of the button.
 	 * @return True if button is pressed
 	 */
 	public boolean isRunMotorPressed() {
@@ -39,11 +39,19 @@ public class TeleopInput {
 	}
 
 	/**
-	 * Get the value of the retract button.
+	 * Get the value of the button.
 	 * @return True if button is pressed
 	 */
-	public boolean isPlayMusicPressed() {
+	public boolean isFullButtonPressed() {
 		return mechController.getCrossButton();
+	}
+
+	/**
+	 * Get the value of the button.
+	 * @return True is button pressed
+	 */
+	public boolean isHalfButtonPressed() {
+		return mechController.getSquareButton();
 	}
 
 }

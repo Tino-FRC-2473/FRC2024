@@ -2,9 +2,10 @@ package frc.robot.systems;
 
 // WPILib Imports
 
-import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import frc.robot.HardwareMap;
 
 // Third party Hardware Imports
 
@@ -17,10 +18,13 @@ public class KrakenTestFSM {
 	public enum KrakenTestFSMState {
 		IDLE_STOP,
 		RUN_MOTOR,
-		PLAY_MUSIC,
+		RUN_HALF,
+		RUN_FULL
 	}
 
 	private static final float RUN_SPEED = 0.1f;
+	private static final float HALF_SPEED = 0.5f;
+	private static final float FULL_SPEED = 1.0f;
 
 	/* ======================== Private variables ======================== */
 	private KrakenTestFSMState currentState;
@@ -28,7 +32,6 @@ public class KrakenTestFSM {
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private TalonFX testMotor;
-	private Orchestra mOrchestra;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -38,11 +41,8 @@ public class KrakenTestFSM {
 	 */
 	public KrakenTestFSM() {
 		// Perform hardware init
-		testMotor = new TalonFX(1);
+		testMotor = new TalonFX(HardwareMap.KRAKEN_ID);
 		testMotor.setNeutralMode(NeutralModeValue.Brake);
-
-		mOrchestra = new Orchestra("tetris.chrp");
-		mOrchestra.addInstrument(testMotor);
 
 		// Reset state machine
 		reset();
@@ -89,8 +89,11 @@ public class KrakenTestFSM {
 			case RUN_MOTOR:
 				handleRunState(input);
 				break;
-			case PLAY_MUSIC:
-				handleMusicState(input);
+			case RUN_FULL:
+				handleFullSpeed(input);
+				break;
+			case RUN_HALF:
+				handleHalfSpeed(input);
 				break;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
@@ -114,25 +117,52 @@ public class KrakenTestFSM {
 		}
 		switch (currentState) {
 			case IDLE_STOP:
-				if (input.isPlayMusicPressed()) {
-					return KrakenTestFSMState.PLAY_MUSIC;
-				}
 				if (input.isRunMotorPressed()) {
 					return KrakenTestFSMState.RUN_MOTOR;
 				}
+				if (input.isFullButtonPressed()) {
+					return KrakenTestFSMState.RUN_FULL;
+				}
+				if (input.isHalfButtonPressed()) {
+					return KrakenTestFSMState.RUN_HALF;
+				}
 				return KrakenTestFSMState.IDLE_STOP;
+
 			case RUN_MOTOR:
 				if (input.isRunMotorPressed()) {
 					return KrakenTestFSMState.RUN_MOTOR;
-				} else {
-					return KrakenTestFSMState.IDLE_STOP;
 				}
-			case PLAY_MUSIC:
-				if (input.isPlayMusicPressed()) {
-					return KrakenTestFSMState.PLAY_MUSIC;
-				} else {
-					return KrakenTestFSMState.IDLE_STOP;
+				if (input.isFullButtonPressed()) {
+					return KrakenTestFSMState.RUN_FULL;
 				}
+				if (input.isHalfButtonPressed()) {
+					return KrakenTestFSMState.RUN_HALF;
+				}
+				return KrakenTestFSMState.IDLE_STOP;
+
+			case RUN_FULL:
+				if (input.isRunMotorPressed()) {
+					return KrakenTestFSMState.RUN_MOTOR;
+				}
+				if (input.isFullButtonPressed()) {
+					return KrakenTestFSMState.RUN_FULL;
+				}
+				if (input.isHalfButtonPressed()) {
+					return KrakenTestFSMState.RUN_HALF;
+				}
+				return KrakenTestFSMState.IDLE_STOP;
+
+			case RUN_HALF:
+				if (input.isRunMotorPressed()) {
+					return KrakenTestFSMState.RUN_MOTOR;
+				}
+				if (input.isFullButtonPressed()) {
+					return KrakenTestFSMState.RUN_FULL;
+				}
+				if (input.isHalfButtonPressed()) {
+					return KrakenTestFSMState.RUN_HALF;
+				}
+				return KrakenTestFSMState.IDLE_STOP;
 			default:
 				throw new IllegalStateException("Invalid state: " + currentState.toString());
 		}
@@ -146,8 +176,8 @@ public class KrakenTestFSM {
 	 */
 	private void handleIdleState(TeleopInput input) {
 		testMotor.set(0);
-		mOrchestra.stop();
 	}
+
 	/**
 	 * Handle behavior in INTAKING state.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
@@ -158,11 +188,20 @@ public class KrakenTestFSM {
 	}
 
 	/**
-	 * Handle behavior in OUTTAKING_SPEAKER state.
+	 * Handle behavior in INTAKING state.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-	private void handleMusicState(TeleopInput input) {
-		mOrchestra.play();
+	private void handleFullSpeed(TeleopInput input) {
+		testMotor.set(FULL_SPEED);
+	}
+
+	/**
+	 * Handle behavior in INTAKING state.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
+	 */
+	private void handleHalfSpeed(TeleopInput input) {
+		testMotor.set(HALF_SPEED);
 	}
 }
