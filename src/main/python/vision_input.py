@@ -9,7 +9,9 @@ class VisionInput:
     def __init__(self, fov, res: tuple, height, angle):
         self.w = res[0]
         self.h = res[1]
+        # self.cap = cv2.VideoCapture(0)
         self.cap = cv2.VideoCapture(0)
+
         Target.FOV = fov
         Target.RES = res
         Target.CAM_HEIGHT = height
@@ -26,8 +28,13 @@ class VisionInput:
         ret, frame = self.cap.read()
 
         if not ret:
-            print('frame malf')
-        exit
+            print('frame malf foo')
+            exit()
+
+        # from matplotlib import pyplot as plt
+        # plt.figure()
+        # plt.imshow(frame)
+        # plt.show()
 
         fr = cv2.resize(frame, (self.w, self.h), interpolation=cv2.INTER_AREA)
         return fr

@@ -17,6 +17,8 @@ d = Detector()
 input = VisionInput(FOV, RES, CAM_HEIGHT, CAM_ANGLE)
 cnt = 0
 p = 0
+
+
 while True:
     p = time.time()
     try:
