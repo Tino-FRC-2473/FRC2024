@@ -7,6 +7,9 @@ import time
 cap = cv2.VideoCapture(0)
 counter = 0
 
+LOW_THRESHOLD = 110
+HIGH_THRESHOLD = 255
+
 while(True):
 
     ret, frame = cap.read()
@@ -24,7 +27,7 @@ while(True):
     # convert tuple from (height, width, # of channels) to just (height, width)
     frame_single_channel = frame[:,:,0]
 
-    orange_mask = d.detectOrange(frame_single_channel, threshold=100)
+    orange_mask = d.detectOrange(frame_single_channel, LOW_THRESHOLD, HIGH_THRESHOLD)
     contour = d.find_largest_orange_contour(orange_mask)
     #cv2.drawContours(frame, contour, 0, [255, 0, 0], 2)
     if contour is not None and d.contour_is_note(contour):

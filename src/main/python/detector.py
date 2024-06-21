@@ -7,12 +7,8 @@ import time
 
 # define orange hsv values (opencv range is h:0-180, s:0-255, v:0-255)
 # NOTE: BELOW VALS REPRESENT RED ACTUALLY BC I ONLY HAD A RED SPONGE TO USE 
-LOWER_ORANGE_HSV = np.array([3, 80, 80])
-UPPER_ORANGE_HSV = np.array([6, 255, 255])
-
-LOW_THRESHOLD = 110
-HIGH_THRESHOLD = 255
-
+# LOWER_ORANGE_HSV = np.array([3, 80, 80])
+# UPPER_ORANGE_HSV = np.array([6, 255, 255])
 
 # orange hsv values
 # LOWER_ORANGE_HSV = np.array([3, 80, 80])
@@ -28,11 +24,11 @@ class Detector:
     def __init__(self):
         pass
 
-    def detectOrange(self, grayscale_image, threshold):     
+    def detectOrange(self, grayscale_image, low_threshold, high_threshold):     
         """NOTE: to threshold with monochrome image (single-channel, grayscale) to create a binary mask, 
                 can specify a SINGLE scalar value for lower/upper bounds
                 returns: binary image (single-channel, 8-bit)"""
-        return cv2.inRange(grayscale_image, LOW_THRESHOLD, HIGH_THRESHOLD)
+        return cv2.inRange(grayscale_image, low_threshold, high_threshold)
         #return np.where(grayscale_image > threshold, 255, 0).astype(np.uint8)    
     
     def find_largest_orange_contour(self, orange_mask: np.ndarray) -> np.ndarray:
