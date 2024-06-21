@@ -10,8 +10,8 @@ import time
 LOWER_ORANGE_HSV = np.array([3, 80, 80])
 UPPER_ORANGE_HSV = np.array([6, 255, 255])
 
-LOW_THRESHOLD = 90
-HIGH_THRESHOLD = 150
+LOW_THRESHOLD = 110
+HIGH_THRESHOLD = 255
 
 
 # orange hsv values
@@ -28,34 +28,26 @@ class Detector:
     def __init__(self):
         pass
 
-    # TODO purpose of this function?
-    def bgr_to_rgb(self, image):
-        return image[:,:,::-1]
-    
-    def find_largest_orange_contour(self, grayscale_image: np.ndarray) -> np.ndarray:
-        """
-        finds the largest orange contour in an HSV image
-        input: hsv image (np array)
-        output: largest contour (np array)
-        """
-        # threshold the HSV image to filter only orange, creates a binary mask - white 255, black 0
+    def detectOrange(self, grayscale_image, threshold):     
         """NOTE: to threshold with monochrome image (single-channel, grayscale) to create a binary mask, 
                 can specify a SINGLE scalar value for lower/upper bounds
                 returns: binary image (single-channel, 8-bit)"""
-        #mask = cv2.inRange(grayscale_image, LOW_THRESHOLD, HIGH_THRESHOLD)
-        orange_mask = np.where(LOW_THRESHOLD < grayscale_image, 255, 0).astype(np.uint8)
-
-        # displays cv2 video stream 
-        cv2.imshow('after thresholding', orange_mask)
+        return cv2.inRange(grayscale_image, LOW_THRESHOLD, HIGH_THRESHOLD)
+        #return np.where(grayscale_image > threshold, 255, 0).astype(np.uint8)    
+    
+    def find_largest_orange_contour(self, orange_mask: np.ndarray) -> np.ndarray:
+        """
+        finds the largest contour in the mask
+        input: thresholded image (np array)
+        output: largest contour (np array)
+        """
 
         # find contours in the mask:  (* ignore second return value *)
-        # cv2.RETR_EXTERNAL retrieves external contours only
+        # cv2.RETR_EXTERNAL retrieves external contours only (helps w focusing on outer ring)
         # cv2.CHAIN_APPROX_SIMPLE compresses horizontal, vertical, and diagonal segments and leaves only their end points 
         # input has to be binary image (CV_8UC1)
-
         contours, _ = cv2.findContours(orange_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        # returns contour with max area
         # if contours:
         #     # draws everything else it's detecting
         #     for i in range(len(contours)):
@@ -82,7 +74,10 @@ class Detector:
         contour_hull = cv2.convexHull(contour)
 
         # fits an ellipse to the hull, and gets its area
-        ellipse = cv2.fitEllipse(contour_hull)
+        if len(contour_hull) >= 5:
+            ellipse = cv2.fitEllipse(contour_hull)
+        else:
+            print("contour has less than 5 points")
 
         # area formula: pi * semi-major axis * semi-minor axis
         best_fit_ellipse_area = np.pi * (ellipse[1][0] / 2) * (ellipse[1][1] / 2)
@@ -91,6 +86,7 @@ class Detector:
         returns true & indicates that the contour is likely shaped like a note"""
         return cv2.contourArea(contour_hull) / best_fit_ellipse_area > CONTOUR_DISK_THRESHOLD
 
+    # previous detection code..? not sure what this was for
     # def detectGameElement(self, frame, objectsToDetect: list):
 
     #     results = dict(zip(objectsToDetect, [None for i in range(len(objectsToDetect))]))
@@ -119,8 +115,5 @@ class Detector:
     #         results[object] = Target(contours[len(contours) -1], object)
     #         return results
     #     return None
-        
-    
-    def detectOrange(self, frame, threshold):
-        return np.where(frame > threshold, 255, 0).astype(np.uint8)        
+            
         
