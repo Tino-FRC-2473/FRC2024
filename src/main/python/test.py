@@ -7,8 +7,8 @@ import time
 cap = cv2.VideoCapture(0)
 counter = 0
 
-LOW_THRESHOLD = 110
-HIGH_THRESHOLD = 255
+LOW_THRESHOLD = 100
+HIGH_THRESHOLD = 150
 
 while(True):
 
@@ -28,11 +28,13 @@ while(True):
     frame_single_channel = frame[:,:,0]
 
     orange_mask = d.detectOrange(frame_single_channel, LOW_THRESHOLD, HIGH_THRESHOLD)
-    contour = d.find_largest_orange_contour(orange_mask)
+    largest_contour = d.find_largest_orange_contour(orange_mask)
+    if len(largest_contour) >= 5:
+            print("contour has min 5 points")
     #cv2.drawContours(frame, contour, 0, [255, 0, 0], 2)
-    if contour is not None and d.contour_is_note(contour):
-        print("ellipse error being thrown AFTER contour detected")
-        cv2.ellipse(frame, cv2.fitEllipse(contour), (255, 0, 255), 2)
+    if largest_contour is not None and d.contour_is_note(largest_contour):
+        print(d.contour_is_note(largest_contour))
+        cv2.ellipse(orange_mask, cv2.fitEllipse(largest_contour), (255, 0, 255), 2)
 
     # TODO: ALTER THRESHOLD VALS HERE - define orange based on intensity thresholds? (exposure, brightness..)
     cv2.imshow("masked stream", orange_mask)

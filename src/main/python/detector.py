@@ -28,8 +28,8 @@ class Detector:
         """NOTE: to threshold with monochrome image (single-channel, grayscale) to create a binary mask, 
                 can specify a SINGLE scalar value for lower/upper bounds
                 returns: binary image (single-channel, 8-bit)"""
-        return cv2.inRange(grayscale_image, low_threshold, high_threshold)
-        #return np.where(grayscale_image > threshold, 255, 0).astype(np.uint8)    
+        #return cv2.inRange(grayscale_image, low_threshold, high_threshold)
+        return np.where(grayscale_image > low_threshold, 255, 0).astype(np.uint8)    
     
     def find_largest_orange_contour(self, orange_mask: np.ndarray) -> np.ndarray:
         """
@@ -70,11 +70,10 @@ class Detector:
         contour_hull = cv2.convexHull(contour)
 
         # fits an ellipse to the hull, and gets its area
-        if len(contour_hull) >= 5:
-            ellipse = cv2.fitEllipse(contour_hull)
-        else:
-            print("contour has less than 5 points")
+        # if len(contour_hull) >= 5:
+        #     print("contour has min 5 points")
 
+        ellipse = cv2.fitEllipse(contour_hull)
         # area formula: pi * semi-major axis * semi-minor axis
         best_fit_ellipse_area = np.pi * (ellipse[1][0] / 2) * (ellipse[1][1] / 2)
 
