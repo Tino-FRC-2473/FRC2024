@@ -29,7 +29,7 @@ class Detector:
                 can specify a SINGLE scalar value for lower/upper bounds
                 returns: binary image (single-channel, 8-bit)"""
         #return cv2.inRange(grayscale_image, low_threshold, high_threshold)
-        return np.where(grayscale_image > low_threshold, 255, 0).astype(np.uint8)    
+        return np.where(high_threshold > grayscale_image > low_threshold, 255, 0).astype(np.uint8)    
     
     def find_largest_orange_contour(self, orange_mask: np.ndarray) -> np.ndarray:
         """
@@ -62,12 +62,18 @@ class Detector:
         input: contour (np array)
         output: if contour is a ring (boolean)
         """
+        if len(contour) < 5:
+            return False  # Not enough points to fit an ellipse
+        
         # makes sure the contour isn't some random small spec of noise
         if cv2.contourArea(contour) < MINIMUM_CONTOUR_AREA:
             return False
-
+        
         # gets the convex hull: smallest convex polygon that can fit around the contour
         contour_hull = cv2.convexHull(contour)
+        
+        if len(contour_hull) < 5:
+            return False  # Not enough points to fit an ellipse
 
         # fits an ellipse to the hull, and gets its area
         # if len(contour_hull) >= 5:
