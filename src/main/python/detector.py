@@ -29,7 +29,7 @@ class Detector:
                 can specify a SINGLE scalar value for lower/upper bounds
                 returns: binary image (single-channel, 8-bit)"""
         #return cv2.inRange(grayscale_image, low_threshold, high_threshold)
-        return np.where(high_threshold > grayscale_image > low_threshold, 255, 0).astype(np.uint8)    
+        return np.where(grayscale_image > low_threshold, 255, 0).astype(np.uint8)    
     
     def find_largest_orange_contour(self, orange_mask: np.ndarray) -> np.ndarray:
         """
