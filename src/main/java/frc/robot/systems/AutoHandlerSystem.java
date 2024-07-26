@@ -152,10 +152,10 @@ public class AutoHandlerSystem {
 					currentStateList.add(AutoFSMState.NOTE7);
 				} else if (id == AutoConstants.N_8) {
 					currentStateList.add(AutoFSMState.NOTE8);
-				} else if (id == 9) {
+				} else if (id == AutoConstants.N_9) {
 					currentStateList.add(AutoFSMState.NOTE2_STOP_FAR);
 				}
-				if (id != 9) {
+				if (id != AutoConstants.N_9) {
 					currentStateList.add(AutoFSMState.SPEAKER);
 					currentStateList.add(AutoFSMState.SHOOT);
 				}

@@ -32,10 +32,12 @@ public class MBRFSMv2 {
 	private static final float AMP_SHOOTER_POWER = 0.1f;
 	private static final float AMP_OUTTAKE_POWER = -0.6f; // -0.75
 	private static final double AUTO_SHOOTING_TIME = 0.5;
-	private static final double AUTO_PRELOAD_SHOOTING_TIME = 1.7;
+	private static final double AUTO_PRELOAD_REVVING_TIME = 1.5;
+	private static final double AUTO_PRELOAD_SHOOTING_TIME = 2.2;
 
 	private static final float INTAKE_POWER = 0.3f; //0.4
 	private static final float AUTO_INTAKE_POWER = 0.37f;
+	private static final float MANUAL_INTAKE_POWER = 0.2f;
 	private static final float OUTTAKE_POWER = -0.8f;
 	private static final float TELE_HOLDING_POWER = 0.0f;
 	private static final float AUTO_HOLDING_POWER = 0.05f;
@@ -319,9 +321,9 @@ public class MBRFSMv2 {
 		if (!input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
 			intakeMotor.set(0);
 		} else if (input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
-			intakeMotor.set(0.2);
+			intakeMotor.set(MANUAL_INTAKE_POWER);
 		} else if (input.isManualOuttakeButtonPressed() && !input.isManualIntakeButtonPressed()) {
-			intakeMotor.set(-0.2);
+			intakeMotor.set(-MANUAL_INTAKE_POWER);
 		}
 	}
 
@@ -339,9 +341,9 @@ public class MBRFSMv2 {
 		if (!input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
 			intakeMotor.set(0);
 		} else if (input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
-			intakeMotor.set(0.2);
+			intakeMotor.set(MANUAL_INTAKE_POWER);
 		} else if (input.isManualOuttakeButtonPressed() && !input.isManualIntakeButtonPressed()) {
-			intakeMotor.set(-0.2);
+			intakeMotor.set(-MANUAL_INTAKE_POWER);
 		}
 	}
 
@@ -358,9 +360,9 @@ public class MBRFSMv2 {
 		if (!input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
 			intakeMotor.set(INTAKE_POWER);
 		} else if (input.isManualIntakeButtonPressed() && !input.isManualOuttakeButtonPressed()) {
-			intakeMotor.set(0.2);
+			intakeMotor.set(MANUAL_INTAKE_POWER);
 		} else if (input.isManualOuttakeButtonPressed() && !input.isManualIntakeButtonPressed()) {
-			intakeMotor.set(-0.2);
+			intakeMotor.set(-MANUAL_INTAKE_POWER);
 		}
 	}
 
@@ -476,12 +478,12 @@ public class MBRFSMv2 {
 			timer.start();
 		}
 		pivotMotor.set(pid(throughBore.getDistance(), SHOOTER_ENCODER_ROTATIONS));
-		if (timer.get() < 1 + 0.5) {
+		if (timer.get() < AUTO_PRELOAD_REVVING_TIME) {
 			intakeMotor.set(0);
 			shooterLeftMotor.set(-SHOOTING_POWER);
 			shooterRightMotor.set(SHOOTING_POWER);
 			return false;
-		} else if (timer.get() < AUTO_PRELOAD_SHOOTING_TIME + 0.5) {
+		} else if (timer.get() < AUTO_PRELOAD_SHOOTING_TIME) {
 			intakeMotor.set(OUTTAKE_POWER);
 			shooterLeftMotor.set(-SHOOTING_POWER);
 			shooterRightMotor.set(SHOOTING_POWER);

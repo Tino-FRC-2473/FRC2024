@@ -200,7 +200,7 @@ public class DriveFSMSystem {
 					VisionConstants.SPEAKER_TAG_ANGLE_DEGREES, null, null, null, null,
 					-VisionConstants.SOURCE_TAG_ANGLE_DEGREES,
 					-VisionConstants.SOURCE_TAG_ANGLE_DEGREES, null, null, null, null, null,
-					null};	
+					null};
 		}
 		lockedSourceId = -1;
 		lockedSpeakerId = -1;
@@ -333,11 +333,8 @@ public class DriveFSMSystem {
 						def.add(new Pose2d(-AutoConstants.N_6_5, 2 * multiplier,
 							new Rotation2d(0)));
 					}
-				} else if (path.equals("AUTO")) {
-					// if (placement.equals("SWSR")) {
-
-					// } else if (placement.equals(def))
 				}
+
 				return driveAlongPath(def);
 			case SPEAKER:
 				ArrayList<Pose2d> speaker = new ArrayList<>();

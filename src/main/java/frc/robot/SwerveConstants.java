@@ -157,6 +157,7 @@ public final class SwerveConstants {
 		public static final double N_7 = 7;
 		public static final double N_7_5 = 7.5;
 		public static final double N_8 = 8;
+		public static final double N_9 = 9;
 
 		// Angles in radians
 		public static final double DEG_15 = Math.toRadians(15);
