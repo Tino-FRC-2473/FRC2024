@@ -168,10 +168,18 @@ public class TeleopInput {
 		return mechController.getOptionsButton();
 	}
 
+	/**
+	 * Get the value of the L2 Button.
+	 * @return if L2 Button is pressed
+	 */
 	public boolean isManualIntakeButtonPressed() {
 		return mechController.getL2Button();
 	}
 
+	/**
+	 * Get the value of the R2 Button.
+	 * @return if R2 Button is pressed
+	 */
 	public boolean isManualOuttakeButtonPressed() {
 		return mechController.getR2Button();
 	}
