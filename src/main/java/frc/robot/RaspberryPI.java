@@ -14,6 +14,8 @@ public class RaspberryPI {
 	private DoubleSubscriber fpsCounter;
 	private DoubleArraySubscriber tagSubscriber;
 	private double previousValueReceived = 0;
+	private DoubleSubscriber noteY;
+	private DoubleSubscriber noteD;
 	private double previousTimeReceived = 0;
 	private Timer timer = new Timer();
 	public static final int VALUES_PER_TAG = 6;
@@ -24,6 +26,8 @@ public class RaspberryPI {
 		table = NetworkTableInstance.getDefault().getTable("datatable");
 		fpsCounter = table.getDoubleTopic("x").subscribe(-1);
 		tagSubscriber = table.getDoubleArrayTopic("april_tag_data").subscribe(null);
+		noteY = table.getDoubleTopic("note_yaw").subscribe(-1);
+		noteD = table.getDoubleTopic("note_distance").subscribe(-1);
 	}
 
 	/**Updates the values in SmartDashboard. */
@@ -121,4 +125,29 @@ public class RaspberryPI {
 			return VisionConstants.UNABLE_TO_SEE_TAG_CONSTANT;
 		}
 	}
+
+	/**
+	 * @return Distance from the note to camera in meters
+	 * This value is used in tag-relative swerve movements
+	 */
+	public double getNoteDistance() {
+		try {
+			return noteD.get();
+		} catch (NullPointerException e) {
+			return VisionConstants.UNABLE_TO_SEE_NOTE_CONSTANT;
+		}
+	}
+
+	/**
+	 * @return Yaw from the note to camera in radians
+	 * This value is used in tag-relative swerve movements
+	 */
+	public double getNoteYaw() {
+		try {
+			return noteY.get();
+		} catch (NullPointerException e) {
+			return VisionConstants.UNABLE_TO_SEE_NOTE_CONSTANT;
+		}
+	}
+
 }
