@@ -32,7 +32,11 @@ while(True):
 
     #cv2.drawContours(frame, contour, 0, [255, 0, 0], 2)
     if largest_contour is not None and d.contour_is_note(largest_contour):
-        cv2.ellipse(orange_mask, cv2.fitEllipse(largest_contour), (255, 0, 255), 10)
+        x_coord = cv2.fitElipse(largest_contour)[0][0]
+        y_coord = cv2.fitElipse(largest_contour)[0][1]
+        minorAxis = cv2.fitElipse(largest_contour)[1][0]
+        majorAxis = cv2.fitElipse(largest_contour)[1][1]
+        cv2.ellipse(orange_mask, cv2.fitEllipse(largest_contour), (255, 0, 255), 10) # TRY -1
 
     # TODO: ALTER THRESHOLD VALS HERE - define orange based on intensity thresholds? (exposure, brightness..)
     cv2.imshow("masked stream", orange_mask)
