@@ -2,7 +2,6 @@ import cv2
 import math
 import numpy as np
 from target import Target
-import skimage.color
 import time
 
 # define orange hsv values (opencv range is h:0-180, s:0-255, v:0-255)
@@ -55,7 +54,34 @@ class Detector:
         #             cv2.drawContours(orange_mask, [largest_contour], 0, [255, 0, 0], 2)
 
         return max(contours, key=cv2.contourArea)
+
+    def get_ellipse(self, contour: np.ndarray):
+        """
+        checks if the contour is shaped like a note
+        input: contour (np array)
+        output: if contour is a ring (boolean)
+        """
+        if len(contour) < 5:
+            return False  # Not enough points to fit an ellipse
         
+        # makes sure the contour isn't some random small spec of noise
+        if cv2.contourArea(contour) < MINIMUM_CONTOUR_AREA:
+            return False
+        
+        # gets the convex hull: smallest convex polygon that can fit around the contour
+        contour_hull = cv2.convexHull(contour)
+        
+        if len(contour_hull) < 5:
+            return False  # Not enough points to fit an ellipse
+
+        # fits an ellipse to the hull, and gets its area
+        # if len(contour_hull) >= 5:
+        #     print("contour has min 5 points")
+
+        #returns a rotated rectangle in which the ellipse can fit 
+        ellipse = cv2.fitEllipse(contour_hull)
+        return ellipse
+     
     def contour_is_note(self, contour: np.ndarray) -> bool:
         """
         checks if the contour is shaped like a note
@@ -79,13 +105,33 @@ class Detector:
         # if len(contour_hull) >= 5:
         #     print("contour has min 5 points")
 
+        #returns a rotated rectangle in which the ellipse can fit 
         ellipse = cv2.fitEllipse(contour_hull)
+        print("printing ellipse")
+        print(ellipse)
         # area formula: pi * semi-major axis * semi-minor axis
         best_fit_ellipse_area = np.pi * (ellipse[1][0] / 2) * (ellipse[1][1] / 2)
+
 
         """compares area of the hull to area of the best-fit ellipse, if the ratio is greater than a certain threshold, 
         returns true & indicates that the contour is likely shaped like a note"""
         return cv2.contourArea(contour_hull) / best_fit_ellipse_area > CONTOUR_DISK_THRESHOLD
+
+    #((150.0, 200.0), (100.0, 50.0), 30.0)
+    #In this example:
+    #The center of the ellipse is at (150.0, 200.0).
+    #The major axis length is 100.0 and the minor axis length is 50.0.
+    #The ellipse is rotated by 30.0 degrees.
+    def get_yaw_degrees(self, contour):
+        ellipse = self.get_ellipse(contour)
+        center_tag = ellipse[0][0]
+        #print(x)
+        center_cam = Target.RES[0]/2
+        B = center_tag - center_cam
+        A = center_cam
+        theta = math.atan(B * math.tan(math.radians(Target.FOV[0] / 2)) / A)
+        #print(math.degrees(theta))
+        return math.degrees(theta)
 
     # previous detection code..? not sure what this was for
     # def detectGameElement(self, frame, objectsToDetect: list):

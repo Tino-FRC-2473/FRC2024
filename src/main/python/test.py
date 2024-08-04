@@ -5,7 +5,6 @@ import os
 import time
 
 cap = cv2.VideoCapture(0)
-counter = 0
 
 LOW_THRESHOLD = 80
 HIGH_THRESHOLD = 170
@@ -13,14 +12,6 @@ HIGH_THRESHOLD = 170
 while(True):
 
     ret, frame = cap.read()
-    assert ret
-
-    # import matplotlib.pyplot as plt
-    # plt.figure()
-    # # need a 2D array at least for an image
-    # plt.imshow(frame[:,:,0])
-    # #plt.imshow(frame)
-    # plt.show()
 
     d = Detector()
 
@@ -29,6 +20,8 @@ while(True):
 
     orange_mask = d.detectOrange(frame_single_channel, LOW_THRESHOLD, HIGH_THRESHOLD)
     largest_contour = d.find_largest_orange_contour(orange_mask)
+
+    print("yaw degrees" + str(d.get_yaw_degrees(largest_contour)))
 
     #cv2.drawContours(frame, contour, 0, [255, 0, 0], 2)
     if largest_contour is not None and d.contour_is_note(largest_contour):
@@ -42,13 +35,11 @@ while(True):
     cv2.imshow("masked stream", orange_mask)
 
     key = cv2.waitKey(1)
-
-    filename = f"frame_"+ str(counter) + ".jpg"  # Customize filename format if needed
-    counter +=1
-    
     if key == ord('q'):  # Quit if 'q' key is pressed
-
         break
+    
+cap.release()
+cv2.destroyAllWindows()
 
 
 
