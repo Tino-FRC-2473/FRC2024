@@ -12,7 +12,8 @@ HIGH_THRESHOLD = 170
 while(True):
 
     ret, frame = cap.read()
-
+    assert ret 
+    
     d = Detector()
 
     # convert tuple from (height, width, # of channels) to just (height, width)
