@@ -3,6 +3,8 @@ from detector import Detector
 import numpy as np
 import os
 import time
+import math
+from target import Target
 
 cap = cv2.VideoCapture(0)
 
@@ -26,10 +28,13 @@ while(True):
 
     #cv2.drawContours(frame, contour, 0, [255, 0, 0], 2)
     if largest_contour is not None and d.contour_is_note(largest_contour):
-        x_coord = cv2.fitElipse(largest_contour)[0][0]
-        y_coord = cv2.fitElipse(largest_contour)[0][1]
-        minorAxis = cv2.fitElipse(largest_contour)[1][0]
-        majorAxis = cv2.fitElipse(largest_contour)[1][1]
+        target = Target(largest_contour, "RING")
+
+        yaw = target.get_yaw_degrees()
+        dist = target.get_distance_meters()
+        print("yaw: " + yaw)
+        print("distance: " + dist)
+
         cv2.ellipse(orange_mask, cv2.fitEllipse(largest_contour), (255, 0, 255), 10) # TRY -1
 
     # TODO: ALTER THRESHOLD VALS HERE - define orange based on intensity thresholds? (exposure, brightness..)
@@ -41,8 +46,3 @@ while(True):
     
 cap.release()
 cv2.destroyAllWindows()
-
-
-
-
-   
